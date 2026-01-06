@@ -1,0 +1,69 @@
+/* Promo Section Styles */
+.promo-section {
+    padding: 6rem 0;
+    background-color: #F5F5F5;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.promo-heading {
+    text-align: center;
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 4rem;
+}
+
+.promo-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 2rem;
+}
+
+.promo-card {
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.promo-card:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: rgba(62, 39, 35, 0.1);
+}
+
+.promo-icon {
+    display: inline-flex;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 50%;
+    background-color: var(--background);
+    transition: transform 0.3s ease;
+}
+
+.promo-card:hover .promo-icon {
+    transform: rotate(15deg) scale(1.1);
+}
+
+.promo-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+}
+
+.promo-subtitle {
+    font-size: 1rem;
+    color: var(--text-light);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+@media (min-width: 768px) {
+    .promo-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
