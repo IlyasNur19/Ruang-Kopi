@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Music, Clock, Percent } from 'lucide-react';
-import '../styles/PromoSection.css';
 
 const PromoSection = () => {
     const promos = [
@@ -9,38 +8,38 @@ const PromoSection = () => {
             icon: <Music size={40} />,
             title: 'Live Acoustic',
             subtitle: 'Every Friday • 7PM',
-            color: 'var(--accent)',
+            color: 'text-accent',
             delay: 0
         },
         {
             icon: <Percent size={40} />,
             title: 'Discount 20%',
             subtitle: 'Manual Brew • All Day',
-            color: 'var(--primary)',
+            color: 'text-primary',
             delay: 0.2
         },
         {
             icon: <Clock size={40} />,
             title: 'Happy Hour',
             subtitle: '15:00 - 17:00 • Free Cookie',
-            color: 'var(--accent)',
+            color: 'text-accent',
             delay: 0.4
         }
     ];
 
     return (
-        <section className="promo-section">
-            <div className="container">
+        <section className="py-24 bg-secondary/30 border-y border-black/5">
+            <div className="container mx-auto px-4">
                 <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="promo-heading"
+                    className="text-center font-heading text-5xl text-primary mb-16 font-bold"
                 >
                     Promo & Events
                 </motion.h2>
 
-                <div className="promo-grid">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {promos.map((promo, index) => (
                         <motion.div
                             key={index}
@@ -49,13 +48,13 @@ const PromoSection = () => {
                             viewport={{ once: true }}
                             transition={{ duration: 0.5, delay: promo.delay }}
                             whileHover={{ y: -10 }}
-                            className="promo-card"
+                            className="group bg-white p-10 rounded-3xl text-center transition-all border border-black/5 shadow-sm hover:shadow-xl hover:border-primary/10"
                         >
-                            <div className="promo-icon" style={{ color: promo.color }}>
+                            <div className={`inline-flex mb-6 p-4 rounded-full bg-background transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110 ${promo.color}`}>
                                 {promo.icon}
                             </div>
-                            <h3 className="promo-title">{promo.title}</h3>
-                            <p className="promo-subtitle">{promo.subtitle}</p>
+                            <h3 className="font-heading text-2xl mb-2 text-primary font-bold">{promo.title}</h3>
+                            <p className="text-base text-muted-foreground font-medium tracking-wide">{promo.subtitle}</p>
                         </motion.div>
                     ))}
                 </div>

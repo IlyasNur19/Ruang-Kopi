@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Clock } from 'lucide-react';
-import '../styles/Location.css';
 
 const Location = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -18,35 +17,34 @@ const Location = () => {
     }, []);
 
     return (
-        <section id="location" className="location-section">
-            <div className="container">
-                <div className="location-content">
+        <section id="location" className="py-32 bg-secondary/30">
+            <div className="container mx-auto px-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                     <motion.div
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="location-info"
                     >
-                        <h2 className="location-title">Kunjungi Kami</h2>
-                        <p className="location-desc">
+                        <h2 className="font-heading text-5xl text-primary mb-6 font-bold">Kunjungi Kami</h2>
+                        <p className="text-muted-foreground mb-12 text-lg">
                             Nikmati suasana tenang dan kopi terbaik di lokasi kami yang strategis.
                         </p>
 
-                        <div className="info-item">
-                            <div className="icon-box"><MapPin size={24} /></div>
+                        <div className="flex gap-6 mb-8">
+                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm"><MapPin size={24} /></div>
                             <div>
-                                <h4 className="info-label">Alamat</h4>
-                                <p className="info-text">Jl. Kopi No. 123, Jakarta Selatan</p>
+                                <h4 className="text-sm uppercase tracking-wider text-muted-foreground mb-1">Alamat</h4>
+                                <p className="text-xl font-medium text-primary">Jl. Kopi No. 123, Jakarta Selatan</p>
                             </div>
                         </div>
 
-                        <div className="info-item">
-                            <div className="icon-box"><Clock size={24} /></div>
+                        <div className="flex gap-6 mb-8">
+                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-primary shadow-sm"><Clock size={24} /></div>
                             <div>
-                                <h4 className="info-label">Jam Operasional</h4>
-                                <p className="info-text">Setiap Hari: 08:00 - 22:00</p>
-                                <div className={`status-badge ${isOpen ? 'open' : 'closed'}`}>
-                                    <span className="status-indicator"></span>
+                                <h4 className="text-sm uppercase tracking-wider text-muted-foreground mb-1">Jam Operasional</h4>
+                                <p className="text-xl font-medium text-primary">Setiap Hari: 08:00 - 22:00</p>
+                                <div className={`inline-flex items-center gap-2 mt-2 px-3 py-1 rounded-full text-sm font-bold ${isOpen ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                    <span className={`w-2 h-2 rounded-full bg-current ${isOpen ? 'animate-pulse' : ''}`}></span>
                                     {isOpen ? 'Sedang Buka' : 'Tutup'}
                                 </div>
                             </div>
@@ -57,7 +55,7 @@ const Location = () => {
                         initial={{ opacity: 0, x: 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="map-wrapper"
+                        className="h-[400px] rounded-3xl overflow-hidden shadow-xl"
                     >
                         {/* Placeholder Google Maps Embed */}
                         <iframe

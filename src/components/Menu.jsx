@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import '../styles/Menu.css';
 
 // Sample Data (can be moved to separate file later)
 const menuItems = [
@@ -22,25 +21,28 @@ const Menu = () => {
         : menuItems.filter(item => item.category === activeCategory);
 
     return (
-        <section id="menu" className="menu-section">
-            <div className="container">
+        <section id="menu" className="py-32 bg-background">
+            <div className="container mx-auto px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="menu-header"
+                    className="text-center mb-16"
                 >
-                    <h2 className="menu-title">Menu Kami</h2>
-                    <p className="menu-subtitle">Explore our signature blends and savory treats.</p>
+                    <h2 className="font-heading text-6xl text-primary mb-4 font-bold">Menu Kami</h2>
+                    <p className="text-muted-foreground text-lg">Explore our signature blends and savory treats.</p>
                 </motion.div>
 
                 {/* Categories */}
-                <div className="menu-categories">
+                <div className="flex justify-center gap-4 flex-wrap mb-16">
                     {categories.map(category => (
                         <button
                             key={category}
                             onClick={() => setActiveCategory(category)}
-                            className={`category-btn ${activeCategory === category ? 'active' : ''}`}
+                            className={`px-6 py-3 rounded-full border border-primary/20 font-medium transition-all hover:bg-primary hover:text-white hover:border-primary hover:-translate-y-0.5 hover:shadow-md 
+                                ${activeCategory === category
+                                    ? 'bg-primary text-white border-primary shadow-md transform -translate-y-0.5'
+                                    : 'bg-transparent text-muted-foreground'}`}
                         >
                             {category}
                         </button>
@@ -48,7 +50,7 @@ const Menu = () => {
                 </div>
 
                 {/* Menu Grid */}
-                <motion.div layout className="menu-grid">
+                <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 container mx-auto">
                     <AnimatePresence>
                         {filteredItems.map(item => (
                             <motion.div
@@ -58,17 +60,17 @@ const Menu = () => {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.8 }}
                                 transition={{ duration: 0.3 }}
-                                className="menu-card"
+                                className="group bg-white rounded-3xl overflow-hidden shadow-sm transition-transform hover:-translate-y-1 hover:shadow-lg"
                             >
-                                <div className="menu-img-wrapper">
-                                    <img src={item.image} alt={item.name} className="menu-img" />
+                                <div className="w-full h-64 overflow-hidden">
+                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                 </div>
-                                <div className="menu-info">
-                                    <div className="menu-text">
-                                        <h3 className="menu-item-name">{item.name}</h3>
-                                        <span className="menu-item-cat">{item.category}</span>
+                                <div className="p-6 flex justify-between items-end">
+                                    <div className="flex flex-col gap-1">
+                                        <h3 className="font-heading text-2xl text-primary font-bold">{item.name}</h3>
+                                        <span className="inline-block text-xs uppercase tracking-wider text-accent bg-accent/10 px-3 py-1 rounded w-fit">{item.category}</span>
                                     </div>
-                                    <span className="menu-price">Rp {item.price}</span>
+                                    <span className="font-bold text-xl text-primary">Rp {item.price}</span>
                                 </div>
                             </motion.div>
                         ))}

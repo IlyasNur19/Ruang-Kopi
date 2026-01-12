@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Image, Upload, Trash2 } from 'lucide-react';
+import { Upload, Trash2 } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 const GalleryManagement = () => {
     // Mock data for gallery
@@ -13,57 +15,45 @@ const GalleryManagement = () => {
     ];
 
     return (
-        <div className="gallery-management">
+        <div className="space-y-8">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="content-header"
             >
-                <h1>Gallery Management</h1>
-                <p>Upload and manage your cafe photos.</p>
+                <h1 className="font-heading text-3xl font-bold text-[#3E2723] mb-2">Gallery Management</h1>
+                <p className="text-muted-foreground">Upload and manage your cafe photos.</p>
             </motion.div>
 
-            <section className="dashboard-card" style={{ marginBottom: '2rem' }}>
-                <div className="card-header">
-                    <h3>Upload New Photo</h3>
-                </div>
-                <div className="upload-area">
-                    <Upload size={40} className="text-gray" style={{ margin: '0 auto', marginBottom: '1rem' }} />
-                    <p>Click to upload or drag photos here</p>
-                    <span className="text-small">JPG, PNG up to 5MB</span>
-                </div>
-            </section>
+            <Card className="border-none shadow-sm">
+                <CardHeader>
+                    <CardTitle className="text-lg">Upload New Photo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center cursor-pointer hover:border-[#8D6E63] hover:bg-[#FBEFEF] transition-all group">
+                        <Upload size={40} className="text-muted-foreground mx-auto mb-4 group-hover:text-[#8D6E63] transition-colors" />
+                        <p className="font-medium text-foreground mb-1">Click to upload or drag photos here</p>
+                        <span className="text-xs text-muted-foreground">JPG, PNG up to 5MB</span>
+                    </div>
+                </CardContent>
+            </Card>
 
-            <div className="gallery-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.5rem' }}>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {galleryImages.map((src, index) => (
                     <motion.div
                         key={index}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: index * 0.05 }}
-                        className="gallery-item-admin"
-                        style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', aspectRatio: '1', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                        className="relative rounded-xl overflow-hidden aspect-square shadow-sm group"
                     >
-                        <img src={src} alt="Gallery" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        <button
-                            style={{
-                                position: 'absolute',
-                                top: '10px',
-                                right: '10px',
-                                background: 'rgba(239, 83, 80, 0.9)',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '32px',
-                                height: '32px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer'
-                            }}
+                        <img src={src} alt="Gallery" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
+                        <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 right-2 rounded-full w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
                         >
                             <Trash2 size={16} />
-                        </button>
+                        </Button>
                     </motion.div>
                 ))}
             </div>

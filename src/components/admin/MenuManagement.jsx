@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import useLocalStorage from '../../hooks/useLocalStorage';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Card, CardContent } from '../ui/card';
 
 const MenuManagement = () => {
     // Initial dummy data
@@ -13,8 +17,6 @@ const MenuManagement = () => {
     ];
 
     const [menuItems, setMenuItems] = useLocalStorage('menuItems', initialMenu);
-    const [isEditing, setIsEditing] = useState(false);
-    const [currentItem, setCurrentItem] = useState(null);
 
     const handleDelete = (id) => {
         if (window.confirm('Are you sure you want to delete this item?')) {
@@ -23,68 +25,74 @@ const MenuManagement = () => {
     };
 
     return (
-        <div className="menu-management">
+        <div className="space-y-6">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="content-header"
+                className="flex justify-between items-center"
             >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                        <h1>Menu Management</h1>
-                        <p>Manage your food and beverages.</p>
-                    </div>
-                    <button className="btn-add" style={{ padding: '0.75rem 1.5rem', backgroundColor: '#3E2723', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Plus size={18} /> Add New Item
-                    </button>
+                <div>
+                    <h1 className="font-heading text-3xl font-bold text-[#3E2723] mb-2">Menu Management</h1>
+                    <p className="text-muted-foreground">Manage your food and beverages.</p>
                 </div>
+                <Button className="bg-[#3E2723] hover:bg-[#2D2420]">
+                    <Plus size={18} className="mr-2" /> Add New Item
+                </Button>
             </motion.div>
 
-            <div className="dashboard-card" style={{ overflow: 'hidden' }}>
-                <table className="menu-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>NAME</th>
-                            <th>CATEGORY</th>
-                            <th>PRICE</th>
-                            <th>STATUS</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {menuItems.map(item => (
-                            <tr key={item.id}>
-                                <td>#{item.id}</td>
-                                <td>
-                                    <span style={{ fontWeight: 600, color: '#3E2723' }}>{item.name}</span>
-                                </td>
-                                <td>
-                                    <span className="badge" style={{ backgroundColor: '#EFEBE9', color: '#5D4037' }}>{item.category}</span>
-                                </td>
-                                <td>Rp {parseInt(item.price).toLocaleString('id-ID')}</td>
-                                <td>
-                                    <span style={{ color: item.available ? '#4CAF50' : '#EF5350', fontSize: '0.8rem', fontWeight: 600 }}>
-                                        {item.available ? 'Active' : 'Out of Stock'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div className="actions">
-                                        <button className="btn-icon text-blue"><Edit size={16} /></button>
-                                        <button className="btn-icon text-red" onClick={() => handleDelete(item.id)}><Trash2 size={16} /></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <Card className="border-none shadow-sm overflow-hidden">
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[100px]">ID</TableHead>
+                                <TableHead>NAME</TableHead>
+                                <TableHead>CATEGORY</TableHead>
+                                <TableHead>PRICE</TableHead>
+                                <TableHead>STATUS</TableHead>
+                                <TableHead className="text-right">ACTIONS</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {menuItems.map(item => (
+                                <TableRow key={item.id}>
+                                    <TableCell className="font-medium">#{item.id}</TableCell>
+                                    <TableCell>
+                                        <span className="font-semibold text-[#3E2723]">{item.name}</span>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="secondary" className="bg-[#EFEBE9] text-[#5D4037] hover:bg-[#D7CCC8]">
+                                            {item.category}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>Rp {parseInt(item.price).toLocaleString('id-ID')}</TableCell>
+                                    <TableCell>
+                                        <Badge variant={item.available ? "default" : "destructive"} className={item.available ? "bg-green-100 text-green-700 hover:bg-green-200" : ""}>
+                                            {item.available ? 'Active' : 'Out of Stock'}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <Button variant="ghost" size="icon" className="text-blue-500 hover:text-blue-700 hover:bg-blue-50">
+                                                <Edit size={16} />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDelete(item.id)}>
+                                                <Trash2 size={16} />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
 
-                {menuItems.length === 0 && (
-                    <div style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
-                        No menu items found.
-                    </div>
-                )}
-            </div>
+                    {menuItems.length === 0 && (
+                        <div className="p-8 text-center text-muted-foreground">
+                            No menu items found.
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 };

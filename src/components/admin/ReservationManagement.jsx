@@ -1,6 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Check, X, Clock, MessageSquare } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Card, CardContent } from '../ui/card';
 
 const ReservationManagement = () => {
     // Mock data for reservations
@@ -10,79 +14,72 @@ const ReservationManagement = () => {
         { id: 3, name: 'John Doe', date: '2026-05-22', time: '20:00', guests: 6, status: 'Completed', phone: '08122334455' },
     ];
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'Confirmed': return '#4CAF50';
-            case 'Pending': return '#FF9800';
-            case 'Completed': return '#2196F3';
-            default: return '#999';
-        }
-    };
-
-    const getStatusBg = (status) => {
-        switch (status) {
-            case 'Confirmed': return '#E8F5E9';
-            case 'Pending': return '#FFF3E0';
-            case 'Completed': return '#E3F2FD';
-            default: return '#f5f5f5';
-        }
-    };
-
     return (
-        <div className="reservation-management">
+        <div className="space-y-6">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="content-header"
             >
-                <h1>Reservations</h1>
-                <p>Track and manage table bookings.</p>
+                <h1 className="font-heading text-3xl font-bold text-[#3E2723] mb-2">Reservations</h1>
+                <p className="text-muted-foreground">Track and manage table bookings.</p>
             </motion.div>
 
-            <div className="dashboard-card">
-                <table className="menu-table">
-                    <thead>
-                        <tr>
-                            <th>GUEST</th>
-                            <th>DATE & TIME</th>
-                            <th>PAX</th>
-                            <th>STATUS</th>
-                            <th>ACTIONS</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {reservations.map(res => (
-                            <tr key={res.id}>
-                                <td>
-                                    <div style={{ fontWeight: 600, color: '#3E2723' }}>{res.name}</div>
-                                    <div style={{ fontSize: '0.8rem', color: '#888' }}>{res.phone}</div>
-                                </td>
-                                <td>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        <Calendar size={14} /> {res.date}
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem', color: '#888', fontSize: '0.8rem' }}>
-                                        <Clock size={14} /> {res.time}
-                                    </div>
-                                </td>
-                                <td>{res.guests} Orang</td>
-                                <td>
-                                    <span className="badge" style={{ backgroundColor: getStatusBg(res.status), color: getStatusColor(res.status) }}>
-                                        {res.status}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div className="actions">
-                                        <button className="btn-icon" style={{ color: '#4CAF50' }} title="Confirm"><Check size={18} /></button>
-                                        <button className="btn-icon" style={{ color: '#EF5350' }} title="Cancel"><X size={18} /></button>
-                                        <button className="btn-icon" style={{ color: '#25D366' }} title="WhatsApp"><MessageSquare size={18} /></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <Card className="border-none shadow-sm overflow-hidden">
+                <CardContent className="p-0">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>GUEST</TableHead>
+                                <TableHead>DATE & TIME</TableHead>
+                                <TableHead>PAX</TableHead>
+                                <TableHead>STATUS</TableHead>
+                                <TableHead className="text-right">ACTIONS</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {reservations.map(res => (
+                                <TableRow key={res.id}>
+                                    <TableCell>
+                                        <div className="font-semibold text-[#3E2723]">{res.name}</div>
+                                        <div className="text-xs text-muted-foreground">{res.phone}</div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <Calendar size={14} className="text-muted-foreground" /> {res.date}
+                                        </div>
+                                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                                            <Clock size={14} /> {res.time}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>{res.guests} Orang</TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline" className={`
+                                            ${res.status === 'Confirmed' ? 'bg-green-50 text-green-700 border-green-200' : ''}
+                                            ${res.status === 'Pending' ? 'bg-orange-50 text-orange-700 border-orange-200' : ''}
+                                            ${res.status === 'Completed' ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}
+                                        `}>
+                                            {res.status}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <Button variant="ghost" size="icon" className="text-green-600 hover:text-green-800 hover:bg-green-50" title="Confirm">
+                                                <Check size={18} />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50" title="Cancel">
+                                                <X size={18} />
+                                            </Button>
+                                            <Button variant="ghost" size="icon" className="text-[#25D366] hover:text-[#128C7E] hover:bg-green-50" title="WhatsApp">
+                                                <MessageSquare size={18} />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </div>
     );
 };
