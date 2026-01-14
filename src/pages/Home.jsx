@@ -80,7 +80,7 @@ const Home = () => {
                 {/* Story Section */}
                 <section className="py-24 md:py-32 bg-[#F8F5F2]">
                     <div className="container mx-auto px-4">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto px-20">
                             <motion.div
                                 initial={{ opacity: 0, x: -30 }}
                                 whileInView={{ opacity: 1, x: 0 }}
@@ -130,11 +130,11 @@ const Home = () => {
                 </section>
 
                 {/* Gallery Preview Section */}
-                <section className="py-24 md:py-32 bg-[#F8F5F2]">
+                <section className="py-20 md:py-0 mb-10 bg-[#F8F5F2]">
                     <div className="container mx-auto px-4">
-                        <div className="flex justify-between items-end mb-12 max-w-6xl mx-auto">
+                        <div className="flex justify-between items-end mb-8 max-w-6xl mx-auto">
                             <div>
-                                <h2 className="font-heading text-4xl md:text-5xl text-white font-bold">Our Space</h2>
+                                <h2 className="font-heading text-4xl md:text-5xl text-[#5d4037] font-bold">Our Space</h2>
                                 <p className="text-[#D7CCC8] mt-2">A glimpse into our sanctuary.</p>
                             </div>
                             <Link to="/gallery" className="text-white flex items-center gap-2 hover:text-[#D7CCC8] transition-colors font-medium">
