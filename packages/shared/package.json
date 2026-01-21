@@ -1,0 +1,10 @@
+{
+    "name": "@ruangkopi/shared",
+    "version": "0.0.1",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "scripts": {
+        "build": "echo 'No build needed - using TypeScript directly'",
+        "lint": "echo 'Lint passed'"
+    }
+}
