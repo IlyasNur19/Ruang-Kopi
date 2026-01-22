@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Coffee, AlertTriangle, CheckCircle, XCircle, Users, Calendar, ShoppingBag, Loader2 } from 'lucide-react';
-import { menuApi, reservationsApi } from '../../services/api';
+import { menuApi, reservationsApi, settingsApi } from '../../services/api';
 import { Card, CardContent } from '../ui/card';
 
 const DashboardOverview = () => {
@@ -12,18 +12,20 @@ const DashboardOverview = () => {
         pendingReservations: 0,
     });
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
                 setError(null);
 
-                // Fetch menu items and reservations in parallel
-                const [menuData, reservationsData] = await Promise.all([
+                // Fetch menu items, reservations, and current status in parallel
+                const [menuData, reservationsData, statusData] = await Promise.all([
                     menuApi.getAll().catch(() => []),
                     reservationsApi.getAll().catch(() => []),
+                    settingsApi.getStatus().catch(() => ({ status: 'available' })),
                 ]);
 
                 const menuItems = Array.isArray(menuData) ? menuData : [];
@@ -34,16 +36,35 @@ const DashboardOverview = () => {
                     reservations: reservations.length,
                     pendingReservations: reservations.filter(r => r.status === 'Pending').length,
                 });
+
+                // Set the status from API
+                if (statusData && statusData.status) {
+                    setShopStatus(statusData.status);
+                }
             } catch (err) {
-                console.error('Error fetching stats:', err);
+                console.error('Error fetching data:', err);
                 setError('Failed to load dashboard data');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchStats();
+        fetchData();
     }, []);
+
+    // Function to update status via API
+    const handleStatusChange = async (newStatus) => {
+        try {
+            setSaving(true);
+            await settingsApi.updateStatus(newStatus);
+            setShopStatus(newStatus);
+        } catch (err) {
+            console.error('Error updating status:', err);
+            setError('Failed to update status');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const statusOptions = [
         {
@@ -160,8 +181,8 @@ const DashboardOverview = () => {
                     {statusOptions.map((option) => (
                         <div
                             key={option.id}
-                            className={`relative bg-card p-6 rounded-xl border-2 transition-all cursor-pointer hover:shadow-md ${shopStatus === option.id ? `${option.border} shadow-sm` : 'border-transparent hover:border-gray-200'} `}
-                            onClick={() => setShopStatus(option.id)}
+                            className={`relative bg-card p-6 rounded-xl border-2 transition-all cursor-pointer hover:shadow-md ${shopStatus === option.id ? `${option.border} shadow-sm` : 'border-transparent hover:border-gray-200'} ${saving ? 'opacity-50 pointer-events-none' : ''}`}
+                            onClick={() => handleStatusChange(option.id)}
                         >
                             <div className="flex items-start gap-4">
                                 <div className={`p-3 rounded-lg ${option.bg} ${option.color}`}>

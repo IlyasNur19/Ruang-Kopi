@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sprout, Users, Award, Coffee } from 'lucide-react';
+import { ArrowRight, Users, Lightbulb, ClockFading } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import useLocalStorage from '../hooks/useLocalStorage';
+import { settingsApi } from '../services/api';
+
 
 const Home = () => {
-    const [shopStatus] = useLocalStorage('shopStatus', 'available');
+    const [shopStatus, setShopStatus] = useState('available');
 
     const statusConfig = {
         available: { text: 'Tersedia • Masih ada kursi', color: 'bg-green-500', border: 'border-green-500/30' },
@@ -17,16 +18,35 @@ const Home = () => {
     const status = statusConfig[shopStatus] || statusConfig.available;
 
     const features = [
-        { icon: <Sprout size={28} />, title: 'Premium Beans', description: 'Sourced directly from sustainable local farmers for the perfect, bold profile.' },
-        { icon: <Users size={28} />, title: 'Community', description: 'A space built for meaningful connections and shared experiences.' },
-        { icon: <Award size={28} />, title: 'Mastery', description: 'Brewed by certified baristas with passion and precision.' }
+        { icon: <ClockFading size={28} />, title: 'Proses & Perjalanan', description: 'Layaknya ide besar, kopi kami melewati perjalanan panjang dari petani lokal hingga ke cangkirmu untuk hasil yang jujur.' },
+        { icon: <Users size={28} />, title: 'Ruang Kolaborasi', description: 'Sebuah wadah untuk berbagi cerita, merancang mimpi, dan membangun koneksi bermakna di setiap sudut kedai.' },
+        { icon: <Lightbulb size={28} />, title: 'Inspirasi Murni', description: 'Melalui kurasi biji pilihan dan seduhan yang presisi, kami hadirkan pemantik untuk setiap langkah produktifmu.' }
     ];
 
-    const galleryImages = [
-        { src: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80', title: 'Artisan Coffee', caption: 'Crafted to perfection', large: true },
-        { src: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&q=80', title: 'Cozy Space', caption: 'Your daily sanctuary' },
-        { src: 'https://images.unsplash.com/photo-1442512595367-4273250913a9?auto=format&fit=crop&q=80', title: 'Cozy Interior', caption: 'Warmth in every corner' },
-    ];
+    // Fetch space images from API
+    const [galleryImages, setGalleryImages] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch status and space images in parallel
+                const [statusData, spaceData] = await Promise.all([
+                    settingsApi.getStatus().catch(() => ({ status: 'available' })),
+                    settingsApi.getSpaceImages().catch(() => ({ images: [] })),
+                ]);
+
+                if (statusData && statusData.status) {
+                    setShopStatus(statusData.status);
+                }
+                if (spaceData.images && spaceData.images.length > 0) {
+                    setGalleryImages(spaceData.images);
+                }
+            } catch (err) {
+                console.error('Failed to fetch data:', err);
+            }
+        };
+        fetchData();
+    }, []);
 
     return (
         <div className="min-h-screen bg-background text-foreground">
@@ -52,11 +72,12 @@ const Home = () => {
                                 <span className={`w-2 h-2 rounded-full animate-pulse ${status.color}`} />
                                 <span className="text-xs font-medium uppercase tracking-wider text-white">{status.text}</span>
                             </div>
-                            <h1 className="font-heading font-bold text-6xl md:text-8xl lg:text-9xl mb-6 leading-tight tracking-tighter">
-                                Ruang Kopi
+                            <h1 className="flex flex-col gap-0 md:gap-6 md:flex-row font-['Baskervville'] font-normal text-8xl md:text-8xl lg:text-9xl mb-6 leading-tight tracking-tight">
+                                <span>ruang </span>
+                                <span>kopi</span>
                             </h1>
-                            <p className="text-xl md:text-2xl font-light text-white/90 mb-12 tracking-widest uppercase">
-                                — Cerita di Setiap Tegukan —
+                            <p className="text-xl md:text-xl italic font-light text-white/90 mb-12 tracking-widest">
+                                ruang singgah komunitas
                             </p>
                             <Link
                                 to="/menu"
@@ -67,14 +88,7 @@ const Home = () => {
                             </Link>
                         </motion.div>
                     </div>
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1, y: [0, 10, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, delay: 1 }}
-                        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/70 text-sm tracking-[0.2em] uppercase z-10"
-                    >
-                        <span>SCROLL</span>
-                    </motion.div>
+
                 </section>
 
                 {/* Story Section */}
@@ -87,9 +101,9 @@ const Home = () => {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.6 }}
                             >
-                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#8D6E63] mb-4 block">Filosofi Kopi</span>
-                                <h2 className="font-heading text-4xl md:text-5xl text-primary mb-6 leading-tight font-bold">
-                                    More than just a<br /><span className="italic text-[#5d4037]">coffee cup.</span>
+                                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#8D6E63] mb-2 block">Filosofi Kopi</span>
+                                <h2 className="font-heading text-7xl md:text-8xl text-primary mb-6 leading-tight font-bold">
+                                    ruang<br /><span className="italic text-[#5d4037]">kopi</span>
                                 </h2>
                                 <div className="w-12 h-0.5 bg-[#8D6E63] mb-8"></div>
                             </motion.div>
@@ -100,10 +114,10 @@ const Home = () => {
                                 transition={{ duration: 0.6, delay: 0.2 }}
                             >
                                 <p className="text-muted-foreground leading-relaxed mb-6">
-                                    We craft more than just coffee; we create moments. Every cup tells a story of tradition, precision, and passion in a sanctuary designed for connection.
+                                    Setiap biji kopi memiliki perjalanan panjang sebelum sampai ke cangkirmu. Begitu pula dengan sebuah ide besar. Di Ruang Kopi, kami menghargai setiap proses.
                                 </p>
                                 <p className="text-muted-foreground/80 leading-relaxed text-sm">
-                                    Ruang Kopi is a place where time slows down, allowing you to savor the earthy notes of our signature beans amidst conversations that matter.
+                                    Kami mendesain tempat ini sebagai 'ruang' kolaborasi. Kami percaya bahwa kopi terbaik adalah kopi yang diminum sambil berbagi cerita, merancang mimpi, atau sekadar menikmati kesendirian yang produktif. Dari biji pilihan yang kami kurasi dengan hati, kami menciptakan ruang di mana setiap tegukan adalah inspirasi baru.
                                 </p>
                             </motion.div>
                         </div>

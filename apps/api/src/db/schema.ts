@@ -59,6 +59,17 @@ export const shopSettings = pgTable('shop_settings', {
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
+// Ideas/Feedback table (Kotak Gagasan)
+export const ideas = pgTable('ideas', {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    contact: text('contact'), // Email or Instagram (optional)
+    topic: text('topic').notNull(), // Soal Rasa, Suasana Ruang, Pelayanan, Ide Baru
+    message: text('message').notNull(),
+    status: text('status').notNull().default('Baru'), // Baru, Dibaca, Diproses, Selesai
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
 // Type exports for use in the application
 export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
@@ -77,3 +88,6 @@ export type NewUser = typeof users.$inferInsert;
 
 export type ShopSetting = typeof shopSettings.$inferSelect;
 export type NewShopSetting = typeof shopSettings.$inferInsert;
+
+export type Idea = typeof ideas.$inferSelect;
+export type NewIdea = typeof ideas.$inferInsert;

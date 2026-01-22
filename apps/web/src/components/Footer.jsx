@@ -1,55 +1,83 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Coffee, Instagram, Twitter, Facebook, MapPin } from 'lucide-react';
+import { MapPin, Clock, Phone, Instagram, MessageSquare, Smartphone, Lock, ArrowRight } from 'lucide-react';
 
 const Footer = () => {
+
     return (
-        <footer className="bg-[#2D2420] text-[#D7CCC8] py-24 pb-8">
-            <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr] gap-12 mb-16">
-                    <div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <Coffee size={32} className="text-white" />
-                            <span className="font-heading text-2xl text-white font-bold">RUANGKOPI</span>
+        <footer className="bg-[#F5F3F0]">
+
+            {/* Main Footer */}
+            <div className="bg-[#3E2723] text-[#D7CCC8] py-16">
+                <div className="max-w-6xl mx-auto px-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                        {/* Brand */}
+                        <div>
+                            <h2 className="font-['Baskervville'] text-4xl font-bold text-white tracking-wider mb-4">ruang kopi</h2>
+                            <p className="text-sm leading-relaxed opacity-80">
+                                Temukan inspirasi di setiap tegukan. Ruang Kopi hadir sebagai wadah bagi setiap cerita, kolaborasi, dan dedikasi terhadap kopi berkualitas tinggi yang diracik khusus untuk mendukung kreativitasmu.
+                            </p>
                         </div>
-                        <p className="leading-relaxed opacity-80 max-w-xs">
-                            Menghadirkan cerita di setiap tegukan kopi terbaik nusantara.
-                        </p>
-                    </div>
 
-                    <div className="flex flex-col gap-4 opacity-80">
-                        <h4 className="text-white font-heading text-xl mb-2 font-bold">Navigasi</h4>
-                        <Link to="/menu" className="hover:text-white hover:opacity-100 transition-colors">Menu</Link>
-                        <Link to="/story" className="hover:text-white hover:opacity-100 transition-colors">Story</Link>
-                        <Link to="/gallery" className="hover:text-white hover:opacity-100 transition-colors">Gallery</Link>
-                        <Link to="/reservation" className="hover:text-white hover:opacity-100 transition-colors">Reservasi</Link>
-                        <Link to="/location" className="hover:text-white hover:opacity-100 transition-colors">Utama/Peta</Link>
-                    </div>
-
-                    <div>
-                        <h4 className="text-white font-heading text-xl mb-6 font-bold">Kunjungi Kami</h4>
-                        <div className="flex items-center gap-3 mb-4 opacity-80">
-                            <MapPin size={20} />
-                            <span>Jl. Kopi No. 123, Kota Kopi</span>
+                        {/* Explore */}
+                        <div>
+                            <h4 className="font-medium text-white mb-5">Explore</h4>
+                            <ul className="space-y-3 text-sm opacity-80">
+                                <li><Link to="/" className="hover:text-white hover:opacity-100 transition-colors">Home</Link></li>
+                                <li><Link to="/kotak-gagasan" className="hover:text-white hover:opacity-100 transition-colors">Kotak Gagasan</Link></li>
+                                <li><Link to="/menu" className="hover:text-white hover:opacity-100 transition-colors">Menu</Link></li>
+                                <li><Link to="/gallery" className="hover:text-white hover:opacity-100 transition-colors">Gallery</Link></li>
+                                <li><Link to="/reservation" className="hover:text-white hover:opacity-100 transition-colors">Reservations</Link></li>
+                            </ul>
                         </div>
-                        <p className="opacity-80 leading-relaxed">
-                            Buka Setiap Hari<br />
-                            08:00 - 22:00
-                        </p>
+
+                        {/* Visit Us */}
+                        <div>
+                            <h4 className="font-medium text-white mb-5">Visit Us</h4>
+                            <ul className="space-y-4 text-sm opacity-80">
+                                <li className="flex items-start gap-3">
+                                    <MapPin size={16} className="mt-0.5 shrink-0 text-[#8D6E63]" />
+                                    <span>Jl. Raya Solo - Tawangmangu, Keprabon, Karangpandan, Kec. Karangpandan, Kabupaten Karanganyar, Jawa Tengah 57791</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <Clock size={16} className="shrink-0 text-[#8D6E63]" />
+                                    <span>09.00 - 00.00</span>
+                                </li>
+                                <li className="flex items-center gap-3">
+                                    <Phone size={16} className="shrink-0 text-[#8D6E63]" />
+                                    <span>+62 812 3456 7890</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* Follow Us */}
+                        <div>
+                            <h4 className="font-medium text-white mb-5">Follow Us</h4>
+                            <div className="flex gap-3 mb-6">
+                                <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                                    <Instagram size={18} />
+                                </a>
+                                <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                                    <MessageSquare size={18} />
+                                </a>
+                                <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+                                    <Smartphone size={18} />
+                                </a>
+                            </div>
+                            <Link to="/admin/login" className="flex items-center gap-2 text-sm opacity-60 hover:opacity-100 transition-opacity">
+                                <Lock size={14} /> Admin Login
+                            </Link>
+                        </div>
                     </div>
 
-                    <div>
-                        <h4 className="text-white font-heading text-xl mb-6 font-bold">Social</h4>
+                    {/* Bottom Bar */}
+                    <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs opacity-60">
+                        <p>© 2026 RuangKopi. All rights reserved.</p>
                         <div className="flex gap-6">
-                            <a href="#" className="opacity-80 hover:text-white hover:opacity-100 hover:-translate-y-1 transition-all"><Instagram size={24} /></a>
-                            <a href="#" className="opacity-80 hover:text-white hover:opacity-100 hover:-translate-y-1 transition-all"><Twitter size={24} /></a>
-                            <a href="#" className="opacity-80 hover:text-white hover:opacity-100 hover:-translate-y-1 transition-all"><Facebook size={24} /></a>
+                            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
                         </div>
                     </div>
-                </div>
-
-                <div className="text-center pt-8 border-t border-white/5 text-sm opacity-50">
-                    <p>&copy; 2026 RuangKopi. All rights reserved.</p>
                 </div>
             </div>
         </footer>

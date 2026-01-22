@@ -9,6 +9,7 @@ import reservationRoutes from './routes/reservation.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
+import ideasRoutes from './routes/ideas.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -33,6 +34,7 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/ideas', ideasRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

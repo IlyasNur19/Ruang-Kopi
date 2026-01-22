@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const menuItems = [
   { name: 'Home', path: '/' },
   { name: 'Menu', path: '/menu' },
-  { name: 'Story', path: '/story' },
+  { name: 'Kotak Gagasan', path: '/kotak-gagasan' },
   { name: 'Gallery', path: '/gallery' },
   { name: 'Location', path: '/location' },
 ];
@@ -40,16 +40,16 @@ const Navbar = () => {
     <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${showBackground
-            ? 'bg-primary/95 backdrop-blur-md shadow-lg'
-            : 'bg-transparent'
+          ? 'bg-primary/95 backdrop-blur-md shadow-lg'
+          : 'bg-transparent'
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
-              <span className="font-heading text-2xl font-bold text-white tracking-wide">
-                RuangKopi
+              <span className="font-['Baskervville'] font-medium text-2xl text-white tracking-wide">
+                ruang kopi
               </span>
             </Link>
 

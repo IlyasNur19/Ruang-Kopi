@@ -34,13 +34,11 @@ const ReservationPage = () => {
 
         try {
             await createReservation({
-                customerName: formData.name,
-                customerEmail: formData.email,
-                customerPhone: formData.phone,
+                name: formData.name,
+                phone: formData.phone || formData.email, // Use phone or fallback to email
                 date: formData.date,
                 time: formData.time,
                 guests: formData.guests,
-                notes: formData.notes
             });
             setSubmitted(true);
         } catch (err) {

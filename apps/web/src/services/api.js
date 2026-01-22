@@ -164,6 +164,24 @@ export const settingsApi = {
     getStatus: async () => {
         return apiRequest('/settings/status');
     },
+
+    updateStatus: async (status) => {
+        return apiRequest('/settings/status', {
+            method: 'PUT',
+            body: JSON.stringify({ status }),
+        });
+    },
+
+    getSpaceImages: async () => {
+        return apiRequest('/settings/space-images');
+    },
+
+    updateSpaceImages: async (images) => {
+        return apiRequest('/settings/space-images', {
+            method: 'PUT',
+            body: JSON.stringify({ images }),
+        });
+    },
 };
 
 // ================================
@@ -199,6 +217,35 @@ export const uploadApi = {
     },
 };
 
+// ================================
+// Ideas API (Kotak Gagasan)
+// ================================
+export const ideasApi = {
+    getAll: async () => {
+        return apiRequest('/ideas');
+    },
+
+    create: async (data) => {
+        return apiRequest('/ideas', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    },
+
+    updateStatus: async (id, status) => {
+        return apiRequest(`/ideas/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify({ status }),
+        });
+    },
+
+    delete: async (id) => {
+        return apiRequest(`/ideas/${id}`, {
+            method: 'DELETE',
+        });
+    },
+};
+
 export default {
     auth: authApi,
     menu: menuApi,
@@ -207,4 +254,5 @@ export default {
     gallery: galleryApi,
     settings: settingsApi,
     upload: uploadApi,
+    ideas: ideasApi,
 };
