@@ -38,21 +38,5 @@
         "CLOUDINARY_API_KEY",
         "CLOUDINARY_API_SECRET",
         "PORT"
-    ],
-    "pipeline": {
-        "build": {
-            "dependsOn": [
-                "^build"
-            ],
-            "outputs": [
-                ".next/**",
-                "!.next/cache/**"
-            ]
-        },
-        "lint": {},
-        "dev": {
-            "cache": false,
-            "persistent": true
-        }
-    }
+    ]
 }
