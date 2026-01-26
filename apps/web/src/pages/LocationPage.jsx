@@ -41,8 +41,7 @@ const LocationPage = () => {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-foreground mb-1">Alamat</h3>
-                                        <p className="text-muted-foreground text-sm">Jl. Kopi No. 123, Kota, Indonesia</p>
-                                        <p className="text-xs text-muted-foreground/70">500m dari Taman Kota</p>
+                                        <p className="text-muted-foreground text-sm">Jl. Raya Solo - Tawangmangu, Keprabon, Karangpandan, Kec. Karangpandan, Kabupaten Karanganyar, Jawa Tengah 57791</p>
                                     </div>
                                 </div>
 
@@ -52,8 +51,7 @@ const LocationPage = () => {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-foreground mb-1">Jam Operasional</h3>
-                                        <p className="text-muted-foreground text-sm">Senin - Jumat <span className="text-foreground font-medium">08:00 - 22:00</span></p>
-                                        <p className="text-muted-foreground text-sm">Sabtu - Minggu <span className="text-foreground font-medium">09:00 - 23:00</span></p>
+                                        <p className="text-muted-foreground text-sm">Setiap Hari : <span className="text-foreground font-medium">09:00 - 00:00</span></p>
                                     </div>
                                 </div>
 
@@ -63,7 +61,7 @@ const LocationPage = () => {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-foreground mb-1">Hubungi Kami</h3>
-                                        <p className="text-muted-foreground text-sm">+62 812-3456-7890</p>
+                                        <p className="text-muted-foreground text-sm">085642332105</p>
                                     </div>
                                 </div>
                             </div>
@@ -71,7 +69,7 @@ const LocationPage = () => {
                             {/* Action Buttons */}
                             <div className="flex flex-wrap gap-4 mt-10">
                                 <a
-                                    href="https://www.google.com/maps"
+                                    href="https://maps.app.goo.gl/iF77DJP89R5hARrQ6"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-[#2D2420] transition-colors"
@@ -94,21 +92,12 @@ const LocationPage = () => {
                             transition={{ delay: 0.2 }}
                             className="bg-[#E8E4E0] rounded-3xl overflow-hidden shadow-lg h-[500px] relative"
                         >
-                            {/* Placeholder Map - Replace with actual iframe */}
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
-                                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-md">
-                                    <Coffee size={32} className="text-primary" />
-                                </div>
-                                <span className="font-heading text-lg font-bold text-primary">RuangKopi</span>
-                                <p className="text-sm text-muted-foreground mt-1">Map Integration Here</p>
-                            </div>
-                            {/* Uncomment for actual map:
                             <iframe
-                                src="https://www.google.com/maps/embed?..."
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15818.494369279775!2d111.06436821144354!3d-7.615872099999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7a218f9d96e2c7%3A0x7a4a88f2aafc26d8!2sRuang%20Kopi!5e0!3m2!1sid!2sid!4v1769433306205!5m2!1sid!2sid"
                                 className="w-full h-full border-0"
                                 allowFullScreen=""
                                 loading="lazy"
-                            /> */}
+                            />
                         </motion.div>
                     </div>
                 </div>

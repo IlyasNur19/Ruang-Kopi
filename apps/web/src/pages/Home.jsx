@@ -72,7 +72,8 @@ const Home = () => {
                                 <span className={`w-2 h-2 rounded-full animate-pulse ${status.color}`} />
                                 <span className="text-xs font-medium uppercase tracking-wider text-white">{status.text}</span>
                             </div>
-                            <h1 className="flex flex-col gap-0 md:gap-6 md:flex-row font-['Baskervville'] font-normal text-8xl md:text-8xl lg:text-9xl mb-6 leading-tight tracking-tight">
+                            <h1 className="flex flex-col justify-center items-center gap-0 md:gap-6 md:flex-row font-['Baskervville'] font-normal text-8xl md:text-8xl lg:text-9xl mb-3 leading-tight tracking-tight">
+                                <img src='/icon-ruang-kopi-putih.png' className='w-60 block md:hidden -mb-7' alt='Icon Ruang Kopi' />
                                 <span>ruang </span>
                                 <span>kopi</span>
                             </h1>
