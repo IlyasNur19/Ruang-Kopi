@@ -1,13 +1,24 @@
 {
     "$schema": "https://turbo.build/schema.json",
+    "globalEnv": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "CLOUDINARY_CLOUD_NAME",
+        "CLOUDINARY_API_KEY",
+        "CLOUDINARY_API_SECRET",
+        "PORT"
+    ],
     "tasks": {
         "build": {
             "dependsOn": [
                 "^build"
             ],
             "outputs": [
+                ".next/**",
+                "!.next/cache/**",
                 "dist/**",
-                ".next/**"
+                "build/**"
             ]
         },
         "dev": {
@@ -29,14 +40,5 @@
         "db:seed": {
             "cache": false
         }
-    },
-    "globalEnv": [
-        "NODE_ENV",
-        "DATABASE_URL",
-        "JWT_SECRET",
-        "CLOUDINARY_CLOUD_NAME",
-        "CLOUDINARY_API_KEY",
-        "CLOUDINARY_API_SECRET",
-        "PORT"
-    ]
+    }
 }
