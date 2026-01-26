@@ -29,5 +29,30 @@
         "db:seed": {
             "cache": false
         }
+    },
+    "globalEnv": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "JWT_SECRET",
+        "CLOUDINARY_CLOUD_NAME",
+        "CLOUDINARY_API_KEY",
+        "CLOUDINARY_API_SECRET",
+        "PORT"
+    ],
+    "pipeline": {
+        "build": {
+            "dependsOn": [
+                "^build"
+            ],
+            "outputs": [
+                ".next/**",
+                "!.next/cache/**"
+            ]
+        },
+        "lint": {},
+        "dev": {
+            "cache": false,
+            "persistent": true
+        }
     }
 }
