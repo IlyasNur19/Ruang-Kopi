@@ -9,6 +9,7 @@ import { settingsApi } from '../services/api';
 
 const Home = () => {
     const [shopStatus, setShopStatus] = useState('available');
+    const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80');
 
     const statusConfig = {
         available: { text: 'Tersedia • Masih ada kursi', color: 'bg-green-500', border: 'border-green-500/30' },
@@ -29,10 +30,11 @@ const Home = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch status and space images in parallel
-                const [statusData, spaceData] = await Promise.all([
+                // Fetch status, space images, and hero image in parallel
+                const [statusData, spaceData, heroData] = await Promise.all([
                     settingsApi.getStatus().catch(() => ({ status: 'available' })),
                     settingsApi.getSpaceImages().catch(() => ({ images: [] })),
+                    settingsApi.getHeroImage().catch(() => ({ heroImage: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80' })),
                 ]);
 
                 if (statusData && statusData.status) {
@@ -40,6 +42,9 @@ const Home = () => {
                 }
                 if (spaceData.images && spaceData.images.length > 0) {
                     setGalleryImages(spaceData.images);
+                }
+                if (heroData && heroData.heroImage) {
+                    setHeroImage(heroData.heroImage);
                 }
             } catch (err) {
                 console.error('Failed to fetch data:', err);
@@ -56,7 +61,7 @@ const Home = () => {
                 <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
                     <div className="absolute inset-0 z-0">
                         <img
-                            src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80"
+                            src={heroImage}
                             alt="Ruang Kopi Interior"
                             className="w-full h-full object-cover"
                         />

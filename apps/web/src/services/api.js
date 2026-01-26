@@ -189,6 +189,17 @@ export const settingsApi = {
             body: JSON.stringify({ images }),
         });
     },
+
+    getHeroImage: async () => {
+        return apiRequest('/settings/hero-image');
+    },
+
+    updateHeroImage: async (heroImage) => {
+        return apiRequest('/settings/hero-image', {
+            method: 'PUT',
+            body: JSON.stringify({ heroImage }),
+        });
+    },
 };
 
 // ================================

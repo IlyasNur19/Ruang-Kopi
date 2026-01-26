@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Coffee, Image, Calendar, Bell, User, LogOut, Menu, X, Home, Lightbulb } from 'lucide-react';
+import { LayoutDashboard, Coffee, Image, Calendar, Bell, User, LogOut, Menu, X, Home, Lightbulb, ImageIcon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import DashboardOverview from '../components/admin/DashboardOverview';
 import MenuManagement from '../components/admin/MenuManagement';
@@ -8,6 +8,7 @@ import GalleryManagement from '../components/admin/GalleryManagement';
 import ReservationManagement from '../components/admin/ReservationManagement';
 import SpaceImagesManagement from '../components/admin/SpaceImagesManagement';
 import IdeasManagement from '../components/admin/IdeasManagement';
+import HeroImageManagement from '../components/admin/HeroImageManagement';
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -33,6 +34,7 @@ const Admin = () => {
             case 'reservations': return <ReservationManagement />;
             case 'space-images': return <SpaceImagesManagement />;
             case 'ideas': return <IdeasManagement />;
+            case 'hero-image': return <HeroImageManagement />;
             default: return <DashboardOverview />;
         }
     };
@@ -41,6 +43,7 @@ const Admin = () => {
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'menu', label: 'Menu Management', icon: Coffee },
         { id: 'gallery', label: 'Gallery', icon: Image },
+        { id: 'hero-image', label: 'Hero Image', icon: ImageIcon },
         { id: 'space-images', label: 'Space Images', icon: Home },
         { id: 'ideas', label: 'Kotak Gagasan', icon: Lightbulb },
         { id: 'reservations', label: 'Reservations', icon: Calendar },
