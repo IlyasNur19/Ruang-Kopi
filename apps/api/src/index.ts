@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-    origin: ['https://ruang-kopi-web.vercel.app', 'https://ruangkopi.site', 'http://localhost:5173', 'http://localhost:3000'],
+    origin: ['https://ruang-kopi-web.vercel.app', 'https://www.ruangkopi.site', 'https://ruangkopi.site', 'http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
 }));
 app.use(express.json());
