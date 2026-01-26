@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Trash2, Loader2, RefreshCw, X, Plus } from 'lucide-react';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
+import { Upload, Trash2, Loader2, RefreshCw, X, GripVertical, Save, ArrowUpDown } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { galleryApi, uploadApi } from '../../services/api';
@@ -20,6 +20,11 @@ const GalleryManagement = () => {
     const [category, setCategory] = useState('');
     const [saving, setSaving] = useState(false);
 
+    // Reorder mode state
+    const [reorderMode, setReorderMode] = useState(false);
+    const [reorderedImages, setReorderedImages] = useState([]);
+    const [savingOrder, setSavingOrder] = useState(false);
+
     const fetchImages = async () => {
         try {
             setLoading(true);
@@ -38,17 +43,22 @@ const GalleryManagement = () => {
         fetchImages();
     }, []);
 
+    // Sync reorderedImages when entering reorder mode
+    useEffect(() => {
+        if (reorderMode) {
+            setReorderedImages([...images]);
+        }
+    }, [reorderMode]);
+
     const handleFileSelect = async (files) => {
         if (!files || files.length === 0) return;
 
         const file = files[0];
 
-
         if (!file.type.startsWith('image/')) {
             alert('Please select an image file');
             return;
         }
-
 
         if (file.size > 5 * 1024 * 1024) {
             alert('File size must be less than 5MB');
@@ -59,9 +69,7 @@ const GalleryManagement = () => {
             setUploading(true);
             setError(null);
 
-
             const result = await uploadApi.upload(file);
-
 
             setUploadedUrl(result.url);
             setCategory('');
@@ -85,10 +93,10 @@ const GalleryManagement = () => {
         try {
             setSaving(true);
 
-
             await galleryApi.create({
                 src: uploadedUrl,
                 category: category,
+                order: images.length, // Add at the end
             });
 
             setShowModal(false);
@@ -104,7 +112,7 @@ const GalleryManagement = () => {
     };
 
     const handleDelete = async (image) => {
-        if (!window.confirm('Are you sure you want to delete this image?')) {
+        if (!window.confirm('Hapus gambar ini dari galeri?')) {
             return;
         }
 
@@ -144,6 +152,41 @@ const GalleryManagement = () => {
         }
     };
 
+    // Reorder functions
+    const handleEnterReorderMode = () => {
+        setReorderMode(true);
+        setReorderedImages([...images]);
+    };
+
+    const handleCancelReorder = () => {
+        setReorderMode(false);
+        setReorderedImages([]);
+    };
+
+    const handleSaveOrder = async () => {
+        try {
+            setSavingOrder(true);
+
+            // Build array of {id, order}
+            const orderData = reorderedImages.map((img, index) => ({
+                id: img.id,
+                order: index,
+            }));
+
+            await galleryApi.reorder(orderData);
+
+            // Update main images state
+            setImages(reorderedImages);
+            setReorderMode(false);
+            setReorderedImages([]);
+        } catch (err) {
+            console.error('Reorder error:', err);
+            alert('Failed to save order');
+        } finally {
+            setSavingOrder(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -166,10 +209,61 @@ const GalleryManagement = () => {
                     <h1 className="font-heading text-2xl sm:text-3xl font-bold text-[#3E2723] mb-2">Gallery Management</h1>
                     <p className="text-muted-foreground text-sm sm:text-base">Upload and manage your cafe photos.</p>
                 </div>
-                <Button variant="outline" onClick={fetchImages} disabled={loading}>
-                    <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
-                </Button>
+                <div className="flex gap-2">
+                    {!reorderMode ? (
+                        <>
+                            <Button
+                                variant="outline"
+                                onClick={handleEnterReorderMode}
+                                disabled={images.length < 2}
+                                className="gap-2"
+                            >
+                                <ArrowUpDown size={18} />
+                                <span className="hidden sm:inline">Atur Urutan</span>
+                            </Button>
+                            <Button variant="outline" onClick={fetchImages} disabled={loading}>
+                                <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button
+                                variant="outline"
+                                onClick={handleCancelReorder}
+                                disabled={savingOrder}
+                            >
+                                Batal
+                            </Button>
+                            <Button
+                                className="bg-[#3E2723] hover:bg-[#2D2420] gap-2"
+                                onClick={handleSaveOrder}
+                                disabled={savingOrder}
+                            >
+                                {savingOrder ? (
+                                    <Loader2 size={18} className="animate-spin" />
+                                ) : (
+                                    <Save size={18} />
+                                )}
+                                Simpan Urutan
+                            </Button>
+                        </>
+                    )}
+                </div>
             </motion.div>
+
+            {/* Reorder Mode Banner */}
+            {reorderMode && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-3"
+                >
+                    <GripVertical size={20} className="text-blue-600" />
+                    <p className="text-blue-700 text-sm">
+                        <strong>Mode Atur Urutan:</strong> Drag gambar untuk mengubah posisi, lalu klik "Simpan Urutan"
+                    </p>
+                </motion.div>
+            )}
 
             {error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -177,86 +271,124 @@ const GalleryManagement = () => {
                 </div>
             )}
 
-            {/* Upload Area */}
-            <Card className="border-none shadow-sm">
-                <CardHeader>
-                    <CardTitle className="text-lg">Upload New Photo</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div
-                        className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
-                            ${dragActive ? 'border-[#8D6E63] bg-[#FBEFEF]' : 'border-gray-200 hover:border-[#8D6E63] hover:bg-[#FBEFEF]'}
-                            ${uploading ? 'pointer-events-none opacity-70' : ''}
-                        `}
-                        onDragEnter={handleDrag}
-                        onDragLeave={handleDrag}
-                        onDragOver={handleDrag}
-                        onDrop={handleDrop}
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => handleFileSelect(e.target.files)}
-                        />
-                        {uploading ? (
-                            <>
-                                <Loader2 size={40} className="text-[#8D6E63] mx-auto mb-4 animate-spin" />
-                                <p className="font-medium text-foreground mb-1">Uploading...</p>
-                            </>
-                        ) : (
-                            <>
-                                <Upload size={40} className="text-muted-foreground mx-auto mb-4 group-hover:text-[#8D6E63] transition-colors" />
-                                <p className="font-medium text-foreground mb-1">Click to upload or drag photos here</p>
-                                <span className="text-xs text-muted-foreground">JPG, PNG up to 5MB</span>
-                            </>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+            {/* Upload Area - Hidden in reorder mode */}
+            {!reorderMode && (
+                <Card className="border-none shadow-sm">
+                    <CardHeader>
+                        <CardTitle className="text-lg">Upload New Photo</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div
+                            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all
+                                ${dragActive ? 'border-[#8D6E63] bg-[#FBEFEF]' : 'border-gray-200 hover:border-[#8D6E63] hover:bg-[#FBEFEF]'}
+                                ${uploading ? 'pointer-events-none opacity-70' : ''}
+                            `}
+                            onDragEnter={handleDrag}
+                            onDragLeave={handleDrag}
+                            onDragOver={handleDrag}
+                            onDrop={handleDrop}
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleFileSelect(e.target.files)}
+                            />
+                            {uploading ? (
+                                <>
+                                    <Loader2 size={40} className="text-[#8D6E63] mx-auto mb-4 animate-spin" />
+                                    <p className="font-medium text-foreground mb-1">Uploading...</p>
+                                </>
+                            ) : (
+                                <>
+                                    <Upload size={40} className="text-muted-foreground mx-auto mb-4 group-hover:text-[#8D6E63] transition-colors" />
+                                    <p className="font-medium text-foreground mb-1">Click to upload or drag photos here</p>
+                                    <span className="text-xs text-muted-foreground">JPG, PNG up to 5MB</span>
+                                </>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
 
-            {/* Gallery Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                <AnimatePresence>
-                    {images.map((image) => (
-                        <motion.div
+            {/* Gallery Grid - Normal Mode */}
+            {!reorderMode && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <AnimatePresence>
+                        {images.map((image) => (
+                            <motion.div
+                                key={image.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                className="relative rounded-xl overflow-hidden aspect-square shadow-sm group"
+                            >
+                                <img
+                                    src={image.src}
+                                    alt={image.category}
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors">
+                                    <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span className="text-white text-xs font-medium bg-black/50 px-2 py-1 rounded">
+                                            {image.category}
+                                        </span>
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    className="absolute top-2 right-2 rounded-full w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                                    onClick={() => handleDelete(image)}
+                                    disabled={deleting === image.id}
+                                >
+                                    {deleting === image.id ? (
+                                        <Loader2 size={16} className="animate-spin" />
+                                    ) : (
+                                        <Trash2 size={16} />
+                                    )}
+                                </Button>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                </div>
+            )}
+
+            {/* Gallery Grid - Reorder Mode */}
+            {reorderMode && (
+                <Reorder.Group
+                    axis="x"
+                    values={reorderedImages}
+                    onReorder={setReorderedImages}
+                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
+                >
+                    {reorderedImages.map((image) => (
+                        <Reorder.Item
                             key={image.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="relative rounded-xl overflow-hidden aspect-square shadow-sm group"
+                            value={image}
+                            className="relative rounded-xl overflow-hidden aspect-square shadow-sm cursor-grab active:cursor-grabbing"
                         >
                             <img
                                 src={image.src}
                                 alt={image.category}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                className="w-full h-full object-cover pointer-events-none"
                             />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors">
-                                <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span className="text-white text-xs font-medium bg-black/50 px-2 py-1 rounded">
-                                        {image.category}
-                                    </span>
+                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                <div className="bg-white/90 p-2 rounded-full shadow-lg">
+                                    <GripVertical size={24} className="text-[#3E2723]" />
                                 </div>
                             </div>
-                            <Button
-                                variant="destructive"
-                                size="icon"
-                                className="absolute top-2 right-2 rounded-full w-8 h-8 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                                onClick={() => handleDelete(image)}
-                                disabled={deleting === image.id}
-                            >
-                                {deleting === image.id ? (
-                                    <Loader2 size={16} className="animate-spin" />
-                                ) : (
-                                    <Trash2 size={16} />
-                                )}
-                            </Button>
-                        </motion.div>
+                            <div className="absolute bottom-2 left-2">
+                                <span className="text-white text-xs font-medium bg-black/50 px-2 py-1 rounded">
+                                    {image.category}
+                                </span>
+                            </div>
+                        </Reorder.Item>
                     ))}
-                </AnimatePresence>
-            </div>
+                </Reorder.Group>
+            )}
 
             {images.length === 0 && (
                 <div className="text-center py-12 text-muted-foreground">

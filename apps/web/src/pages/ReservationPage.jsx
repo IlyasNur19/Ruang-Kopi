@@ -1,25 +1,41 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { User, CalendarDays, Clock, Users, Phone, MapPin, Mail, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, CalendarDays, Clock, Users, Phone, MapPin, Loader2, CheckCircle, XCircle, AlertTriangle, Check } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { reservationsApi } from '../services/api';
+import { reservationsApi, settingsApi } from '../services/api';
 import { useMutation } from '../hooks/useApi';
 
 const ReservationPage = () => {
     const [formData, setFormData] = useState({
         name: '',
-        email: '',
         phone: '',
         date: '',
-        time: '08:00',
+        time: '10:00',
         guests: 2,
-        notes: ''
     });
-    const [submitted, setSubmitted] = useState(false);
+    const [step, setStep] = useState('form'); // 'form', 'review', 'success', 'error'
+    const [shopStatus, setShopStatus] = useState('available'); // 'available', 'busy', 'full'
+    const [statusLoading, setStatusLoading] = useState(true);
 
     // Mutation for creating reservation
     const { mutate: createReservation, loading, error, reset } = useMutation(reservationsApi.create);
+
+    // Fetch shop status on mount
+    useEffect(() => {
+        const fetchStatus = async () => {
+            try {
+                const data = await settingsApi.getStatus();
+                setShopStatus(data.status || 'available');
+            } catch (err) {
+                console.error('Failed to fetch status:', err);
+                setShopStatus('available'); // Default to available on error
+            } finally {
+                setStatusLoading(false);
+            }
+        };
+        fetchStatus();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -29,47 +45,204 @@ const ReservationPage = () => {
         }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleReview = (e) => {
         e.preventDefault();
+        setStep('review');
+    };
 
+    const handleConfirm = async () => {
         try {
+            // Save to database first
             await createReservation({
                 name: formData.name,
-                phone: formData.phone || formData.email, // Use phone or fallback to email
+                phone: formData.phone,
                 date: formData.date,
                 time: formData.time,
                 guests: formData.guests,
             });
-            setSubmitted(true);
+
+            // Then open WhatsApp
+            handleWhatsApp();
+            setStep('success');
         } catch (err) {
-            // Error is already handled by useMutation
             console.error('Reservation failed:', err);
+            setStep('error');
         }
     };
 
     const handleWhatsApp = () => {
-        const { name, date, time, guests, notes } = formData;
-        const whatsappPhone = '6281234567890';
-        const message = `Halo RuangKopi, saya ingin reservasi.%0A%0ANama: ${name}%0ATanggal: ${date}%0AJam: ${time}%0AJumlah: ${guests} orang${notes ? `%0ACatatan: ${notes}` : ''}%0A%0AMohon konfirmasinya. Terima kasih.`;
+        const { name, date, time, guests } = formData;
+        const whatsappPhone = '6281234567890'; // TODO: Make this configurable
+        const formattedDate = new Date(date).toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        const message = `Halo RuangKopi, saya ingin reservasi.%0A%0ANama: ${name}%0ATanggal: ${formattedDate}%0AJam: ${time}%0AJumlah: ${guests} orang%0A%0AMohon konfirmasinya. Terima kasih.`;
         window.open(`https://wa.me/${whatsappPhone}?text=${message}`, '_blank');
     };
 
     const handleReset = () => {
-        setSubmitted(false);
+        setStep('form');
         reset();
         setFormData({
             name: '',
-            email: '',
             phone: '',
             date: '',
-            time: '08:00',
+            time: '10:00',
             guests: 2,
-            notes: ''
         });
+    };
+
+    const handleBack = () => {
+        setStep('form');
     };
 
     const timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
     const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8];
+
+    // Status indicator component
+    const StatusWidget = () => {
+        const statusConfig = {
+            available: {
+                color: 'bg-green-500',
+                textColor: 'text-green-700',
+                bgColor: 'bg-green-50',
+                borderColor: 'border-green-200',
+                label: 'Tersedia',
+                description: 'Tempat masih tersedia untuk reservasi',
+                icon: CheckCircle
+            },
+            busy: {
+                color: 'bg-yellow-500',
+                textColor: 'text-yellow-700',
+                bgColor: 'bg-yellow-50',
+                borderColor: 'border-yellow-200',
+                label: 'Hampir Penuh',
+                description: 'Segera reservasi sebelum kehabisan',
+                icon: AlertTriangle
+            },
+            full: {
+                color: 'bg-red-500',
+                textColor: 'text-red-700',
+                bgColor: 'bg-red-50',
+                borderColor: 'border-red-200',
+                label: 'Penuh',
+                description: 'Maaf, tempat sedang penuh. Coba lagi nanti.',
+                icon: XCircle
+            }
+        };
+
+        const config = statusConfig[shopStatus] || statusConfig.available;
+        const Icon = config.icon;
+
+        if (statusLoading) {
+            return (
+                <div className="flex items-center gap-3 p-4 bg-gray-50 border border-gray-200 rounded-xl mb-6">
+                    <Loader2 size={20} className="animate-spin text-gray-400" />
+                    <span className="text-gray-500">Memuat status ketersediaan...</span>
+                </div>
+            );
+        }
+
+        return (
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex items-center gap-3 p-4 ${config.bgColor} border ${config.borderColor} rounded-xl mb-6`}
+            >
+                <div className={`w-3 h-3 rounded-full ${config.color} animate-pulse`} />
+                <Icon size={20} className={config.textColor} />
+                <div className="flex-1">
+                    <span className={`font-semibold ${config.textColor}`}>{config.label}</span>
+                    <p className={`text-sm ${config.textColor} opacity-80`}>{config.description}</p>
+                </div>
+            </motion.div>
+        );
+    };
+
+    // Review Modal
+    const ReviewModal = () => {
+        const formattedDate = new Date(formData.date).toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        return (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            >
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+                >
+                    <div className="text-center mb-6">
+                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Check size={32} className="text-primary" />
+                        </div>
+                        <h3 className="font-heading text-2xl text-primary font-bold">Konfirmasi Reservasi</h3>
+                        <p className="text-muted-foreground mt-2">Pastikan data berikut sudah benar</p>
+                    </div>
+
+                    <div className="space-y-4 bg-gray-50 p-4 rounded-xl mb-6">
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Nama</span>
+                            <span className="font-medium text-primary">{formData.name}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">No. Telepon</span>
+                            <span className="font-medium text-primary">{formData.phone}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Tanggal</span>
+                            <span className="font-medium text-primary">{formattedDate}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Jam</span>
+                            <span className="font-medium text-primary">{formData.time}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-muted-foreground">Jumlah Tamu</span>
+                            <span className="font-medium text-primary">{formData.guests} Orang</span>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                        <button
+                            onClick={handleConfirm}
+                            disabled={loading}
+                            className="w-full py-4 bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 size={18} className="animate-spin" /> Memproses...
+                                </>
+                            ) : (
+                                <>
+                                    <Phone size={18} /> Konfirmasi via WhatsApp
+                                </>
+                            )}
+                        </button>
+                        <button
+                            onClick={handleBack}
+                            disabled={loading}
+                            className="w-full py-3 border border-gray-300 text-muted-foreground rounded-xl font-medium hover:border-primary hover:text-primary disabled:opacity-50"
+                        >
+                            Kembali & Edit
+                        </button>
+                    </div>
+                </motion.div>
+            </motion.div>
+        );
+    };
 
     return (
         <div className="min-h-screen flex flex-col bg-[#F8F5F2]">
@@ -100,19 +273,19 @@ const ReservationPage = () => {
                             className="w-full max-w-lg"
                         >
                             {/* Success State */}
-                            {submitted && !error && (
+                            {step === 'success' && (
                                 <div className="text-center py-10">
                                     <CheckCircle size={64} className="mx-auto text-green-500 mb-6" />
-                                    <h2 className="font-heading text-3xl text-primary mb-4 font-bold">Reservasi Berhasil!</h2>
+                                    <h2 className="font-heading text-3xl text-primary mb-4 font-bold">Reservasi Terkirim!</h2>
                                     <p className="text-muted-foreground mb-6">
-                                        Terima kasih, kami akan segera menghubungi Anda untuk konfirmasi.
+                                        Terima kasih! Silakan kirim pesan WhatsApp untuk konfirmasi. Kami akan segera merespon.
                                     </p>
                                     <div className="flex flex-col gap-3">
                                         <button
                                             onClick={handleWhatsApp}
                                             className="w-full py-3 bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600"
                                         >
-                                            <Phone size={18} /> Konfirmasi via WhatsApp
+                                            <Phone size={18} /> Buka WhatsApp Lagi
                                         </button>
                                         <button
                                             onClick={handleReset}
@@ -125,11 +298,11 @@ const ReservationPage = () => {
                             )}
 
                             {/* Error State */}
-                            {error && (
+                            {step === 'error' && (
                                 <div className="text-center py-10">
                                     <XCircle size={64} className="mx-auto text-red-500 mb-6" />
-                                    <h2 className="font-heading text-3xl text-primary mb-4 font-bold">Reservasi Gagal</h2>
-                                    <p className="text-red-500 mb-6">{error}</p>
+                                    <h2 className="font-heading text-3xl text-primary mb-4 font-bold">Terjadi Kesalahan</h2>
+                                    <p className="text-red-500 mb-6">{error || 'Gagal menyimpan reservasi. Silakan coba via WhatsApp langsung.'}</p>
                                     <div className="flex flex-col gap-3">
                                         <button
                                             onClick={handleWhatsApp}
@@ -148,15 +321,19 @@ const ReservationPage = () => {
                             )}
 
                             {/* Form */}
-                            {!submitted && !error && (
+                            {step === 'form' && (
                                 <>
                                     <span className="inline-block px-4 py-1.5 bg-gray-100 text-xs font-bold uppercase tracking-widest text-muted-foreground rounded-full mb-6">Book Your Spot</span>
                                     <h1 className="font-heading text-4xl md:text-5xl text-primary mb-4 font-bold">Reservasi Meja Anda</h1>
-                                    <p className="text-muted-foreground mb-10 leading-relaxed">
-                                        Nikmati momen terbaik bersama kopi terbaik. Silakan isi formulir di bawah ini, kami akan menyiapkan tempat spesial untuk Anda.
+                                    <p className="text-muted-foreground mb-8 leading-relaxed">
+                                        Nikmati momen terbaik bersama kopi terbaik. Silakan isi formulir di bawah ini.
                                     </p>
 
-                                    <form onSubmit={handleSubmit} className="space-y-5">
+                                    {/* Status Widget */}
+                                    <StatusWidget />
+
+                                    {/* Form - Disabled when full */}
+                                    <form onSubmit={handleReview} className={`space-y-5 ${shopStatus === 'full' ? 'opacity-50 pointer-events-none' : ''}`}>
                                         <div>
                                             <label className="block text-sm font-medium text-foreground mb-2">Nama Lengkap</label>
                                             <div className="relative">
@@ -173,34 +350,19 @@ const ReservationPage = () => {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-foreground mb-2">Email</label>
-                                                <div className="relative">
-                                                    <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                                    <input
-                                                        type="email"
-                                                        name="email"
-                                                        value={formData.email}
-                                                        placeholder="email@contoh.com"
-                                                        onChange={handleChange}
-                                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-foreground mb-2">No. Telepon</label>
-                                                <div className="relative">
-                                                    <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                                    <input
-                                                        type="tel"
-                                                        name="phone"
-                                                        value={formData.phone}
-                                                        placeholder="08xxxxxxxxxx"
-                                                        onChange={handleChange}
-                                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                                                    />
-                                                </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-foreground mb-2">No. Telepon</label>
+                                            <div className="relative">
+                                                <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                                <input
+                                                    type="tel"
+                                                    name="phone"
+                                                    value={formData.phone}
+                                                    placeholder="08xxxxxxxxxx"
+                                                    required
+                                                    onChange={handleChange}
+                                                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                                />
                                             </div>
                                         </div>
 
@@ -214,6 +376,7 @@ const ReservationPage = () => {
                                                         name="date"
                                                         value={formData.date}
                                                         required
+                                                        min={new Date().toISOString().split('T')[0]}
                                                         onChange={handleChange}
                                                         className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                                                     />
@@ -252,33 +415,10 @@ const ReservationPage = () => {
 
                                         <button
                                             type="submit"
-                                            disabled={loading}
+                                            disabled={shopStatus === 'full'}
                                             className="w-full py-4 bg-primary text-white rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#2D2420] hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                                         >
-                                            {loading ? (
-                                                <>
-                                                    <Loader2 size={18} className="animate-spin" /> Mengirim...
-                                                </>
-                                            ) : (
-                                                'Kirim Reservasi'
-                                            )}
-                                        </button>
-
-                                        <div className="relative">
-                                            <div className="absolute inset-0 flex items-center">
-                                                <div className="w-full border-t border-gray-200"></div>
-                                            </div>
-                                            <div className="relative flex justify-center text-xs uppercase">
-                                                <span className="bg-[#F8F5F2] px-2 text-muted-foreground">atau</span>
-                                            </div>
-                                        </div>
-
-                                        <button
-                                            type="button"
-                                            onClick={handleWhatsApp}
-                                            className="w-full py-4 bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-lg"
-                                        >
-                                            <Phone size={18} /> Pesan via WhatsApp
+                                            Review Reservasi
                                         </button>
                                     </form>
 
@@ -297,6 +437,11 @@ const ReservationPage = () => {
                 </div>
             </main>
             <Footer />
+
+            {/* Review Modal */}
+            <AnimatePresence>
+                {step === 'review' && <ReviewModal />}
+            </AnimatePresence>
         </div>
     );
 };

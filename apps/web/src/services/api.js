@@ -155,6 +155,13 @@ export const galleryApi = {
             method: 'DELETE',
         });
     },
+
+    reorder: async (images) => {
+        return apiRequest('/gallery/reorder', {
+            method: 'PUT',
+            body: JSON.stringify({ images }),
+        });
+    },
 };
 
 // ================================

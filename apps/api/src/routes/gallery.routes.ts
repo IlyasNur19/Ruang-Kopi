@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db/index.js';
 import { galleryImages } from '../db/schema.js';
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, sql } from 'drizzle-orm';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { z } from 'zod';
@@ -18,6 +18,14 @@ const galleryImageSchema = z.object({
 
 const updateGalleryImageSchema = galleryImageSchema.partial();
 
+// Reorder schema
+const reorderSchema = z.object({
+    images: z.array(z.object({
+        id: z.number(),
+        order: z.number(),
+    })),
+});
+
 // GET /api/gallery - Get all gallery images
 router.get('/', async (req, res, next) => {
     try {
@@ -28,6 +36,26 @@ router.get('/', async (req, res, next) => {
 
         res.json(images);
     } catch (error) {
+        next(error);
+    }
+});
+
+// PUT /api/gallery/reorder - Reorder gallery images (protected)
+// IMPORTANT: This route MUST be defined BEFORE /:id to avoid route conflicts
+router.put('/reorder', authMiddleware, validate(reorderSchema), async (req, res, next) => {
+    try {
+        const { images } = req.body;
+
+        // Update each image's order using raw SQL to handle reserved keyword "order"
+        for (const img of images) {
+            await db.execute(
+                sql`UPDATE gallery_images SET "order" = ${img.order} WHERE id = ${img.id}`
+            );
+        }
+
+        res.json({ message: 'Gallery order updated successfully' });
+    } catch (error) {
+        console.error('Reorder error:', error);
         next(error);
     }
 });
@@ -56,7 +84,7 @@ router.post('/', authMiddleware, validate(galleryImageSchema), async (req, res, 
 // PUT /api/gallery/:id - Update gallery image (protected)
 router.put('/:id', authMiddleware, validate(updateGalleryImageSchema), async (req, res, next) => {
     try {
-        const id = parseInt(req.params.id);
+        const id = parseInt(req.params.id as string);
         const updateData = req.body;
 
         const [updatedImage] = await db
@@ -79,7 +107,7 @@ router.put('/:id', authMiddleware, validate(updateGalleryImageSchema), async (re
 // DELETE /api/gallery/:id - Delete gallery image (protected)
 router.delete('/:id', authMiddleware, async (req, res, next) => {
     try {
-        const id = parseInt(req.params.id);
+        const id = parseInt(req.params.id as string);
 
         const [deletedImage] = await db
             .delete(galleryImages)
