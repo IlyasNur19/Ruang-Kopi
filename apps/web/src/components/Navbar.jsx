@@ -1,175 +1,299 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const menuItems = [
-  { name: 'Home', path: '/' },
-  { name: 'Menu', path: '/menu' },
-  { name: 'Kotak Gagasan', path: '/kotak-gagasan' },
-  { name: 'Gallery', path: '/gallery' },
-  { name: 'Location', path: '/location' },
+const navLinks = [
+  { name: 'Home', path: '/', icon: 'home' },
+  { name: 'Menu', path: '/menu', icon: 'restaurant_menu' },
+  { name: 'About', path: '/kotak-gagasan', icon: 'lightbulb' },
+  { name: 'Gallery', path: '/gallery', icon: 'photo_library' },
 ];
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const contactRef = useRef(null);
   const location = useLocation();
 
-  // Handle scroll effect for navbar background
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
+    setIsContactOpen(false);
   }, [location]);
 
-  const isActive = (path) => location.pathname === path;
-  const isHome = location.pathname === '/';
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isMenuOpen]);
 
-  // Show background when scrolled OR when not on home page
-  const showBackground = isScrolled || !isHome;
+  // Close contact dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (contactRef.current && !contactRef.current.contains(e.target)) {
+        setIsContactOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <>
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${showBackground
-          ? 'bg-primary/95 backdrop-blur-md shadow-lg'
-          : 'bg-transparent'
+      {/* ====== ANNOUNCEMENT BAR ====== */}
+
+
+      {/* ====== MAIN NAVBAR ====== */}
+      <header
+        className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
+            ? 'bg-[#F5F0EB]/95 backdrop-blur-lg shadow-[0_2px_20px_rgba(62,39,35,0.06)]'
+            : 'bg-[#F5F0EB]'
           }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <span className="font-['Baskervville'] font-medium text-2xl text-white tracking-wide">
-                ruang kopi
+        <div className="max-w-[1200px] mx-auto px-4 md:px-10">
+          <div className="flex items-center justify-between h-20 md:h-24">
+
+            {/* === LEFT: Logo === */}
+            <Link to="/" className="flex items-center gap-0.5 shrink-0 group">
+              <span className="font-serif text-[32px] md:text-[40px] font-bold text-[#3E2723] leading-none tracking-tight">
+                Ruang
               </span>
+              <span className="font-serif text-[32px] md:text-[40px] font-bold text-[#8D6E63] leading-none tracking-tight italic">
+                Kopi
+              </span>
+              <span className="font-serif text-[#8D6E63] text-[32px] md:text-[40px] font-bold leading-none">.</span>
             </Link>
 
-            {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-8">
-              {menuItems.map((item) => (
+            {/* === CENTER: Desktop Nav Links === */}
+            <nav className="hidden md:flex items-center gap-1">
+              {navLinks.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`relative text-sm font-medium transition-colors duration-200 ${isActive(item.path)
-                    ? 'text-secondary'
-                    : 'text-white/80 hover:text-white'
+                  className={`relative px-5 py-2 text-[15px] font-medium transition-colors duration-200 rounded-lg ${isActive(item.path)
+                      ? 'text-[#3E2723]'
+                      : 'text-[#6D4C41] hover:text-[#3E2723] hover:bg-[#3E2723]/5'
                     }`}
                 >
                   {item.name}
                   {isActive(item.path) && (
                     <motion.span
-                      layoutId="activeTab"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-secondary rounded-full"
+                      layoutId="nav-underline"
+                      className="absolute bottom-0 left-5 right-5 h-[2px] bg-[#3E2723] rounded-full"
+                      transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                     />
                   )}
                 </Link>
               ))}
-            </div>
+            </nav>
 
-            {/* Desktop CTA */}
-            <div className="hidden md:block">
-              <Link
-                to="/reservation"
-                className="bg-secondary text-primary font-semibold px-6 py-2.5 rounded-full hover:bg-secondary/90 transition-colors"
+            {/* === RIGHT: Contact Button (Desktop) + Hamburger (Mobile) === */}
+            <div className="flex items-center gap-3">
+              {/* Contact Dropdown - Desktop */}
+              <div className="hidden md:block relative" ref={contactRef}>
+                <button
+                  onClick={() => setIsContactOpen(!isContactOpen)}
+                  className={`flex items-center gap-2 bg-[#3E2723] text-white pl-6 pr-4 py-2.5 rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-[#4E342E] transition-all duration-200 active:scale-[0.97] shadow-sm ${isContactOpen ? 'bg-[#4E342E]' : ''
+                    }`}
+                >
+                  Contact
+                  <span className={`material-symbols-outlined text-[18px] transition-transform duration-200 ${isContactOpen ? 'rotate-180' : ''}`}>
+                    expand_more
+                  </span>
+                </button>
+
+                {/* Dropdown Menu */}
+                <AnimatePresence>
+                  {isContactOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ duration: 0.15, ease: 'easeOut' }}
+                      className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#3E2723]/8 overflow-hidden py-2"
+                    >
+                      <Link
+                        to="/reservation"
+                        onClick={() => setIsContactOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 text-sm text-[#3E2723] hover:bg-[#F5F0EB] transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[20px] text-[#8D6E63]">calendar_month</span>
+                        Reservasi
+                      </Link>
+                      <Link
+                        to="/location"
+                        onClick={() => setIsContactOpen(false)}
+                        className="flex items-center gap-3 px-5 py-3 text-sm text-[#3E2723] hover:bg-[#F5F0EB] transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[20px] text-[#8D6E63]">location_on</span>
+                        Lokasi Kami
+                      </Link>
+                      <a
+                        href="https://wa.me/6281234567890"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 px-5 py-3 text-sm text-[#3E2723] hover:bg-[#F5F0EB] transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[20px] text-[#8D6E63]">chat</span>
+                        WhatsApp
+                      </a>
+                      <div className="border-t border-[#3E2723]/8 mx-4 my-1"></div>
+                      <a
+                        href="tel:+6281234567890"
+                        className="flex items-center gap-3 px-5 py-3 text-sm text-[#3E2723] hover:bg-[#F5F0EB] transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-[20px] text-[#8D6E63]">call</span>
+                        +62 812 3456 7890
+                      </a>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Hamburger - Mobile */}
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden p-2.5 rounded-xl text-[#3E2723] hover:bg-[#3E2723]/5 transition-colors"
+                aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
               >
-                Reservation
-              </Link>
+                <span className="material-symbols-outlined text-[28px]">
+                  {isMenuOpen ? 'close' : 'menu'}
+                </span>
+              </button>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
-              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-            >
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Mobile Menu Overlay */}
+      {/* ====== MOBILE DRAWER ====== */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Backdrop */}
+            {/* Overlay */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[55] md:hidden"
             />
 
-            {/* Menu Panel */}
-            <motion.div
-              initial={{ x: '100%' }}
+            {/* Drawer Panel */}
+            <motion.aside
+              initial={{ x: '-100%' }}
               animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed top-0 right-0 bottom-0 w-80 bg-primary z-50 md:hidden shadow-2xl"
+              exit={{ x: '-100%' }}
+              transition={{ type: 'tween', duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+              className="fixed top-0 left-0 z-[60] bg-[#F5F0EB] h-full w-[85vw] max-w-[320px] shadow-2xl flex flex-col md:hidden"
             >
-              {/* Close Button */}
-              <div className="flex justify-end p-4">
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between px-6 pt-6 pb-4">
+                <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-0.5">
+                  <span className="font-serif text-[28px] font-bold text-[#3E2723] leading-none tracking-tight">Ruang</span>
+                  <span className="font-serif text-[28px] font-bold text-[#8D6E63] leading-none tracking-tight italic">Kopi</span>
+                  <span className="font-serif text-[#8D6E63] text-[28px] font-bold leading-none">.</span>
+                </Link>
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2 rounded-xl text-[#6D4C41] hover:bg-[#3E2723]/5 transition-colors"
                   aria-label="Close menu"
                 >
-                  <X size={28} />
+                  <span className="material-symbols-outlined text-[24px]">close</span>
                 </button>
               </div>
 
-              {/* Menu Items */}
-              <div className="px-6 py-4">
-                <div className="space-y-2">
-                  {menuItems.map((item, index) => (
-                    <motion.div
-                      key={item.path}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Link
-                        to={item.path}
-                        onClick={() => setIsMenuOpen(false)}
-                        className={`block py-3 px-4 text-lg font-medium rounded-lg transition-colors ${isActive(item.path)
-                          ? 'text-secondary bg-white/10'
-                          : 'text-white/80 hover:text-white hover:bg-white/5'
-                          }`}
-                      >
-                        {item.name}
-                      </Link>
-                    </motion.div>
-                  ))}
-                </div>
+              {/* Divider */}
+              <div className="mx-6 border-t border-[#3E2723]/10 mb-2"></div>
 
-                {/* Mobile CTA */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="mt-8"
-                >
-                  <Link
-                    to="/reservation"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block w-full text-center bg-secondary text-primary font-semibold py-3 rounded-full hover:bg-secondary/90 transition-colors"
+              {/* Nav Items */}
+              <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+                {navLinks.map((item, index) => (
+                  <motion.div
+                    key={item.path}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 + index * 0.05, ease: 'easeOut' }}
                   >
-                    Reservation
-                  </Link>
-                </motion.div>
-              </div>
-            </motion.div>
+                    <Link
+                      to={item.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-[15px] font-medium transition-all duration-200 ${isActive(item.path)
+                          ? 'bg-[#3E2723] text-white shadow-sm'
+                          : 'text-[#5D4037] hover:bg-[#3E2723]/5 hover:text-[#3E2723]'
+                        }`}
+                    >
+                      <span
+                        className="material-symbols-outlined text-[22px]"
+                        style={isActive(item.path) ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                      >
+                        {item.icon}
+                      </span>
+                      {item.name}
+                    </Link>
+                  </motion.div>
+                ))}
+
+                {/* Extra mobile links */}
+                <div className="pt-3 mt-3 border-t border-[#3E2723]/10 space-y-1">
+                  <motion.div
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.25, ease: 'easeOut' }}
+                  >
+                    <Link
+                      to="/location"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-[15px] font-medium text-[#5D4037] hover:bg-[#3E2723]/5 hover:text-[#3E2723] transition-all"
+                    >
+                      <span className="material-symbols-outlined text-[22px]">location_on</span>
+                      Lokasi
+                    </Link>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3, ease: 'easeOut' }}
+                  >
+                    <a
+                      href="tel:+6281234567890"
+                      className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-[15px] font-medium text-[#5D4037] hover:bg-[#3E2723]/5 hover:text-[#3E2723] transition-all"
+                    >
+                      <span className="material-symbols-outlined text-[22px]">call</span>
+                      Hubungi Kami
+                    </a>
+                  </motion.div>
+                </div>
+              </nav>
+
+              {/* Bottom CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="p-6 pt-2"
+              >
+                <Link
+                  to="/reservation"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full bg-[#3E2723] text-white py-3.5 rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-[#4E342E] transition-all active:scale-[0.97] shadow-md"
+                >
+                  <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+                  Reservasi Sekarang
+                </Link>
+              </motion.div>
+            </motion.aside>
           </>
         )}
       </AnimatePresence>

@@ -1,83 +1,135 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Clock, Phone, Instagram, MessageSquare, Smartphone, Lock, ArrowRight } from 'lucide-react';
 
 const Footer = () => {
-
     return (
-        <footer className="bg-[#F5F3F0]">
-
-            {/* Main Footer */}
-            <div className="bg-[#3E2723] text-[#D7CCC8] py-16">
-                <div className="max-w-6xl mx-auto px-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                        {/* Brand */}
-                        <div>
-                            <h2 className="font-['Baskervville'] text-4xl font-bold text-white tracking-wider mb-4">ruang kopi</h2>
-                            <p className="text-sm leading-relaxed opacity-80">
-                                Temukan inspirasi di setiap tegukan. Ruang Kopi hadir sebagai wadah bagi setiap cerita, kolaborasi, dan dedikasi terhadap kopi berkualitas tinggi yang diracik khusus untuk mendukung kreativitasmu.
-                            </p>
+        <footer className="bg-primary text-on-primary w-full py-section-gap px-margin-mobile md:px-margin-desktop">
+            <div className="max-w-container-max-width mx-auto">
+                {/* 4-Column Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+                    {/* Column 1 - Brand */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-4">
+                            <span
+                                className="material-symbols-outlined text-primary-fixed text-3xl"
+                                style={{ fontVariationSettings: "'FILL' 1" }}
+                            >
+                                coffee
+                            </span>
+                            <span className="font-headline text-headline-md text-primary-fixed font-bold">
+                                RuangKopi
+                            </span>
                         </div>
-
-                        {/* Explore */}
-                        <div>
-                            <h4 className="font-medium text-white mb-5">Explore</h4>
-                            <ul className="space-y-3 text-sm opacity-80">
-                                <li><Link to="/" className="hover:text-white hover:opacity-100 transition-colors">Home</Link></li>
-                                <li><Link to="/kotak-gagasan" className="hover:text-white hover:opacity-100 transition-colors">Kotak Gagasan</Link></li>
-                                <li><Link to="/menu" className="hover:text-white hover:opacity-100 transition-colors">Menu</Link></li>
-                                <li><Link to="/gallery" className="hover:text-white hover:opacity-100 transition-colors">Gallery</Link></li>
-                                <li><Link to="/reservation" className="hover:text-white hover:opacity-100 transition-colors">Reservations</Link></li>
-                            </ul>
-                        </div>
-
-                        {/* Visit Us */}
-                        <div>
-                            <h4 className="font-medium text-white mb-5">Visit Us</h4>
-                            <ul className="space-y-4 text-sm opacity-80">
-                                <li className="flex items-start gap-3">
-                                    <MapPin size={16} className="mt-0.5 shrink-0 text-[#8D6E63]" />
-                                    <span>Jl. Raya Solo - Tawangmangu, Keprabon, Karangpandan, Kec. Karangpandan, Kabupaten Karanganyar, Jawa Tengah 57791</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <Clock size={16} className="shrink-0 text-[#8D6E63]" />
-                                    <span>09.00 - 00.00</span>
-                                </li>
-                                <li className="flex items-center gap-3">
-                                    <Phone size={16} className="shrink-0 text-[#8D6E63]" />
-                                    <span>+62 812 3456 7890</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        {/* Follow Us */}
-                        <div>
-                            <h4 className="font-medium text-white mb-5">Follow Us</h4>
-                            <div className="flex gap-3 mb-6">
-                                <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                                    <Instagram size={18} />
-                                </a>
-                                <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                                    <MessageSquare size={18} />
-                                </a>
-                                <a href="#" className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                                    <Smartphone size={18} />
-                                </a>
-                            </div>
-                            <Link to="/admin/login" className="flex items-center gap-2 text-sm opacity-60 hover:opacity-100 transition-opacity">
-                                <Lock size={14} /> Admin Login
-                            </Link>
+                        <p className="font-body text-body-sm text-on-primary/80 max-w-xs mb-6">
+                            Membawa Ketenangan ke Cangkir Anda. Kopi artisanal di jantung kota.
+                        </p>
+                        <div className="flex items-center gap-3">
+                            <button
+                                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                                aria-label="Instagram"
+                            >
+                                <span className="material-symbols-outlined text-xl">photo_camera</span>
+                            </button>
+                            <button
+                                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                                aria-label="Music"
+                            >
+                                <span className="material-symbols-outlined text-xl">music_note</span>
+                            </button>
                         </div>
                     </div>
 
-                    {/* Bottom Bar */}
-                    <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs opacity-60">
-                        <p>© 2026 RuangKopi. All rights reserved.</p>
-                        <div className="flex gap-6">
-                            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-                            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-                        </div>
+                    {/* Column 2 - Navigasi */}
+                    <div>
+                        <h4 className="font-body text-label-md text-primary-fixed mb-6 uppercase tracking-wider">
+                            Navigasi
+                        </h4>
+                        <ul className="space-y-3">
+                            <li>
+                                <Link to="/" className="font-body text-body-sm text-on-primary font-bold">
+                                    Home
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/menu" className="font-body text-body-sm text-on-primary/70 hover:text-on-primary transition-colors">
+                                    Menu
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/kotak-gagasan" className="font-body text-body-sm text-on-primary/70 hover:text-on-primary transition-colors">
+                                    Kotak Gagasan
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/gallery" className="font-body text-body-sm text-on-primary/70 hover:text-on-primary transition-colors">
+                                    Gallery
+                                </Link>
+                            </li>
+                        </ul>
                     </div>
+
+                    {/* Column 3 - Informasi */}
+                    <div>
+                        <h4 className="font-body text-label-md text-primary-fixed mb-6 uppercase tracking-wider">
+                            Informasi
+                        </h4>
+                        <ul className="space-y-3">
+                            <li>
+                                <Link to="/location" className="font-body text-body-sm text-on-primary/70 hover:text-on-primary transition-colors">
+                                    Location
+                                </Link>
+                            </li>
+                            <li>
+                                <a href="#hours" className="font-body text-body-sm text-on-primary/70 hover:text-on-primary transition-colors">
+                                    Hours
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#privacy" className="font-body text-body-sm text-on-primary/70 hover:text-on-primary transition-colors">
+                                    Privacy Policy
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#contact" className="font-body text-body-sm text-on-primary/70 hover:text-on-primary transition-colors">
+                                    Contact
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Column 4 - Lokasi & Jam Buka */}
+                    <div>
+                        <h4 className="font-body text-label-md text-primary-fixed mb-6 uppercase tracking-wider">
+                            Lokasi &amp; Jam Buka
+                        </h4>
+                        <p className="font-body text-body-sm text-on-primary/80 mb-4">
+                            Jl. Raya Solo - Tawangmangu, Keprabon, Karangpandan, Kec. Karangpandan, Kabupaten Karanganyar, Jawa Tengah 57791
+                        </p>
+                        <p className="font-body text-body-sm text-on-primary/80">
+                            Senin - Minggu
+                        </p>
+                        <p className="font-body text-body-sm text-on-primary/80">
+                            09.00 - 00.00 WIB
+                        </p>
+                        <button className="bg-white/10 hover:bg-white/20 text-on-primary w-full py-2.5 rounded-full mt-4 flex items-center justify-center gap-2 transition-colors border border-white/20">
+                            <span className="material-symbols-outlined text-xl">map</span>
+                            <span className="font-body text-body-sm">Arahkan Peta</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Copyright Bar */}
+                <div className="max-w-container-max-width mx-auto mt-16 pt-8 border-t border-white/10 text-center">
+                    <p className="font-body text-body-sm text-on-primary/50">
+                        © 2026 RuangKopi Artisanal Coffee. All rights reserved.
+                    </p>
+                    <Link
+                        to="/admin/login"
+                        className="inline-flex items-center gap-1.5 font-body text-body-sm text-on-primary/30 hover:text-on-primary/50 transition-colors mt-3"
+                    >
+                        <span className="material-symbols-outlined text-sm">lock</span>
+                        Admin Login
+                    </Link>
                 </div>
             </div>
         </footer>

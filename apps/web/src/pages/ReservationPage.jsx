@@ -72,7 +72,7 @@ const ReservationPage = () => {
 
     const handleWhatsApp = () => {
         const { name, date, time, guests } = formData;
-        const whatsappPhone = '6281234567890'; // TODO: Make this configurable
+        const whatsappPhone = '6285156432030';
         const formattedDate = new Date(date).toLocaleDateString('id-ID', {
             weekday: 'long',
             year: 'numeric',

@@ -60,6 +60,7 @@
 }
 
 @layer utilities {
+  /* Existing utilities (preserved for other pages) */
   .glass-nav {
     @apply bg-[#FAF9F7]/70 backdrop-blur-md border-b border-[#3E2723]/5 dark:bg-[#1c1716]/70 dark:border-white/5;
   }
@@ -68,8 +69,46 @@
     @apply bg-white/10 backdrop-blur-md border border-white/20;
   }
 
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl;
+  }
+
+  .glass-dark {
+    @apply bg-black/30 backdrop-blur-xl border border-white/10 rounded-3xl;
+  }
+
   .text-outline {
     -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
     color: transparent;
+  }
+
+  /* New redesign utilities */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .ambient-shadow {
+    box-shadow: 0 12px 40px rgba(78, 52, 46, 0.08);
+  }
+
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(78, 52, 46, 0.12);
+  }
+
+  /* Material Symbols helper */
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+
+  .material-symbols-filled {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
 }

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RuangKopi - Membawa Ketenangan ke Cangkir Anda</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#1a1c1c",
+                      "inverse-primary": "#e5beb5",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed": "#2b160f",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed-dim": "#cfc4c0",
+                      "surface-variant": "#e2e2e2",
+                      "tertiary": "#292421",
+                      "secondary-fixed": "#ffdbce",
+                      "on-secondary-fixed-variant": "#5b4137",
+                      "secondary-fixed-dim": "#e4beb2",
+                      "surface-container-highest": "#e2e2e2",
+                      "primary": "#361f1a",
+                      "on-background": "#1a1c1c",
+                      "surface-dim": "#dadada",
+                      "surface-container": "#eeeeee",
+                      "on-primary-fixed": "#2b1611",
+                      "outline": "#827471",
+                      "inverse-surface": "#2f3131",
+                      "tertiary-fixed": "#ece0dc",
+                      "on-tertiary-fixed": "#201a18",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#e8e8e8",
+                      "secondary-container": "#fed7ca",
+                      "surface-bright": "#f9f9f9",
+                      "inverse-on-surface": "#f0f1f1",
+                      "primary-fixed-dim": "#e5beb5",
+                      "on-primary": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed": "#ffdad2",
+                      "error-container": "#ffdad6",
+                      "surface-container-low": "#f3f3f3",
+                      "outline-variant": "#d4c3bf",
+                      "on-primary-container": "#c19c94",
+                      "background": "#f9f9f9",
+                      "on-tertiary-container": "#aca29f",
+                      "on-secondary-container": "#795c51",
+                      "on-primary-fixed-variant": "#5c403a",
+                      "surface": "#f9f9f9",
+                      "surface-tint": "#755750",
+                      "error": "#ba1a1a",
+                      "tertiary-container": "#403936",
+                      "secondary": "#75584d",
+                      "on-surface-variant": "#504442",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-container": "#4e342e",
+                      "on-tertiary-fixed-variant": "#4c4542"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-max-width": "1200px",
+                      "margin-desktop": "40px",
+                      "section-gap": "80px",
+                      "unit": "8px",
+                      "margin-mobile": "16px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Playfair Display"],
+                      "headline-md": ["Playfair Display"],
+                      "headline-xl": ["Playfair Display"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-lg": ["Playfair Display"],
+                      "body-sm": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "label-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "label-md": ["14px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Custom Utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .ambient-shadow {
+            box-shadow: 0 12px 40px rgba(78, 52, 46, 0.08);
+        }
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(78, 52, 46, 0.12);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md antialiased selection:bg-primary-fixed selection:text-on-primary-fixed overflow-x-hidden">
+<!-- Navigation Overlay -->
+<div class="fixed inset-0 bg-inverse-surface/40 backdrop-blur-sm z-[55] opacity-0 pointer-events-none transition-opacity duration-300" id="nav-overlay"></div>
+<!-- NavigationDrawer (JSON Component) -->
+<aside class="fixed top-0 left-0 z-[60] bg-surface h-full w-80 shadow-xl flex flex-col p-6 -translate-x-full transition-transform duration-300 ease-in-out" id="nav-drawer">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">coffee</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">RuangKopi</span>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant" id="close-menu">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<nav class="flex flex-col gap-2">
+<!-- Active Tab -->
+<a class="flex items-center gap-4 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+                Home
+            </a>
+<!-- Inactive Tabs -->
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">restaurant_menu</span>
+                Menu
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+                Story
+            </a>
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">photo_library</span>
+                Gallery
+            </a>
+</nav>
+<div class="mt-auto border-t border-surface-container-highest pt-6">
+<button class="w-full bg-primary text-on-primary py-3 rounded-full font-label-md text-label-md hover:bg-primary-container transition-colors shadow-md">
+                Reservation
+            </button>
+</div>
+</aside>
+<!-- TopAppBar (JSON Component) -->
+<header class="fixed top-0 w-full z-50 sticky border-b border-outline-variant/30 bg-surface/80 backdrop-blur-md transition-all duration-300 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max-width mx-auto">
+<div class="flex items-center gap-4">
+<button class="md:hidden p-2 -ml-2 text-primary hover:bg-surface-container-low rounded-full transition-colors" id="open-menu">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">coffee</span>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">RuangKopi</span>
+</div>
+</div>
+<!-- Desktop Navigation -->
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-primary border-b-2 border-primary pb-1 font-label-md text-label-md transition-colors" href="#">Home</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Menu</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Story</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md" href="#">Gallery</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hidden md:flex bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95 shadow-sm">
+                Reservation
+            </button>
+<button class="md:hidden p-2 text-primary hover:bg-surface-container-low rounded-full transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[751px] md:min-h-[795px] flex items-center p-4 md:p-8 max-w-[1600px] mx-auto overflow-hidden">
+<!-- Background Container with curved edges -->
+<div class="absolute inset-4 md:inset-8 rounded-[2rem] md:rounded-[3rem] overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover" data-alt="A stunning, highly detailed photograph of a perfect latte art rosette in a pristine white ceramic cup. The cup rests on a smooth, warm wooden table in a high-end, minimalist cafe. The lighting is soft, natural daylight streaming through large windows, creating a bright, airy, modern light-mode aesthetic with a sophisticated color palette of earthy browns, creamy whites, and subtle cool grays. The mood is serene, artisanal, and evocative of slow living." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSmi9s2fuQEvRQDG8BqrahR27SAGsBpbnxkwh2AvaZXqIUW4U_C-Xczb3nMF_C2HiVuivymqT9MbvUBmJ-djpgSNDEWdiq6YKnisXCwrIOZ41OqaKWd9C-cf3q_PsaJ-EEwcs6wzUdd3k9tiEBPw7iCMN-B7yei_bwc3R4ei2b8pf8JeSlQGC_BsvsJ-1F7O4LWlIzJhyORffHpytYoZ-Zskdjkl-zjeFH-8CmPgW5zjanM1sZhOhCXwHQAxYjO_3szzG_spoLaqc"/>
+<!-- Soft Gradient Overlay -->
+<div class="absolute inset-0 bg-gradient-to-r from-surface/90 via-surface/60 to-transparent"></div>
+</div>
+<!-- Content Container -->
+<div class="relative z-10 max-w-container-max-width mx-auto w-full px-4 md:px-margin-desktop flex flex-col md:flex-row justify-between items-end pb-12 md:pb-0">
+<!-- Main Glass Card -->
+<div class="glass-panel p-8 md:p-12 rounded-[2rem] max-w-xl w-full flex flex-col gap-6 ambient-shadow mb-8 md:mb-0">
+<div class="self-start px-4 py-1.5 rounded-full bg-surface-container-highest/50 backdrop-blur-md border border-outline-variant/30 text-label-sm font-label-sm text-on-surface-variant flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                        Est. 2024
+                    </div>
+<h1 class="font-headline-xl text-headline-xl md:text-[56px] md:leading-[64px] text-primary tracking-tight">
+                        Membawa Ketenangan ke Cangkir Anda.
+                    </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">
+                        Kopi artisanal yang diseduh dengan presisi. Temukan ritme lambat di tengah hiruk-pikuk kota.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4 mt-2">
+<button class="bg-primary text-on-primary px-8 py-3.5 rounded-full font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95 shadow-md flex justify-center items-center gap-2">
+                            Pesan Sekarang
+                            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<button class="bg-surface/80 backdrop-blur-md border border-outline text-primary px-8 py-3.5 rounded-full font-label-md text-label-md hover:bg-surface transition-all active:scale-95">
+                            Lihat Menu
+                        </button>
+</div>
+</div>
+<!-- Floating Badges (Right side on desktop, hidden/repositioned on mobile) -->
+<div class="hidden md:flex flex-col gap-4 self-center ml-8">
+<!-- Status Badge -->
+<div class="glass-panel p-4 rounded-2xl flex items-center gap-4 hover-lift cursor-default w-64">
+<div class="w-12 h-12 rounded-full bg-surface-bright flex items-center justify-center text-primary shadow-sm border border-outline-variant/20">
+<span class="material-symbols-outlined">table_restaurant</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-0.5">Live Status</p>
+<p class="font-label-md text-label-md text-primary">5 Meja Tersedia</p>
+</div>
+</div>
+<!-- Daily Special Badge -->
+<div class="glass-panel p-4 rounded-2xl flex items-center gap-4 hover-lift cursor-pointer w-64">
+<img class="w-12 h-12 rounded-full object-cover border-2 border-surface shadow-sm" data-alt="A small, elegant cup of flat white coffee with pristine latte art, resting on a clean saucer against a neutral background. The lighting is soft and natural, highlighting the creamy texture of the milk foam." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5LZdYXwOxx-PeTZ5JMaRx_N16ffAfAv_46josaL29d6ibaS_QysfHZ0P4zCBgDs6uG-D_X3oo5QTNzdqpOYLOSi4YfClmU-pb3JrWhXUn0CQHqJZp4zIyhIj3W48-EOqzqHj5wPDT9bQvL3mrRdWhTM-5ytvLZbgJFgfQzmqx2-A2lIUDnzdN3Vj4aFA4eESB9GbxzCdjKIfNTiTwUXTAVxFF5RPlU9cCEYdVq8h_2jW3gsID3ThG6ZPGqu6tYaTGHekKHX-6KMI"/>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-0.5">Daily Special</p>
+<p class="font-label-md text-label-md text-primary">Gaya Flat White</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Menu Grid Section (Pilihan Artisan) -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop max-w-container-max-width mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Pilihan Artisan</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Kurasi biji kopi terbaik dari nusantara.</p>
+</div>
+<button class="flex items-center gap-2 text-primary font-label-md text-label-md hover:text-primary-container transition-colors group">
+                    Lihat Semua Menu 
+                    <span class="material-symbols-outlined transform group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Large Featured Item (Spans 2 columns on md) -->
+<div class="md:col-span-2 relative h-[400px] md:h-[500px] rounded-[2rem] overflow-hidden group hover-lift ambient-shadow">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A top-down view of a barista carefully pouring steamed milk into an espresso shot to create intricate latte art. The setting is a minimalist artisan coffee bar. The image features a sophisticated palette of deep, rich espresso brown and pure milky white, with soft, directional lighting that highlights the glossy texture of the crema. The aesthetic is clean, modern, and highly professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuHonQl1XgWUxgs8LE-zDH7SWCvX1lndL5Wjyr_Pwl9VWDN1_saD2uR88KDCGnltdq65PSa9JKR0Im1IVDgEQD8pn2SfN4LqereBlZN5CGdWyD3Vf-CcHcop7mq-Nef6zrFZkFzbfyjEtmhBNelCQ2YxViV2cZoNNE4I18R38RshzUFMsf911700EsBk6gzDj3ILxeXl0kNNDpBDxkLJPDpF1m4UiZR8EDnmRL8SFNHPG8XZqboqAdqaDFsSeAc9__1oT1KMoU61A"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 w-full p-8 flex justify-between items-end">
+<div class="text-on-primary">
+<span class="inline-block px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-medium tracking-wider uppercase mb-3 border border-white/30">Signature</span>
+<h3 class="font-headline-md text-headline-md mb-2 text-white">Signature Iced Latte</h3>
+<p class="font-body-sm text-body-sm text-white/80 max-w-sm">Espresso house blend dengan susu krimi yang disajikan dingin sempurna.</p>
+</div>
+<div class="bg-surface text-primary px-4 py-2 rounded-full font-label-md text-label-md shadow-lg border border-outline-variant/30">
+                            Rp 45.000
+                        </div>
+</div>
+</div>
+<!-- Regular Grid Item 1 -->
+<div class="bg-surface rounded-[2rem] overflow-hidden flex flex-col hover-lift ambient-shadow border border-outline-variant/20">
+<div class="h-56 relative overflow-hidden bg-surface-container-low">
+<img class="w-full h-full object-cover object-center" data-alt="A close-up shot of a dark ceramic mug filled with rich, black filter coffee. The mug sits on a clean, light-colored wooden table. Soft, natural light casts gentle shadows, emphasizing the minimalist and sophisticated atmosphere of a modern specialty coffee shop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqw5yfN5sAOXYXeX2xQKCNLJk1H6g1h1bzsPVmXitgJQ9SuHCE-pZ_1vJdkIms1zoqF8m74tUbgBygO1Bk7VmpFYbuZ76qYzItJNcTgZH6hAH_YT7skCaYTb0lAmVqcR4ZfTzeBHdtBrseoVyQ0pmGYm538L-qfNIzWqTPSlDIhyOXeBZDULbyhWwaI6qVZvAmAGeBeex850OYjFFdNQ5d8c7oM2U3PYp-nX8uhz0D3IcPwuao_ETxe8l-1QJ3OZNZkb7FkO9Bi_8"/>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md text-primary text-[20px] mb-2">Gayo Highland</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex-grow">Notes of dark chocolate, brown sugar &amp; subtle spice. Pour-over.</p>
+<div class="mt-4 flex justify-between items-center pt-4 border-t border-surface-container-highest">
+<span class="font-label-md text-label-md text-primary">Rp 35.000</span>
+<button class="w-8 h-8 rounded-full bg-surface-container hover:bg-primary hover:text-on-primary flex items-center justify-center transition-colors text-primary border border-outline-variant/30">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Regular Grid Item 2 -->
+<div class="bg-surface rounded-[2rem] overflow-hidden flex flex-col hover-lift ambient-shadow border border-outline-variant/20">
+<div class="h-56 relative overflow-hidden bg-surface-container-low p-6 flex items-center justify-center">
+<img class="w-full h-full object-cover rounded-xl shadow-sm" data-alt="A perfectly baked, golden-brown butter croissant served on a minimalist matte white ceramic plate. The pastry is resting on a clean, light oak wooden surface. The lighting is warm and directional, casting soft, elegant shadows that emphasize the flaky, artisanal texture of the croissant. The overall composition is airy and elegant." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBT_qLxiQ6A9dGYwXTNU2lR3KvVLHuy_fYwO9mm0Hv0aeDfxwtOyGYuhE6PAxa0-j7DBWFkP_0HNxRMpq2Eej9woRlDa-rii8vjeq3BvCASasHBiloP22MvWXQT6fCz0m9MODAh-3G_8YVupTsZdu-biCAVi2ziYozzlpWtEJvkY3NGRDRx8nBFjNgtsBe1hXlsrw71eAGJ-NW4eCMEoaeGshGPfEHmflg-tuSPlbuK_jlE58zrgaSpPkIReS_QvoVPIpgKdv6gzA0"/>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md text-primary text-[20px] mb-2">Butter Croissant</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex-grow">Classic French pastry, baked fresh daily with premium butter.</p>
+<div class="mt-4 flex justify-between items-center pt-4 border-t border-surface-container-highest">
+<span class="font-label-md text-label-md text-primary">Rp 28.000</span>
+<button class="w-8 h-8 rounded-full bg-surface-container hover:bg-primary hover:text-on-primary flex items-center justify-center transition-colors text-primary border border-outline-variant/30">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Horizontal Item (Spans 2 columns on md) -->
+<div class="md:col-span-2 bg-surface rounded-[2rem] overflow-hidden flex flex-col sm:flex-row hover-lift ambient-shadow border border-outline-variant/20 h-auto sm:h-56">
+<div class="sm:w-2/5 h-48 sm:h-full relative overflow-hidden bg-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="A tall glass filled with dark, amber-colored cold brew coffee and large, clear ice cubes. Condensation is visible on the outside of the glass, suggesting a refreshing coolness. The glass sits on a light-colored surface in a bright, modern environment with soft, high-key lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2sHahYogMmOs3-2gUn2Vc6bqzudjROASSlOVwymaz8uzlK7V8Mke552APc_q8t_H3hFJ1BXNh3NsYaEpFKFH6ioztKZ-AdZMYvKqPH9n0xcvF4wV2iGW41ETRLHoNlV7aQ23-B7ph36kzpgHhvYoOEJ60XoFmVO_zg1B4dsFloTtwaP4PkALV94LrVvlNVs2OWxCFVcWjCce69juuVj5ZE4nsL299e2e7Sb0YPanFrhesp_gUSl2aLTPLkBQraZVHBEzHuA9CQxc"/>
+</div>
+<div class="p-6 sm:p-8 flex flex-col justify-center flex-grow sm:w-3/5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-md text-headline-md text-primary text-[22px]">Cold Brew Flores</h3>
+<span class="font-label-md text-label-md text-primary bg-surface-container px-3 py-1 rounded-full border border-outline-variant/30">Rp 30.000</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-6 max-w-md">Disangrai medium, diseduh perlahan selama 18 jam menghasilkan profil rasa yang bersih, manis dengan sentuhan floral.</p>
+<button class="self-start text-primary font-label-md text-label-md border-b border-primary pb-0.5 hover:opacity-70 transition-opacity">
+                            Tambahkan ke Pesanan
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Story Section (Kisah Kami) -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-bright relative overflow-hidden">
+<!-- Decorative blur blob -->
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-secondary-container/30 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+<div class="max-w-container-max-width mx-auto flex flex-col md:flex-row items-center gap-16 relative z-10">
+<!-- Text Content -->
+<div class="w-full md:w-1/2 space-y-6">
+<h2 class="font-headline-lg-mobile md:text-headline-xl text-primary tracking-tight">Kisah Kami</h2>
+<div class="space-y-4 text-on-surface-variant font-body-md">
+<p>Berawal dari sebuah garasi kecil di tahun 2024, RuangKopi lahir dari kecintaan mendalam terhadap ritual menyeduh kopi. Kami percaya bahwa secangkir kopi lebih dari sekadar minuman; ia adalah jeda sejenak, sebuah ruang untuk bernapas.</p>
+<p>Kami bekerja sama langsung dengan petani lokal untuk memastikan setiap biji yang kami sangrai membawa cerita dari tanah tempatnya tumbuh, disajikan dengan kesederhanaan dan presisi.</p>
+</div>
+<div class="flex items-center gap-4 pt-4">
+<div class="flex text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">4.9/5 dari 500+ Ulasan</span>
+</div>
+<div class="pt-4">
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95 shadow-md">
+                            Baca Selengkapnya
+                        </button>
+</div>
+</div>
+<!-- Image Composition -->
+<div class="w-full md:w-1/2 relative min-h-[400px] md:min-h-[500px]">
+<!-- Image 1 (Front, slightly smaller) -->
+<div class="absolute bottom-0 left-0 w-3/5 md:w-2/3 rounded-2xl overflow-hidden shadow-2xl z-20 border-4 border-surface-bright transition-transform hover:scale-105 duration-500">
+<img class="w-full h-full object-cover aspect-square" data-alt="A close-up shot of an espresso machine extracting a rich, dark espresso shot into a clear glass cup. The chrome details of the machine catch the warm, ambient light of the cafe. The focus is sharp on the dripping coffee, blurring the background into soft bokeh, emphasizing the precision and artisanal quality of the coffee-making process." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCopEAKon4UqSqVvvlJanm6nMd9sI4KbkGv0PyiWSRIOINFHygW-j0uCaNQkVw9bHdY1FTXTdCGgiBKiRR3JLOqEOB502NH4aURc0awuJ0dDSy-dYN4CX_Q0Or8aG98yYdT8y3T3ziqACAWGOdqjwNlkVWhxXU2c0odOJ8u8eDnHifExRyCaEPsaMxAAw5dXXjMyUxJPUxzHEudrD29o4_zgpgTFfzbaofyCwy-vr6gNL5XoiZCtF_ODxhDt2XD8wpxTS_167eVM0k"/>
+</div>
+<!-- Image 2 (Back, larger) -->
+<div class="absolute top-0 right-0 w-3/4 rounded-2xl overflow-hidden shadow-xl z-10 transition-transform hover:scale-[1.02] duration-500">
+<img class="w-full h-full object-cover aspect-[4/3] opacity-90" data-alt="A wide shot of a modern, airy cafe interior bathed in natural light. The space features minimalist wooden furniture, lush hanging green plants, and a clean, light-colored aesthetic. The atmosphere is serene and inviting, embodying the concept of slow living and sophisticated design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDA-bQUkoC9BzKos_4mh_nDlQmRwt0Q3wDdgmK4X1B1b2416BmzvhQMLdq5B7uLXZQVxrqwgMogeSn0zCBw2FveLJoqTrV83nRqpEsv6Inp2quGjVS2rEYqycyRKAd1b7WCZ-uBkUrihGtOa3g03PJ_vRSvJpEZ54AZKU8717TMkFsYAP4TeywWRz_EC6YFRXnM2a3s8J7oHtEhibcwfNCfh2oA3F9SrLZ8iLNiQC6T2ZtQJCuQOA1efq4Sh2YMmp6MlfByoaZt91Y"/>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (JSON Component) -->
+<footer class="bg-primary text-on-primary w-full py-section-gap px-margin-mobile md:px-margin-desktop">
+<div class="max-w-container-max-width mx-auto grid grid-cols-1 md:grid-cols-4 gap-gutter fade-in duration-500">
+<!-- Brand Column -->
+<div class="space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed" style="font-variation-settings: 'FILL' 1;">coffee</span>
+<span class="font-headline-md text-headline-md text-primary-fixed font-bold">RuangKopi</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-primary/80 max-w-xs">
+                    Membawa Ketenangan ke Cangkir Anda. Kopi artisanal di jantung kota.
+                </p>
+<div class="flex gap-4 pt-2">
+<a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">photo_camera</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">music_note</span>
+</a>
+</div>
+</div>
+<!-- Navigasi -->
+<div>
+<h4 class="font-label-md text-label-md text-primary-fixed mb-6 uppercase tracking-wider">Navigasi</h4>
+<ul class="space-y-3 flex flex-col">
+<li><a class="font-body-sm text-body-sm text-on-primary font-bold hover:underline decoration-on-primary/30 transition-all" href="#">Home</a></li>
+<li><a class="font-body-sm text-body-sm text-on-primary/70 hover:text-on-primary hover:underline decoration-on-primary/30 transition-all" href="#">Menu</a></li>
+<li><a class="font-body-sm text-body-sm text-on-primary/70 hover:text-on-primary hover:underline decoration-on-primary/30 transition-all" href="#">Story</a></li>
+<li><a class="font-body-sm text-body-sm text-on-primary/70 hover:text-on-primary hover:underline decoration-on-primary/30 transition-all" href="#">Gallery</a></li>
+</ul>
+</div>
+<!-- Informasi -->
+<div>
+<h4 class="font-label-md text-label-md text-primary-fixed mb-6 uppercase tracking-wider">Informasi</h4>
+<ul class="space-y-3 flex flex-col">
+<li><a class="font-body-sm text-body-sm text-on-primary/70 hover:text-on-primary hover:underline decoration-on-primary/30 transition-all" href="#">Location</a></li>
+<li><a class="font-body-sm text-body-sm text-on-primary/70 hover:text-on-primary hover:underline decoration-on-primary/30 transition-all" href="#">Hours</a></li>
+<li><a class="font-body-sm text-body-sm text-on-primary/70 hover:text-on-primary hover:underline decoration-on-primary/30 transition-all" href="#">Privacy Policy</a></li>
+<li><a class="font-body-sm text-body-sm text-on-primary/70 hover:text-on-primary hover:underline decoration-on-primary/30 transition-all" href="#">Contact</a></li>
+</ul>
+</div>
+<!-- Lokasi & Jam Buka -->
+<div>
+<h4 class="font-label-md text-label-md text-primary-fixed mb-6 uppercase tracking-wider">Lokasi &amp; Jam Buka</h4>
+<div class="font-body-sm text-body-sm text-on-primary/80 space-y-4">
+<p>Jl. Senopati No. 45, Jakarta Selatan</p>
+<p>Senin - Minggu<br/>07:00 - 22:00 WIB</p>
+<button class="bg-white/10 hover:bg-white/20 text-on-primary w-full py-2.5 rounded-full mt-4 flex items-center justify-center gap-2 transition-colors border border-white/20">
+                        Arahkan Peta
+                        <span class="material-symbols-outlined text-[16px]">map</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Copyright -->
+<div class="max-w-container-max-width mx-auto mt-16 pt-8 border-t border-white/10 text-center">
+<p class="font-body-sm text-body-sm text-on-primary/50">
+                © 2024 RuangKopi Artisanal Coffee. All rights reserved.
+            </p>
+</div>
+</footer>
+<!-- Simple JS for Drawer Toggle -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openBtn = document.getElementById('open-menu');
+            const closeBtn = document.getElementById('close-menu');
+            const drawer = document.getElementById('nav-drawer');
+            const overlay = document.getElementById('nav-overlay');
+
+            function toggleDrawer() {
+                const isClosed = drawer.classList.contains('-translate-x-full');
+                if (isClosed) {
+                    drawer.classList.remove('-translate-x-full');
+                    overlay.classList.remove('opacity-0', 'pointer-events-none');
+                    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                } else {
+                    drawer.classList.add('-translate-x-full');
+                    overlay.classList.add('opacity-0', 'pointer-events-none');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            openBtn.addEventListener('click', toggleDrawer);
+            closeBtn.addEventListener('click', toggleDrawer);
+            overlay.addEventListener('click', toggleDrawer);
+        });
+    </script>
+</body></html>

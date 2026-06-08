@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RuangKopi - Cerita di Setiap Tegukan</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3E2723",
+                        "secondary": "#D7CCC8",
+                        "accent": "#8D6E63",
+                        "background-light": "#FAF9F7",
+                        "background-dark": "#1c1716",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Playfair Display", "serif"],
+                    },
+                    borderRadius: {
+                        "4xl": "2rem",
+                        "5xl": "3rem",
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .glass-nav {
+            background: rgba(250, 249, 247, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .text-stroke {
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background-light font-display text-primary antialiased overflow-x-hidden selection:bg-accent selection:text-white">
+<nav class="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 glass-nav border-b border-primary/5">
+<div class="max-w-7xl mx-auto px-6 lg:px-12">
+<div class="flex justify-between items-center h-24">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-accent !text-[32px]">coffee</span>
+<h2 class="text-primary text-2xl font-serif font-bold tracking-tight">Ruang<span class="text-accent italic">Kopi</span></h2>
+</div>
+<div class="hidden md:flex items-center gap-12">
+<a class="text-primary/70 hover:text-primary text-sm font-semibold tracking-wide transition-colors" href="#">Home</a>
+<a class="text-primary/70 hover:text-primary text-sm font-semibold tracking-wide transition-colors" href="#">Kisah</a>
+<a class="text-primary/70 hover:text-primary text-sm font-semibold tracking-wide transition-colors" href="#">Menu</a>
+<a class="text-primary/70 hover:text-primary text-sm font-semibold tracking-wide transition-colors" href="#">Galeri</a>
+</div>
+<button class="bg-primary text-white h-12 px-8 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-accent transition-all shadow-lg shadow-primary/10">
+                Reservasi
+            </button>
+</div>
+</div>
+</nav>
+<section class="relative min-h-[90vh] flex items-center pt-24 pb-12 px-6 lg:px-12">
+<div class="absolute inset-4 overflow-hidden rounded-5xl shadow-2xl">
+<div class="absolute inset-0 bg-cover bg-center scale-105" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAJRgo-QYilIbagUyTZH5as0oPl1hte5SGcU6TsfXrA0zxAtmo7KzD-xpQeE_khFm6-BXWBhfoRdgtbEzRzbjmUNlAePNrsNKMUIFX9FgceHAnmze-BJMVQ6v-PcOXRTY4P0QVeBwgiUbYq6wf1xzo6NCLRBIRmNKDNwpHCj2TpVdJrCkgmrqS8V5TdqE1Pe-TNPti-q9R-Fz9AZv8JGWcgq9HJm2Z1Om2tJJahJ6XhGExacoPKiVoYFO9v0WwtPTEy2vZXjKK2dCk");'></div>
+<div class="absolute inset-0 bg-black/40"></div>
+</div>
+<div class="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+<div class="lg:col-span-7 flex flex-col items-start">
+<div class="glass-card px-4 py-2 rounded-full mb-8 inline-flex items-center gap-3">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+</span>
+<span class="text-white text-[11px] font-bold tracking-[0.2em] uppercase">Status: Tersedia</span>
+</div>
+<div class="glass-card p-10 md:p-14 rounded-4xl max-w-2xl border-white/30">
+<h1 class="font-serif italic text-white text-6xl md:text-8xl font-medium leading-[0.9] mb-6">Ruang Kopi</h1>
+<p class="text-secondary/90 text-xl md:text-2xl font-light mb-12 max-w-lg leading-relaxed">Cerita di Setiap Tegukan.</p>
+<div class="flex flex-wrap gap-4">
+<button class="flex items-center gap-4 h-16 px-10 bg-primary text-white hover:bg-accent text-base font-bold tracking-widest uppercase rounded-full transition-all duration-300 shadow-2xl shadow-black/40 group">
+<span>Lihat Menu</span>
+<span class="material-symbols-outlined transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+</button>
+<button class="flex items-center gap-3 h-16 px-10 glass-card text-white text-base font-bold tracking-widest uppercase rounded-full hover:bg-white/20 transition-all">
+                        Hubungi Kami
+                    </button>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5 grid grid-cols-2 gap-4">
+<div class="glass-card p-8 rounded-4xl flex flex-col justify-between h-48">
+<span class="text-white/60 text-xs font-bold tracking-widest uppercase">Varietas Biji</span>
+<div class="flex flex-col">
+<span class="text-white text-5xl font-serif font-bold">10+</span>
+<span class="text-white/80 text-sm mt-1">Pilihan Terbaik</span>
+</div>
+</div>
+<div class="glass-card p-8 rounded-4xl flex flex-col justify-between h-48">
+<span class="text-white/60 text-xs font-bold tracking-widest uppercase">Established</span>
+<div class="flex flex-col">
+<span class="text-white text-5xl font-serif font-bold">2020</span>
+<span class="text-white/80 text-sm mt-1">Sejak Awal</span>
+</div>
+</div>
+<div class="glass-card p-8 rounded-4xl col-span-2 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-white/60 text-xs font-bold tracking-widest uppercase mb-1">Ketersediaan Kursi</span>
+<span class="text-white text-2xl font-medium">Suasana Tenang</span>
+</div>
+<div class="flex -space-x-3">
+<div class="size-10 rounded-full border-2 border-white/20 bg-accent flex items-center justify-center text-white text-xs font-bold">65%</div>
+<div class="size-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+<span class="material-symbols-outlined !text-[20px]">person</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32 bg-background-light">
+<div class="max-w-7xl mx-auto px-6 lg:px-12">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+<div class="relative">
+<div class="aspect-[4/5] rounded-4xl overflow-hidden shadow-2xl">
+<img alt="Kisah Kami" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvs95fiIzjciNT3Sy1WSVqDbl5fAh8zP_RYlY69oFETc0cUjY0R_EMoaXiWEdCPpf8H0Kz5ioUTt8n5wSI3KqF6EoUwMytytDdXK3WLLujumCN5qqe_qba2cBi_6zzhJq19fOwBpfjwN6iZN266iXbplsghKKXRUn9AGnpxLFybaV9V_nZOYtN2Gh_wIQJwSO6L4QynXgcotuuqR-ADZfj36rbe6BE0Fo7ehHOJG_RVI_GnidbxJlbAdS8naz5NM-b428odJzfz50"/>
+</div>
+<div class="absolute -bottom-10 -right-10 glass-nav p-10 rounded-4xl shadow-xl max-w-xs border border-primary/5">
+<h3 class="font-serif text-3xl font-bold mb-4">Filosofi <span class="text-accent italic">Ruang</span></h3>
+<p class="text-sm text-primary/70 leading-relaxed">Tempat di mana waktu melambat dan setiap cangkir kopi menjadi jembatan antar manusia.</p>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-accent font-bold tracking-[0.3em] text-xs uppercase mb-6">Kisah Kami</span>
+<h2 class="font-serif text-5xl md:text-7xl font-medium text-primary mb-10 leading-[1.1]">
+                    Lebih dari sekadar <span class="italic text-accent">secangkir kopi</span>.
+                </h2>
+<div class="space-y-8 text-primary/70 font-light text-xl leading-relaxed">
+<p>Kami percaya bahwa kopi adalah bahasa universal. Di Ruang Kopi, kami meracik bukan hanya biji pilihan, melainkan juga kenyamanan bagi setiap pengunjung yang datang.</p>
+<p>Setiap proses mulai dari roasting hingga brewing dilakukan dengan presisi tinggi oleh tangan-tangan ahli, memastikan karakter asli biji kopi Nusantara terpancar sempurna.</p>
+</div>
+<div class="mt-12 flex gap-8">
+<div class="flex flex-col">
+<span class="text-4xl font-serif font-bold text-primary">15k+</span>
+<span class="text-sm text-primary/50 uppercase tracking-widest font-bold">Pengunjung</span>
+</div>
+<div class="w-px h-12 bg-primary/10"></div>
+<div class="flex flex-col">
+<span class="text-4xl font-serif font-bold text-primary">24</span>
+<span class="text-sm text-primary/50 uppercase tracking-widest font-bold">Signature Drinks</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-32 bg-white rounded-[4rem]">
+<div class="max-w-7xl mx-auto px-6 lg:px-12">
+<div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-20">
+<div class="max-w-xl">
+<span class="text-accent font-bold tracking-[0.3em] text-xs uppercase mb-4 block">Promo Hari Ini</span>
+<h2 class="font-serif text-5xl font-bold text-primary">Spesial Untukmu</h2>
+</div>
+<button class="flex items-center gap-2 text-primary font-bold hover:text-accent transition-colors group">
+                Lihat Semua Promo 
+                <span class="material-symbols-outlined !text-[20px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="group relative rounded-4xl overflow-hidden aspect-[4/5] shadow-lg hover:shadow-2xl transition-all duration-500">
+<img alt="Promo 1" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh9iF6W4IrT2u8E1d7YYwu8aQmAq2RQ3AOVFdxFebOULsYe-W2EZPv8Xxc96ykvRGaBXYeLRAIeseNYoJeQP-l2I8DIpR6b8zWr3e8YR8qwDUsPIh3ItCskI-5qvy0wnyzVsXw784KnU-mXXJ4v3GW0DT47BkZDBDpYCCMWbJPi-UMAKVcx7S6t-n8WOVMFM97mgwLsSwtb86q92Zz35OVqoAka2TLwvv0JSzpIgS2QQlHZmsdKVISqF1oT6_mMQEMAIjxU1HybTo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-8 left-8 right-8">
+<span class="bg-accent text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-3 inline-block">Flash Sale</span>
+<h3 class="text-white text-2xl font-serif font-bold mb-2">Morning Espresso</h3>
+<p class="text-white/70 text-sm">Diskon 50% untuk setiap pembelian sebelum jam 10 pagi.</p>
+</div>
+</div>
+<div class="group relative rounded-4xl overflow-hidden aspect-[4/5] shadow-lg hover:shadow-2xl transition-all duration-500">
+<img alt="Promo 2" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZmEYlucGCoSn6Vwg9GepPHbVUKfAlvnCYvg3ztqQDHWSl8J9U-gA_6ji3_deCNOOB-O30wnVkJkph9gHok1yy58umjkiDag2BSEgBKClie5S2oqW1nW7fdGQLr17EzHltwZ_1qRyJWFchHgx8eQAV6La9HORHHjvm8VtTaMPwMOLUSnuNAHorHSBEAmJkqWwgWAgO9KI9q5F2IscvbKxPeBbzTBh815CfD8eL7ZYMDhYzgUqo1lOyvOBct3D3MhGzJ99vtsvy0ag"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-8 left-8 right-8">
+<span class="bg-primary text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-3 inline-block">Member Only</span>
+<h3 class="text-white text-2xl font-serif font-bold mb-2">Coffee &amp; Chill</h3>
+<p class="text-white/70 text-sm">Beli 2 Signature Drinks, Gratis 1 Pastry pilihan.</p>
+</div>
+</div>
+<div class="bg-background-light p-12 rounded-4xl flex flex-col justify-between border border-primary/5">
+<div>
+<span class="material-symbols-outlined text-accent !text-[48px] mb-8">card_membership</span>
+<h3 class="text-3xl font-serif font-bold text-primary mb-4">Gabung Membership</h3>
+<p class="text-primary/60 leading-relaxed mb-8">Dapatkan poin setiap transaksi dan tukarkan dengan berbagai hadiah menarik.</p>
+</div>
+<button class="w-full h-14 bg-white border border-primary/10 rounded-2xl text-primary font-bold hover:bg-primary hover:text-white transition-all">
+                    Daftar Sekarang
+                </button>
+</div>
+</div>
+</div>
+</section>
+<footer class="bg-primary text-secondary pt-32 pb-16">
+<div class="max-w-7xl mx-auto px-6 lg:px-12">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-16 mb-24">
+<div class="lg:col-span-2">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-accent !text-[32px]">coffee</span>
+<span class="font-serif font-bold text-3xl text-white tracking-tight">RUANG KOPI</span>
+</div>
+<p class="text-secondary/60 max-w-sm text-lg leading-relaxed mb-10">Sanctuari bagi para pecinta kopi. Datang untuk kopinya, menetap untuk suasananya.</p>
+<div class="flex gap-4">
+<a class="size-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined !text-[20px]">share</span>
+</a>
+<a class="size-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined !text-[20px]">favorite</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="text-white font-bold uppercase tracking-widest text-xs mb-8">Navigasi</h4>
+<ul class="space-y-4">
+<li><a class="text-secondary/70 hover:text-white transition-colors" href="#">Tentang Kami</a></li>
+<li><a class="text-secondary/70 hover:text-white transition-colors" href="#">Menu Signature</a></li>
+<li><a class="text-secondary/70 hover:text-white transition-colors" href="#">Lokasi Cabang</a></li>
+<li><a class="text-secondary/70 hover:text-white transition-colors" href="#">Reservasi</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-bold uppercase tracking-widest text-xs mb-8">Hubungi</h4>
+<ul class="space-y-4 text-secondary/70">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined !text-[18px]">location_on</span>
+                        Jl. Senopati No. 42, Jakarta
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined !text-[18px]">call</span>
+                        +62 812 3456 7890
+                    </li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined !text-[18px]">mail</span>
+                        hello@ruangkopi.com
+                    </li>
+</ul>
+</div>
+</div>
+<div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="text-sm opacity-40">© 2024 Ruang Kopi. Dibuat dengan cinta untuk kopi.</p>
+<div class="flex gap-8 text-sm opacity-40">
+<a class="hover:opacity-100" href="#">Privacy Policy</a>
+<a class="hover:opacity-100" href="#">Terms of Service</a>
+</div>
+</div>
+</div>
+</footer>
+<div class="fixed bottom-10 right-10 z-50">
+<button class="size-16 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
+<span class="material-symbols-outlined !text-[32px]">chat</span>
+</button>
+</div>
+
+</body></html>
