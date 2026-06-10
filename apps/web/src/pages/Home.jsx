@@ -391,18 +391,22 @@ const Home = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {spaceImages && spaceImages.length > 0 ? (
-                            spaceImages.slice(0, 3).map((imgUrl, index) => (
-                                <motion.div 
-                                    key={index}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: index * 0.1 }}
-                                    className={`rounded-[2rem] overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 h-[300px] md:h-[400px] ${index === 2 ? 'md:col-span-2 lg:col-span-1' : ''}`}
-                                >
-                                    <img src={imgUrl} alt={`RuangKopi Space ${index + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
-                                </motion.div>
-                            ))
+                            spaceImages.slice(0, 3).map((img, index) => {
+                                const imgSrc = typeof img === 'string' ? img : img.src;
+                                const imgAlt = typeof img === 'string' ? `RuangKopi Space ${index + 1}` : (img.title || `RuangKopi Space ${index + 1}`);
+                                return (
+                                    <motion.div 
+                                        key={index}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: index * 0.1 }}
+                                        className={`rounded-[2rem] overflow-hidden shadow-sm hover:shadow-lg transition-all duration-500 h-[300px] md:h-[400px] ${index === 2 ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                                    >
+                                        <img src={imgSrc} alt={imgAlt} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />
+                                    </motion.div>
+                                );
+                            })
                         ) : (
                             /* Fallback images if API is empty */
                             <>
