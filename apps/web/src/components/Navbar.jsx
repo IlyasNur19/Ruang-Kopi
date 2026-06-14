@@ -51,9 +51,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* ====== ANNOUNCEMENT BAR ====== */}
-
-
       {/* ====== MAIN NAVBAR ====== */}
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
@@ -62,7 +59,7 @@ const Navbar = () => {
           }`}
       >
         <div className="max-w-[1200px] mx-auto px-4 md:px-10">
-          <div className="flex items-center justify-between h-20 md:h-24">
+          <div className="flex items-center justify-between pt-4 md:pt-6">
 
             {/* === LEFT: Logo === */}
             <Link to="/" className="flex items-center gap-0.5 shrink-0 group">

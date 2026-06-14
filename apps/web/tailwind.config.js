@@ -121,6 +121,7 @@ export default {
         serif: ['Playfair Display', 'serif'],
         "headline": ['Playfair Display', 'serif'],
         "body-font": ['Inter', 'sans-serif'],
+        baskervville: ['Baskervville', 'serif'],
       },
       fontSize: {
         "headline-xl": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],

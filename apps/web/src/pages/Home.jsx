@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import { settingsApi, menuApi } from '../services/api';
 
+
 const Home = () => {
     const [shopStatus, setShopStatus] = useState('available');
     const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80');
@@ -85,7 +86,7 @@ const Home = () => {
                 {/* ========================================== */}
                 {/* HERO SECTION */}
                 {/* ========================================== */}
-                <section className="relative min-h-[600px] md:min-h-[700px] flex items-center p-4 md:p-8 max-w-[1400px] mx-auto overflow-hidden">
+                <section className="relative min-h-[600px] md:min-h-[700px] flex items-center max-w-[1400px] mx-auto overflow-hidden">
                     {/* Background Container with curved edges */}
                     <div className="absolute inset-4 md:inset-8 rounded-[2rem] md:rounded-[3rem] overflow-hidden">
                         <img
@@ -107,32 +108,36 @@ const Home = () => {
                             className="max-w-2xl"
                         >
                             {/* Badge */}
-                            <motion.div variants={fadeInUp} custom={0} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/30 backdrop-blur-sm bg-white/10 text-xs font-medium text-white/90 mb-6">
+                            <motion.div variants={fadeInUp} custom={0} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/30 backdrop-blur-sm bg-white/10 text-xs font-medium text-white/90 mb-10">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[#D7CCC8] animate-pulse"></span>
                                 Specialty Coffee
                             </motion.div>
 
                             {/* Headline */}
-                            <motion.h1 variants={fadeInUp} custom={1} className="font-serif text-[42px] md:text-[64px] leading-[1.1] font-bold text-white mb-6 tracking-tight">
-                                Membawa<br />Ketenangan ke<br className="hidden md:block" /> Cangkir Anda.
+                            <motion.div variants={fadeInUp} custom={0}>
+                                <img src='/icon-ruang-kopi-putih.png' className=' w-52 md:w-80' alt='RuangKopi Icon' />
+                            </motion.div>
+
+                            <motion.h1 variants={fadeInUp} custom={1} className="font-serif text-[50px] md:text-[64px] leading-[1.1]  text-white mb-3 tracking-tight">
+                                ruang kopi
                             </motion.h1>
 
                             {/* Subheading */}
-                            <motion.p variants={fadeInUp} custom={2} className="text-white/70 text-base md:text-lg max-w-md mb-8 leading-relaxed">
+                            <motion.p variants={fadeInUp} custom={2} className="text-white/70 text-xs max-w-md mb-8 leading-relaxed pr-20">
                                 Kopi artisanal yang diseduh dengan presisi. Temukan ritme lambat di tengah hiruk-pikuk kota.
                             </motion.p>
 
                             {/* CTA Button */}
-                            <motion.div variants={fadeInUp} custom={3} className="flex flex-wrap gap-4">
+                            <motion.div variants={fadeInUp} custom={3} className="flex gap-4">
                                 <Link
                                     to="/reservation"
-                                    className="inline-flex items-center gap-2 px-8 py-3.5 border-2 border-white text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-white hover:text-[#3E2723] transition-all duration-300 active:scale-95"
+                                    className="inline-flex items-center gap-2 px-3 py-2 md:px-8 md:py3.5 border-2 border-white text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-white hover:text-[#3E2723] transition-all duration-300 active:scale-95"
                                 >
                                     Visit Us
                                 </Link>
                                 <Link
                                     to="/menu"
-                                    className="inline-flex items-center gap-2 px-8 py-3.5 bg-white/15 backdrop-blur-sm border border-white/30 text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-white/25 transition-all duration-300 active:scale-95"
+                                    className="inline-flex items-center gap-2 px-3 py-2 md:px-8 md:py-3.5  bg-white/15 backdrop-blur-sm border border-white/30 text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-white/25 transition-all duration-300 active:scale-95"
                                 >
                                     Lihat Menu
                                     <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
@@ -140,7 +145,7 @@ const Home = () => {
                             </motion.div>
 
                             {/* Status Widget */}
-                            <motion.div variants={fadeInUp} custom={4} className="mt-8 inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 pr-5">
+                            <motion.div variants={fadeInUp} custom={4} className="mt-8 inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 md:pr-5">
                                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white">
                                     <span className="material-symbols-outlined text-[20px]">table_restaurant</span>
                                 </div>
@@ -162,10 +167,10 @@ const Home = () => {
                 {/* ========================================== */}
                 {/* KOLEKSI PILIHAN SECTION */}
                 {/* ========================================== */}
-                <section className="py-20 md:py-28 px-4 md:px-8 max-w-[1200px] mx-auto bg-[#F5F0EB]">
+                <section className="py-5 md:py-28 px-4 md:px-8 max-w-[1200px] mx-auto bg-[#F5F0EB]">
                     {/* Header & Filters */}
                     <div className="text-center mb-12">
-                        <motion.h2 
+                        <motion.h2
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
@@ -173,7 +178,7 @@ const Home = () => {
                         >
                             Koleksi Pilihan
                         </motion.h2>
-                        <motion.p 
+                        <motion.p
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
@@ -182,9 +187,9 @@ const Home = () => {
                         >
                             Jelajahi biji kopi terbaik dan peralatan seduh pilihan kami untuk menyempurnakan ritual kopi Anda di rumah.
                         </motion.p>
-                        
+
                         {/* Filter Buttons */}
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
@@ -215,10 +220,10 @@ const Home = () => {
                         </div>
                     ) : menuItems.length > 0 ? (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-                            
+
                             {/* Left Large Card */}
                             {menuItems[0] && (
-                                <motion.div 
+                                <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
@@ -254,7 +259,7 @@ const Home = () => {
                             {/* Right 2x2 Grid */}
                             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 {menuItems.slice(1, 5).map((item, index) => (
-                                    <motion.div 
+                                    <motion.div
                                         key={item._id || index}
                                         initial={{ opacity: 0, y: 20 }}
                                         whileInView={{ opacity: 1, y: 0 }}
@@ -369,7 +374,7 @@ const Home = () => {
                 {/* ========================================== */}
                 <section className="py-20 md:py-28 px-4 md:px-8 max-w-[1400px] mx-auto bg-[#F5F0EB]">
                     <div className="text-center mb-12">
-                        <motion.h2 
+                        <motion.h2
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
@@ -377,14 +382,14 @@ const Home = () => {
                         >
                             Our Space
                         </motion.h2>
-                        <motion.p 
+                        <motion.p
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.1 }}
                             className="text-[#6D4C41] text-base md:text-lg max-w-2xl mx-auto"
                         >
-                            Ruang nyaman untuk bersantai, bekerja, atau sekadar menikmati waktu. 
+                            Ruang nyaman untuk bersantai, bekerja, atau sekadar menikmati waktu.
                             Setiap sudut dirancang untuk memberikan ketenangan.
                         </motion.p>
                     </div>
@@ -395,7 +400,7 @@ const Home = () => {
                                 const imgSrc = typeof img === 'string' ? img : img.src;
                                 const imgAlt = typeof img === 'string' ? `RuangKopi Space ${index + 1}` : (img.title || `RuangKopi Space ${index + 1}`);
                                 return (
-                                    <motion.div 
+                                    <motion.div
                                         key={index}
                                         initial={{ opacity: 0, y: 20 }}
                                         whileInView={{ opacity: 1, y: 0 }}
