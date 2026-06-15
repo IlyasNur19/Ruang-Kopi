@@ -11,6 +11,10 @@ import { reservationController } from '../controllers/reservation.controller.js'
 import { settingsController } from '../controllers/settings.controller.js';
 import { uploadController } from '../controllers/upload.controller.js';
 import { ideasController } from '../controllers/ideas.controller.js';
+import { mejaController } from '../controllers/meja.controller.js';
+import { transaksiController } from '../controllers/transaksi.controller.js';
+import { dashboardController } from '../controllers/dashboard.controller.js';
+import { paymentController } from '../controllers/payment.controller.js';
 
 // Middleware
 import { authMiddleware } from '../middleware/auth.middleware.js';
@@ -61,15 +65,17 @@ const createReservationSchema = z.object({
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be in YYYY-MM-DD format'),
     time: z.string().regex(/^\d{2}:\d{2}$/, 'Time must be in HH:MM format'),
     guests: z.number().min(1, 'At least 1 guest required'),
+    mejaId: z.number().optional().nullable(),
 });
 
 const updateReservationSchema = z.object({
-    status: z.enum(['Pending', 'Confirmed', 'Completed', 'Cancelled']).optional(),
+    status: z.enum(['pending', 'dibayar', 'batal', 'selesai']).optional(),
     name: z.string().min(1).optional(),
     phone: z.string().min(1).optional(),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     time: z.string().regex(/^\d{2}:\d{2}$/).optional(),
     guests: z.number().min(1).optional(),
+    mejaId: z.number().optional().nullable(),
 });
 
 const statusSchema = z.object({
@@ -93,6 +99,42 @@ const createIdeaSchema = z.object({
 
 const updateIdeaSchema = z.object({
     status: z.enum(['Baru', 'Dibaca', 'Diproses', 'Selesai']).optional(),
+});
+
+// Meja schemas
+const createMejaSchema = z.object({
+    nomor_meja: z.string().min(1, 'Nomor meja harus diisi'),
+    kapasitas: z.number().min(1, 'Kapasitas minimal 1').optional(),
+    status: z.enum(['tersedia', 'direservasi', 'terisi']).optional(),
+});
+
+const updateMejaSchema = z.object({
+    nomor_meja: z.string().min(1).optional(),
+    kapasitas: z.number().min(1).optional(),
+    status: z.enum(['tersedia', 'direservasi', 'terisi']).optional(),
+});
+
+// Transaksi schemas
+const createTransaksiSchema = z.object({
+    items: z.array(z.object({
+        menuId: z.number(),
+        name: z.string(),
+        qty: z.number().min(1),
+        price: z.number(),
+        subtotal: z.number(),
+    })),
+    total: z.number(),
+    tableId: z
+        .union([z.number(), z.string()])
+        .transform((val) => (val === '' || val === null || val === undefined ? null : Number(val)))
+        .nullable()
+        .optional(),
+    reservationId: z.number().optional().nullable(),
+    customerName: z.string().optional().nullable(),
+    orderType: z.enum(['online', 'dine_in', 'take_away']),
+    paymentMethod: z.enum(['cash', 'qris']),
+    amountPaid: z.number(),
+    change: z.number(),
 });
 
 // ================================
@@ -151,6 +193,7 @@ router.delete('/gallery/:id', authMiddleware, galleryController.delete);
 // Reservation Routes
 // ================================
 
+router.get('/reservations/available-tables', reservationController.getAvailableTables);
 router.get('/reservations', authMiddleware, reservationController.getAll);
 router.get('/reservations/:id', authMiddleware, reservationController.getById);
 router.post('/reservations', validate(createReservationSchema), reservationController.create);
@@ -183,5 +226,58 @@ router.get('/ideas', authMiddleware, ideasController.getAll);
 router.post('/ideas', validate(createIdeaSchema), ideasController.create);
 router.put('/ideas/:id', authMiddleware, validate(updateIdeaSchema), ideasController.update);
 router.delete('/ideas/:id', authMiddleware, ideasController.delete);
+
+// ================================
+// Meja Routes
+// ================================
+
+router.get('/meja', mejaController.getAll);
+router.get('/meja/status', mejaController.getStatus);
+router.get('/meja/:id', mejaController.getById);
+router.post('/meja', authMiddleware, validate(createMejaSchema), mejaController.create);
+router.put('/meja/:id', authMiddleware, validate(updateMejaSchema), mejaController.update);
+router.delete('/meja/:id', authMiddleware, mejaController.delete);
+
+// ================================
+// Transaksi Routes
+// ================================
+
+router.get('/transaksi', authMiddleware, transaksiController.getAll);
+router.get('/transaksi/recent', authMiddleware, transaksiController.getRecent);
+router.get('/transaksi/summary', authMiddleware, transaksiController.getSummary);
+router.get('/transaksi/:id', authMiddleware, transaksiController.getById);
+router.post('/transaksi', authMiddleware, validate(createTransaksiSchema), transaksiController.create);
+router.put('/transaksi/:id/cancel', authMiddleware, transaksiController.cancel);
+
+// ================================
+// Dashboard Routes
+// ================================
+
+router.get('/dashboard/stats', authMiddleware, dashboardController.getStats);
+router.get('/dashboard/revenue-daily', authMiddleware, dashboardController.getRevenueDaily);
+router.get('/dashboard/revenue-by-type', authMiddleware, dashboardController.getRevenueByType);
+router.get('/dashboard/recent-transactions', authMiddleware, dashboardController.getRecentTransactions);
+
+// ================================
+// Payment Routes (Midtrans Integration)
+// ================================
+
+// Payment validation schema
+const createPaymentSchema = z.object({
+    reservationId: z.number().optional().nullable(),
+    amount: z.number().positive('Amount must be positive'),
+    customerName: z.string().min(1, 'Customer name is required').optional(),
+    customerEmail: z.string().email('Valid email is required').optional(),
+    customerPhone: z.string().optional(),
+});
+
+// Public routes (no auth required)
+router.post('/payment/snap-token', validate(createPaymentSchema), paymentController.createSnapToken);
+router.post('/payment/webhook', paymentController.webhook); // Called by Midtrans server
+router.get('/payment/status/:orderId', paymentController.getStatus); // Public status check
+
+// Authenticated routes
+router.get('/payment/by-reservation/:reservationId', authMiddleware, paymentController.getByReservation);
+router.get('/payment/all', authMiddleware, paymentController.getAll);
 
 export default router;

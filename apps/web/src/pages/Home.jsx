@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import { settingsApi, menuApi } from '../services/api';
+import { Socket } from 'socket.io';
 
 
 const Home = () => {
@@ -141,7 +142,7 @@ const Home = () => {
                                 >
                                     Lihat Menu
                                     <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                                </Link>
+                  </Link>
                             </motion.div>
 
                             {/* Status Widget */}
@@ -167,7 +168,7 @@ const Home = () => {
                 {/* ========================================== */}
                 {/* KOLEKSI PILIHAN SECTION */}
                 {/* ========================================== */}
-                <section className="py-5 md:py-28 px-4 md:px-8 max-w-[1200px] mx-auto bg-[#F5F0EB]">
+                <section className="py-5 md:py-10 px-4 md:px-8 max-w-[1200px] mx-auto bg-[#F5F0EB]">
                     {/* Header & Filters */}
                     <div className="text-center mb-12">
                         <motion.h2

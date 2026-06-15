@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Coffee, Image, Calendar, Bell, User, LogOut, Menu, X, Home, Lightbulb, ImageIcon } from 'lucide-react';
+import { LayoutDashboard, Coffee, Image, Calendar, Bell, User, LogOut, Menu, X, Home, Lightbulb, ImageIcon, Grid3X3 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import DashboardOverview from '../components/admin/DashboardOverview';
 import MenuManagement from '../components/admin/MenuManagement';
@@ -9,6 +9,7 @@ import ReservationManagement from '../components/admin/ReservationManagement';
 import SpaceImagesManagement from '../components/admin/SpaceImagesManagement';
 import IdeasManagement from '../components/admin/IdeasManagement';
 import HeroImageManagement from '../components/admin/HeroImageManagement';
+import TableManagement from '../components/admin/TableManagement';
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -35,6 +36,7 @@ const Admin = () => {
             case 'space-images': return <SpaceImagesManagement />;
             case 'ideas': return <IdeasManagement />;
             case 'hero-image': return <HeroImageManagement />;
+            case 'meja': return <TableManagement />;
             default: return <DashboardOverview />;
         }
     };
@@ -42,6 +44,7 @@ const Admin = () => {
     const navItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'menu', label: 'Menu Management', icon: Coffee },
+        { id: 'meja', label: 'Table Management', icon: Grid3X3 },
         { id: 'gallery', label: 'Gallery', icon: Image },
         { id: 'hero-image', label: 'Hero Image', icon: ImageIcon },
         { id: 'space-images', label: 'Space Images', icon: Home },

@@ -9,6 +9,19 @@ const navLinks = [
   { name: 'Gallery', path: '/gallery', icon: 'photo_library' },
 ];
 
+const staffLinks = [
+  { name: 'POS', path: '/pos', icon: 'point_of_sale' },
+  { name: 'Admin', path: '/admin', icon: 'admin_panel_settings' },
+];
+
+const isAuthenticated = () => {
+  try {
+    return !!localStorage.getItem('ruangkopi_token');
+  } catch {
+    return false;
+  }
+};
+
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -91,6 +104,17 @@ const Navbar = () => {
                       transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                     />
                   )}
+                </Link>
+              ))}
+              {/* Staff Links */}
+              {isAuthenticated() && staffLinks.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className="relative px-4 py-2 text-[13px] font-medium text-[#8D6E63] hover:text-[#3E2723] hover:bg-[#8D6E63]/5 rounded-lg transition-colors duration-200 flex items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-[16px]">{item.icon}</span>
+                  {item.name}
                 </Link>
               ))}
             </nav>
