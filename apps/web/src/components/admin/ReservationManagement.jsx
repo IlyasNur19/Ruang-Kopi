@@ -14,7 +14,7 @@ const ReservationManagement = () => {
     const [updating, setUpdating] = useState(null);
 
     // Filter states
-    const [statusFilter, setStatusFilter] = useState('All');
+    const [statusFilter, setStatusFilter] = useState('all');
     const [dateFilter, setDateFilter] = useState('all'); // 'all', 'today', 'week', 'custom'
     const [customDate, setCustomDate] = useState('');
 
@@ -41,12 +41,22 @@ const ReservationManagement = () => {
         fetchReservations();
     }, []);
 
+    // Status label mapping (backend value -> display label)
+    const statusLabels = {
+        pending: 'Pending',
+        dibayar: 'Dikonfirmasi',
+        batal: 'Dibatalkan',
+        selesai: 'Selesai',
+    };
+
+    const getStatusLabel = (status) => statusLabels[status] || status;
+
     // Filtered reservations
     const filteredReservations = useMemo(() => {
         let result = [...reservations];
 
         // Filter by status
-        if (statusFilter !== 'All') {
+        if (statusFilter !== 'all') {
             result = result.filter(res => res.status === statusFilter);
         }
 
@@ -117,10 +127,10 @@ const ReservationManagement = () => {
 
     const getStatusBadge = (status) => {
         const styles = {
-            Confirmed: 'bg-green-50 text-green-700 border-green-200',
-            Pending: 'bg-orange-50 text-orange-700 border-orange-200',
-            Completed: 'bg-blue-50 text-blue-700 border-blue-200',
-            Cancelled: 'bg-red-50 text-red-700 border-red-200',
+            dibayar: 'bg-green-50 text-green-700 border-green-200',
+            pending: 'bg-orange-50 text-orange-700 border-orange-200',
+            selesai: 'bg-blue-50 text-blue-700 border-blue-200',
+            batal: 'bg-red-50 text-red-700 border-red-200',
         };
         return styles[status] || 'bg-gray-50 text-gray-700 border-gray-200';
     };
@@ -152,8 +162,14 @@ const ReservationManagement = () => {
         }
     };
 
-    // Status options
-    const statusOptions = ['All', 'Pending', 'Confirmed', 'Completed', 'Cancelled'];
+    // Status options (value matches backend, label for display)
+    const statusOptions = [
+        { value: 'all', label: 'Semua' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'dibayar', label: 'Dikonfirmasi' },
+        { value: 'selesai', label: 'Selesai' },
+        { value: 'batal', label: 'Dibatalkan' },
+    ];
     const dateOptions = [
         { value: 'all', label: 'Semua Tanggal' },
         { value: 'today', label: 'Hari Ini' },
@@ -230,7 +246,7 @@ const ReservationManagement = () => {
                             <div className="p-3 bg-gray-50 rounded-xl">
                                 <p className="text-xs text-muted-foreground mb-1">Status Saat Ini</p>
                                 <Badge variant="outline" className={getStatusBadge(res.status)}>
-                                    {res.status}
+                                    {getStatusLabel(res.status)}
                                 </Badge>
                             </div>
                         </div>
@@ -240,13 +256,13 @@ const ReservationManagement = () => {
                     <div className="mb-6">
                         <p className="text-sm font-medium text-[#3E2723] mb-2">Update Status</p>
                         <div className="grid grid-cols-2 gap-2">
-                            {['Pending', 'Confirmed', 'Completed', 'Cancelled'].map(status => (
+                            {[{ value: 'pending', label: 'Pending' }, { value: 'dibayar', label: 'Konfirmasi' }, { value: 'selesai', label: 'Selesai' }, { value: 'batal', label: 'Batalkan' }].map(({ value, label }) => (
                                 <button
-                                    key={status}
-                                    onClick={() => updateStatus(res.id, status)}
-                                    disabled={updating === res.id || res.status === status}
+                                    key={value}
+                                    onClick={() => updateStatus(res.id, value)}
+                                    disabled={updating === res.id || res.status === value}
                                     className={`py-2 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2
-                                        ${res.status === status
+                                        ${res.status === value
                                             ? 'bg-[#3E2723] text-white'
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         }
@@ -255,10 +271,10 @@ const ReservationManagement = () => {
                                 >
                                     {updating === res.id ? (
                                         <Loader2 size={14} className="animate-spin" />
-                                    ) : res.status === status ? (
+                                    ) : res.status === value ? (
                                         <Check size={14} />
                                     ) : null}
-                                    {status}
+                                    {label}
                                 </button>
                             ))}
                         </div>
@@ -330,8 +346,8 @@ const ReservationManagement = () => {
                             onChange={(e) => setStatusFilter(e.target.value)}
                             className="appearance-none bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#3E2723]/20"
                         >
-                            {statusOptions.map(status => (
-                                <option key={status} value={status}>{status}</option>
+                            {statusOptions.map(opt => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
                             ))}
                         </select>
                         <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
@@ -415,19 +431,19 @@ const ReservationManagement = () => {
                                         <TableCell>{res.guests} Orang</TableCell>
                                         <TableCell>
                                             <Badge variant="outline" className={getStatusBadge(res.status)}>
-                                                {res.status}
+                                                {getStatusLabel(res.status)}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2" onClick={e => e.stopPropagation()}>
-                                                {res.status === 'Pending' && (
+                                                {res.status === 'pending' && (
                                                     <>
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
                                                             className="text-green-600 hover:text-green-800 hover:bg-green-50"
-                                                            title="Confirm"
-                                                            onClick={() => updateStatus(res.id, 'Confirmed')}
+                                                            title="Konfirmasi"
+                                                            onClick={() => updateStatus(res.id, 'dibayar')}
                                                             disabled={updating === res.id}
                                                         >
                                                             {updating === res.id ? (
@@ -440,21 +456,21 @@ const ReservationManagement = () => {
                                                             variant="ghost"
                                                             size="icon"
                                                             className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                                                            title="Cancel"
-                                                            onClick={() => updateStatus(res.id, 'Cancelled')}
+                                                            title="Batalkan"
+                                                            onClick={() => updateStatus(res.id, 'batal')}
                                                             disabled={updating === res.id}
                                                         >
                                                             <X size={18} />
                                                         </Button>
                                                     </>
                                                 )}
-                                                {res.status === 'Confirmed' && (
+                                                {res.status === 'dibayar' && (
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
                                                         className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                                                        title="Mark as Completed"
-                                                        onClick={() => updateStatus(res.id, 'Completed')}
+                                                        title="Selesaikan"
+                                                        onClick={() => updateStatus(res.id, 'selesai')}
                                                         disabled={updating === res.id}
                                                     >
                                                         {updating === res.id ? (

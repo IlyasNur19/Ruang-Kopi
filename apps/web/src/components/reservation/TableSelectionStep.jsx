@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Users, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { mejaApi } from '../../services/api';
+import { reservationsApi } from '../../services/api';
 import { TABLE_STATUS } from '../../stores/tableStore';
 
 const TableSelectionStep = ({ selectedTable, onSelect, date, time }) => {
@@ -14,20 +14,16 @@ const TableSelectionStep = ({ selectedTable, onSelect, date, time }) => {
             try {
                 setLoading(true);
                 setError(null);
-                const params = {};
-                if (date) params.date = date;
-                if (time) params.time = time;
-                const data = await mejaApi.getStatus(params);
-                setTables(Array.isArray(data) ? data : data?.data || []);
-            } catch (err) {
-                console.error('Failed to fetch table status:', err);
-                // Fallback: get all tables
-                try {
-                    const data = await mejaApi.getAll();
-                    setTables(Array.isArray(data) ? data : data?.data || []);
-                } catch {
-                    setError('Gagal memuat data meja.');
+                if (!date || !time) {
+                    setTables([]);
+                    return;
                 }
+                const data = await reservationsApi.getAvailableTables(date, time);
+                // API returns { available: [...], total, availableCount }
+                setTables(data?.available || []);
+            } catch (err) {
+                console.error('Failed to fetch available tables:', err);
+                setError('Gagal memuat data meja.');
             } finally {
                 setLoading(false);
             }

@@ -34,8 +34,8 @@ const ReservationCalendar = ({ selected, onSelect, disabledDates = [] }) => {
                 selected={selected}
                 onSelect={onSelect}
                 disabled={(date) => isPastDay(date) || date > maxDate || isDisabledDate(date)}
-                fromDate={today}
-                toDate={maxDate}
+                startMonth={today}
+                endMonth={maxDate}
                 className="rounded-xl border border-[#3E2723]/10 bg-white shadow-sm"
             />
             <p className="text-xs text-[#6D4C41]/60 mt-3">

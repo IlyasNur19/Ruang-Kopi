@@ -126,6 +126,10 @@ export const reservationsApi = {
             method: 'DELETE',
         });
     },
+
+    getAvailableTables: async (date, time) => {
+        return apiRequest(`/reservations/available-tables?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`);
+    },
 };
 
 // ================================

@@ -5,14 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 const navLinks = [
   { name: 'Home', path: '/', icon: 'home' },
   { name: 'Menu', path: '/menu', icon: 'restaurant_menu' },
-  { name: 'About', path: '/kotak-gagasan', icon: 'lightbulb' },
+  { name: 'Kotak Gagasan', path: '/kotak-gagasan', icon: 'lightbulb' },
   { name: 'Gallery', path: '/gallery', icon: 'photo_library' },
 ];
 
-const staffLinks = [
-  { name: 'POS', path: '/pos', icon: 'point_of_sale' },
-  { name: 'Admin', path: '/admin', icon: 'admin_panel_settings' },
-];
+// const staffLinks = [
+//   { name: 'POS', path: '/pos', icon: 'point_of_sale' },
+//   { name: 'Admin', path: '/admin', icon: 'admin_panel_settings' },
+// ];
 
 const isAuthenticated = () => {
   try {
@@ -67,20 +67,20 @@ const Navbar = () => {
       {/* ====== MAIN NAVBAR ====== */}
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
-            ? 'bg-[#F5F0EB]/95 backdrop-blur-lg shadow-[0_2px_20px_rgba(62,39,35,0.06)]'
-            : 'bg-[#F5F0EB]'
+          ? 'bg-[#F5F0EB]/95 backdrop-blur-lg shadow-[0_2px_20px_rgba(62,39,35,0.06)]'
+          : 'bg-[#F5F0EB]'
           }`}
       >
-        <div className="max-w-[1200px] mx-auto px-4 md:px-10">
-          <div className="flex items-center justify-between pt-4 md:pt-6">
+        <div className="max-w-[1200px] mx-auto px-7 md:px-10 ">
+          <div className="flex items-center justify-between py-2 pt-3 md:pt-6 md:py-5 ">
 
             {/* === LEFT: Logo === */}
             <Link to="/" className="flex items-center gap-0.5 shrink-0 group">
               <span className="font-serif text-[32px] md:text-[40px] font-bold text-[#3E2723] leading-none tracking-tight">
-                Ruang
+                ruang&nbsp;
               </span>
-              <span className="font-serif text-[32px] md:text-[40px] font-bold text-[#8D6E63] leading-none tracking-tight italic">
-                Kopi
+              <span className="font-serif text-[32px] md:text-[40px] font-bold text-[#8D6E63] leading-none tracking-tight">
+                kopi
               </span>
               <span className="font-serif text-[#8D6E63] text-[32px] md:text-[40px] font-bold leading-none">.</span>
             </Link>
@@ -92,8 +92,8 @@ const Navbar = () => {
                   key={item.path}
                   to={item.path}
                   className={`relative px-5 py-2 text-[15px] font-medium transition-colors duration-200 rounded-lg ${isActive(item.path)
-                      ? 'text-[#3E2723]'
-                      : 'text-[#6D4C41] hover:text-[#3E2723] hover:bg-[#3E2723]/5'
+                    ? 'text-[#3E2723]'
+                    : 'text-[#6D4C41] hover:text-[#3E2723] hover:bg-[#3E2723]/5'
                     }`}
                 >
                   {item.name}
@@ -107,7 +107,7 @@ const Navbar = () => {
                 </Link>
               ))}
               {/* Staff Links */}
-              {isAuthenticated() && staffLinks.map((item) => (
+              {/* {isAuthenticated() && staffLinks.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
@@ -116,7 +116,7 @@ const Navbar = () => {
                   <span className="material-symbols-outlined text-[16px]">{item.icon}</span>
                   {item.name}
                 </Link>
-              ))}
+              ))} */}
             </nav>
 
             {/* === RIGHT: Contact Button (Desktop) + Hamburger (Mobile) === */}
@@ -251,8 +251,8 @@ const Navbar = () => {
                       to={item.path}
                       onClick={() => setIsMenuOpen(false)}
                       className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-[15px] font-medium transition-all duration-200 ${isActive(item.path)
-                          ? 'bg-[#3E2723] text-white shadow-sm'
-                          : 'text-[#5D4037] hover:bg-[#3E2723]/5 hover:text-[#3E2723]'
+                        ? 'bg-[#3E2723] text-white shadow-sm'
+                        : 'text-[#5D4037] hover:bg-[#3E2723]/5 hover:text-[#3E2723]'
                         }`}
                     >
                       <span

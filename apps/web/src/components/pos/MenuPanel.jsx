@@ -78,12 +78,11 @@ const MenuPanel = ({ searchQuery = '' }) => {
     return (
         <div className="h-full flex flex-col bg-[#F5F0EB]">
             {/* Category Filter */}
-            <div className="py-4 px-4 bg-white border-b border-[#3E2723]/5">
+            <div className="py-3 px-4 bg-white border-b border-[#3E2723]/5">
                 <CategoryFilter
                     categories={categories}
                     active={activeCategory}
                     onChange={setActiveCategory}
-                    itemCounts={itemCounts}
                 />
             </div>
 

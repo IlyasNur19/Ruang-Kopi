@@ -10,11 +10,13 @@ import { reservationsApi, settingsApi, paymentApi } from '../services/api';
 import { useMutation } from '../hooks/useApi';
 import ReservationCalendar from '../components/reservation/ReservationCalendar';
 import TableSelectionStep from '../components/reservation/TableSelectionStep';
+import PreOrderStep from '../components/reservation/PreOrderStep';
 import ReservationReview from '../components/reservation/ReservationReview';
 import PaymentStep from '../components/reservation/PaymentStep';
 
 const ReservationPage = () => {
-    const [step, setStep] = useState('form'); // 'form' | 'table' | 'review' | 'payment' | 'success' | 'error'
+    // Steps: 'form' | 'table' | 'preorder' | 'review' | 'payment' | 'success' | 'error'
+    const [step, setStep] = useState('form');
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -23,6 +25,8 @@ const ReservationPage = () => {
         guests: 2,
     });
     const [selectedTable, setSelectedTable] = useState(null);
+    const [cartItems, setCartItems] = useState([]); // { menuId, name, price, qty }
+    const [paymentType, setPaymentType] = useState('dp'); // 'dp' = 30%, 'full' = 100%
     const [snapToken, setSnapToken] = useState(null);
     const [shopStatus, setShopStatus] = useState('available');
     const [statusLoading, setStatusLoading] = useState(true);
@@ -49,7 +53,15 @@ const ReservationPage = () => {
     };
 
     const handleDateSelect = (date) => {
-        setFormData((prev) => ({ ...prev, date: date ? date.toISOString().split('T')[0] : '' }));
+        if (!date) {
+            setFormData((prev) => ({ ...prev, date: '' }));
+            return;
+        }
+        // Gunakan local date untuk menghindari offset timezone (WIB = UTC+7)
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        setFormData((prev) => ({ ...prev, date: `${year}-${month}-${day}` }));
     };
 
     const handleNextToTable = (e) => {
@@ -61,16 +73,28 @@ const ReservationPage = () => {
         setStep('table');
     };
 
-    const handleNextToReview = () => {
+    const handleNextToPreOrder = () => {
         if (!selectedTable) {
             alert('Silakan pilih meja terlebih dahulu.');
             return;
         }
+        setStep('preorder');
+    };
+
+    const handleNextToReview = () => {
         setStep('review');
     };
 
     const handleBackToForm = () => setStep('form');
     const handleBackToTable = () => setStep('table');
+    const handleBackToPreOrder = () => setStep('preorder');
+
+    // Calculate totals — DP = 30% dari total pre-order, Full = 100%
+    const cartTotal = cartItems.reduce((sum, ci) => sum + ci.price * ci.qty, 0);
+    const dpAmount = Math.round(cartTotal * 0.3);
+    const fullAmount = cartTotal;
+    const paymentAmount = paymentType === 'full' ? fullAmount : dpAmount;
+    const hasPreOrder = cartItems.length > 0;
 
     const handleConfirm = async () => {
         try {
@@ -84,13 +108,26 @@ const ReservationPage = () => {
                 mejaId: selectedTable,
             });
 
-            // 2. Get Snap token for DP payment
+            // 2. If no pre-order, skip payment — go directly to success
+            if (!hasPreOrder || paymentAmount <= 0) {
+                setStep('success');
+                return;
+            }
+
+            // 3. Get Snap token for payment (DP 30% or Full)
             const reservationId = reservation?.id || reservation?.data?.id;
             const snapResult = await paymentApi.getSnapToken({
                 reservationId,
-                amount: 50000, // DP Rp 50.000
+                amount: paymentAmount,
                 customerName: formData.name,
                 customerPhone: formData.phone,
+                // Include cart items so they can be stored in the transaction
+                items: cartItems.map(ci => ({
+                    id: ci.menuId,
+                    name: ci.name,
+                    price: ci.price,
+                    quantity: ci.qty,
+                })),
             });
 
             setSnapToken(snapResult?.snapToken || snapResult?.data?.snapToken);
@@ -117,6 +154,8 @@ const ReservationPage = () => {
         setStep('form');
         setFormData({ name: '', phone: '', date: null, time: '10:00', guests: 2 });
         setSelectedTable(null);
+        setCartItems([]);
+        setPaymentType('dp');
         setSnapToken(null);
     };
 
@@ -126,21 +165,34 @@ const ReservationPage = () => {
         const formattedDate = date ? new Date(date).toLocaleDateString('id-ID', {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         }) : '';
-        const message = `Halo RuangKopi, saya ingin reservasi.%0A%0ANama: ${name}%0ATanggal: ${formattedDate}%0AJam: ${time}%0AJumlah: ${guests} orang%0AMeja: ${selectedTable || '-'}%0A%0AMohon konfirmasinya. Terima kasih.`;
+        // Include cart items in WhatsApp message
+        let itemsText = '';
+        if (cartItems.length > 0) {
+            itemsText = '%0A%0A*Pre-Order:*%0A' + cartItems.map(ci =>
+                `- ${ci.name} x${ci.qty} (${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(ci.price * ci.qty).replace('IDR', 'Rp')})`
+            ).join('%0A');
+            const cartTotalLocal = cartItems.reduce((sum, ci) => sum + ci.price * ci.qty, 0);
+            const dpLocal = Math.round(cartTotalLocal * 0.3);
+            itemsText += `%0A*Total Pre-Order:* ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(cartTotalLocal).replace('IDR', 'Rp')}`;
+            itemsText += `%0A*DP 30%:* ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(dpLocal).replace('IDR', 'Rp')}`;
+        }
+        const message = `Halo RuangKopi, saya ingin reservasi.%0A%0ANama: ${name}%0ATanggal: ${formattedDate}%0AJam: ${time}%0AJumlah: ${guests} orang%0AMeja: ${selectedTable || '-'}${itemsText}%0A%0AMohon konfirmasinya. Terima kasih.`;
         window.open(`https://wa.me/${whatsappPhone}?text=${message}`, '_blank');
     };
 
     const timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
     const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8];
 
-    // Step indicator
+    // Step indicator — 5 steps
     const steps = [
         { id: 'form', label: 'Jadwal' },
         { id: 'table', label: 'Meja' },
+        { id: 'preorder', label: 'Menu' },
         { id: 'review', label: 'Review' },
         { id: 'payment', label: 'Bayar' },
     ];
-    const currentStepIndex = steps.findIndex((s) => s.id === (step === 'success' || step === 'error' ? 'review' : step));
+    const activeStepForIndicator = ['success', 'error'].includes(step) ? 'review' : step;
+    const currentStepIndex = steps.findIndex((s) => s.id === activeStepForIndicator);
 
     return (
         <div className="min-h-screen flex flex-col bg-[#F8F5F2]">
@@ -178,9 +230,31 @@ const ReservationPage = () => {
                                 <div className="text-center py-10">
                                     <CheckCircle size={64} className="mx-auto text-green-500 mb-6" />
                                     <h2 className="font-heading text-3xl text-primary mb-4 font-bold">Reservasi Terkonfirmasi!</h2>
-                                    <p className="text-muted-foreground mb-2">
-                                        Pembayaran DP berhasil. Reservasi Anda telah dikonfirmasi.
-                                    </p>
+                                    {hasPreOrder ? (
+                                        paymentType === 'full' ? (
+                                            <>
+                                                <p className="text-muted-foreground mb-2">
+                                                    Pembayaran penuh sebesar {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(fullAmount).replace('IDR', 'Rp')} telah berhasil.
+                                                </p>
+                                                <p className="text-sm text-[#6D4C41] mb-2">
+                                                    Pre-order Anda sudah lunas dan akan disiapkan sebelum kedatangan.
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p className="text-muted-foreground mb-2">
+                                                    DP sebesar {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(dpAmount).replace('IDR', 'Rp')} telah berhasil dibayar.
+                                                </p>
+                                                <p className="text-sm text-[#6D4C41] mb-2">
+                                                    Sisa {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(cartTotal - dpAmount).replace('IDR', 'Rp')} dibayar di kedai. Pre-order Anda akan disiapkan.
+                                                </p>
+                                            </>
+                                        )
+                                    ) : (
+                                        <p className="text-muted-foreground mb-2">
+                                            Reservasi gratis Anda telah dikonfirmasi.
+                                        </p>
+                                    )}
                                     <p className="text-sm text-[#6D4C41] mb-8">
                                         Silakan datang tepat waktu. Kami tunggu kedatangan Anda!
                                     </p>
@@ -222,7 +296,15 @@ const ReservationPage = () => {
                             {/* ============ PAYMENT STEP ============ */}
                             {step === 'payment' && (
                                 <div>
-                                    <h2 className="font-heading text-2xl text-primary mb-6 font-bold text-center">Pembayaran DP</h2>
+                                    <h2 className="font-heading text-2xl text-primary mb-2 font-bold text-center">
+                                        {paymentType === 'full' ? 'Pembayaran Penuh' : 'Pembayaran DP 30%'}
+                                    </h2>
+                                    <p className="text-center text-sm text-[#6D4C41] mb-4">
+                                        {paymentType === 'full'
+                                            ? `Bayar penuh ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(fullAmount).replace('IDR', 'Rp')}`
+                                            : `Bayar uang muka ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(dpAmount).replace('IDR', 'Rp')} · Sisa ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(cartTotal - dpAmount).replace('IDR', 'Rp')} di kedai`
+                                        }
+                                    </p>
                                     <PaymentStep
                                         snapToken={snapToken}
                                         onSuccess={handlePaymentSuccess}
@@ -245,9 +327,22 @@ const ReservationPage = () => {
                                 <ReservationReview
                                     formData={formData}
                                     selectedTable={selectedTable}
+                                    cartItems={cartItems}
+                                    paymentType={paymentType}
+                                    onPaymentTypeChange={setPaymentType}
                                     onConfirm={handleConfirm}
-                                    onBack={handleBackToTable}
+                                    onBack={handleBackToPreOrder}
                                     loading={loading}
+                                />
+                            )}
+
+                            {/* ============ PRE-ORDER STEP ============ */}
+                            {step === 'preorder' && (
+                                <PreOrderStep
+                                    cartItems={cartItems}
+                                    onCartChange={setCartItems}
+                                    onNext={handleNextToReview}
+                                    onBack={handleBackToTable}
                                 />
                             )}
 
@@ -270,11 +365,11 @@ const ReservationPage = () => {
                                         time={formData.time}
                                     />
                                     <button
-                                        onClick={handleNextToReview}
+                                        onClick={handleNextToPreOrder}
                                         disabled={!selectedTable}
                                         className="w-full mt-6 py-4 bg-[#3E2723] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-[#4E342E] disabled:opacity-40 disabled:cursor-not-allowed"
                                     >
-                                        Lanjut ke Review
+                                        Lanjut Pre-Order Menu
                                         <ChevronRight size={18} />
                                     </button>
                                 </div>
@@ -290,7 +385,7 @@ const ReservationPage = () => {
                                         Reservasi Meja Anda
                                     </h1>
                                     <p className="text-muted-foreground mb-8 leading-relaxed">
-                                        Nikmati momen terbaik bersama kopi terbaik. Silakan isi formulir di bawah ini.
+                                        Nikmati momen terbaik bersama kopi terbaik. Pilih jadwal, meja, dan pre-order menu favorit Anda.
                                     </p>
 
                                     {/* Step Indicator */}

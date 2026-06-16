@@ -1,84 +1,98 @@
-# PRODUCT REQUIREMENTS DOCUMENT (PRD)
+# PRODUCT REQUIREMENTS DOCUMENT (PRD) v2.0
 
-**Nama Proyek:** Kedai Ruang Kopi - *Integrated POS & Reservation System*
+**Nama Proyek:** Kedai Ruang Kopi - *Integrated POS & Self-Ordering System*
 **Dokumen Pemilik:** Ilyas Nur Putra Kautsar (Peneliti / *Lead Developer*)
 **Status Dokumen:** Draf / Perencanaan Lanjutan
 
 ---
 
 ## 1. Ringkasan Eksekutif
-Proyek ini mengembangkan sistem informasi terpadu berskala mikro (*micro-ERP*) untuk Kedai Ruang Kopi. Sistem ini dirancang untuk menjembatani asinkronisasi data antara reservasi daring pelanggan dan operasional luring kasir. Dengan mengintegrasikan *Payment Gateway* dan modul *Point of Sales* (POS) dalam satu arsitektur terpusat, sistem ini mengeliminasi validasi pembayaran manual, mencegah *double booking* meja secara *real-time*, dan menghasilkan rekapitulasi pelaporan keuangan gabungan yang presisi.
+Proyek ini mengembangkan sistem informasi terpadu berskala mikro (*micro-ERP*) untuk Kedai Ruang Kopi. Sistem ini dirancang untuk memecahkan masalah asinkronisasi data antara reservasi daring dan operasional kasir luring. Pada versi pembaruan ini, sistem ditingkatkan menjadi **Sistem Pemesanan Mandiri (Self-Ordering System)** di mana pelanggan tidak hanya memesan meja, tetapi juga dapat melakukan pra-pesan (*pre-order*) menu secara daring. Integrasi dengan Payment Gateway memungkinkan validasi pembayaran otomatis dan penguncian meja secara *real-time*, sekaligus memaksimalkan arus kas dan efisiensi operasional.
 
 ## 2. Tujuan & Metrik Keberhasilan
-* **Otomatisasi Validasi:** 100% transaksi uang muka (DP) reservasi divalidasi otomatis melalui *webhook Payment Gateway*, tanpa intervensi manual administrator.
-* **Akurasi Sinkronisasi:** Keterlambatan (*latency*) penguncian status meja dari reservasi daring ke layar POS luring berada di bawah 2 detik.
-* **Sentralisasi Laporan:** Kesalahan rekapitulasi data antara daring dan luring (*human error*) ditekan hingga 0%.
+* **Otomatisasi Validasi:** 100% transaksi daring divalidasi otomatis melalui *webhook* Payment Gateway.
+* **Akurasi Sinkronisasi:** Keterlambatan (*latency*) penguncian status meja di layar POS luring berada di bawah 2 detik.
+* **Peningkatan Efisiensi Dapur:** Waktu tunggu pelanggan untuk penyajian makanan menurun karena dapur sudah menerima daftar *pre-order* sebelum kedatangan.
+* **Sentralisasi Laporan:** Kesalahan rekapitulasi data pendapatan harian ditekan hingga 0%.
 
 ## 3. Target Pengguna (*User Personas*)
 
 | Peran (*Role*) | Deskripsi Kebutuhan Utama |
 | :--- | :--- |
-| **Pelanggan** | Membutuhkan antarmuka web yang responsif untuk memesan meja, memilih tanggal/waktu, dan membayar uang muka menggunakan metode nirtunai (QRIS/VA) secara aman. |
-| **Kasir / Barista** | Membutuhkan *dashboard* POS yang cepat, informatif (melihat ketersediaan meja secara *real-time*), dan tidak memuat ulang (*reload*) halaman saat memproses pesanan *walk-in*. |
-| **Admin / Pemilik** | Membutuhkan *dashboard* terpusat untuk melihat rekapitulasi pendapatan harian gabungan, mengelola katalog menu, dan mengatur *shift* kasir. |
+| **Pelanggan** | Membutuhkan antarmuka web untuk memesan meja, melihat katalog menu, memasukkan pesanan ke keranjang (*cart*), dan membayar total tagihan menggunakan QRIS/VA secara aman. |
+| **Kasir / Barista** | Membutuhkan *dashboard* POS yang informatif (melihat meja yang telah dipesan beserta isi pesanannya secara otomatis) dan tombol konfirmasi "Pelanggan Tiba" untuk memicu proses masak. |
+| **Admin / Pemilik** | Membutuhkan *dashboard* terpusat untuk melihat rekap pendapatan gabungan dan mengelola ketersediaan master data (menu dan meja). |
 
 ## 4. Ruang Lingkup & Batasan Masalah
-* **Di Dalam Lingkup (*In-Scope*):** Integrasi API Midtrans/Xendit untuk reservasi web, *dashboard* POS SPA (*Single Page Application*), manajemen status meja *real-time*, laporan pendapatan gabungan.
-* **Di Luar Lingkup (*Out-of-Scope*):** Modul inventaris gudang/penyusutan bahan baku mentah (*Bill of Materials*), akuntansi pengeluaran operasional (gaji, listrik), sistem *refund* otomatis melalui API.
+* **Di Dalam Lingkup (*In-Scope*):** *Pre-order* menu saat reservasi, integrasi API Midtrans/Xendit, manajemen status meja *real-time* via Socket.io, *dashboard* POS SPA, autentikasi berbasis *Role* (RBAC), dan laporan sentral.
+* **Di Luar Lingkup (*Out-of-Scope*):** Modul inventaris gudang (penyusutan gramasi bahan baku mentah), akuntansi pengeluaran (gaji, listrik), sistem *refund* otomatis via API.
 
-## 5. Arsitektur & Teknologi (*Tech Stack*)
+## 5. Keamanan Sistem (*Security Requirements*)
+* **Autentikasi & RBAC:** Menggunakan JSON Web Tokens (JWT) dan *middleware* Express.js untuk membatasi akses URL berdasarkan *role* (Admin, Kasir, Pelanggan).
+* **Webhook Signature:** Wajib melakukan komputasi HMAC SHA512 pada *payload* dari Payment Gateway untuk memastikan notifikasi pembayaran sah dan tidak bisa di-*spoofing*.
+* **Password Hashing:** Enkripsi *password* menggunakan `bcrypt`.
+* **API Protection:** Implementasi Helmet.js (HTTP Headers), CORS, dan Rate Limiting pada *endpoint* krusial (login, checkout).
+
+## 6. Arsitektur & Teknologi (*Tech Stack*)
 * **Manajemen Proyek:** Turborepo (*Monorepo*).
 * **Antarmuka (*Frontend*):** React.js / Next.js, Tailwind CSS, shadcn/ui.
-* **Logika Antarmuka:** Zustand (*State Management*), TanStack Query (*Data Fetching*), react-to-print (Cetak Struk Thermal).
+* **Logika Antarmuka:** Zustand (*Global Cart State* pelanggan & kasir), TanStack Query (*Data Fetching*), react-to-print.
 * **Peladen (*Backend*):** Node.js dengan Express.js.
 * **Basis Data & ORM:** PostgreSQL dengan Drizzle ORM.
-* **Integrasi Pihak Ketiga:** Midtrans/Xendit (Pembayaran), Socket.io (Komunikasi *Real-time* untuk sinkronisasi meja).
+* **Integrasi Eksternal:** Midtrans/Xendit, Socket.io.
 
 ---
 
-## 6. Diagram Alur Aplikasi (*App Flow*)
+## 7. Diagram Alur Aplikasi (*App Flow*)
 
 ```mermaid
 flowchart TD
     Start([Mulai Alur Pemesanan]) --> PilihJalur{Metode Kedatangan?}
 
+    %% Zona Daring (Web)
     subgraph Pelanggan [Antarmuka Pelanggan Daring]
-        PilihJalur -->|Reservasi Online| BukaWeb[Buka Web Reservasi]
-        BukaWeb --> PilihJadwal[Pilih Tanggal, Waktu & Meja]
-        PilihJadwal --> CekKetersediaan{Meja Tersedia?}
+        PilihJalur -->|Online| BukaWeb[Buka Web Reservasi]
+        BukaWeb --> PilihJadwal[Pilih Waktu & Meja]
+        PilihJadwal --> CekKetersediaan{Tersedia?}
         CekKetersediaan -->|Tidak| PilihJadwal
-        CekKetersediaan -->|Ya| Checkout[Isi Data & Checkout]
+        CekKetersediaan -->|Ya| PilihMenu[Pilih Menu Pre-Order]
+        PilihMenu --> Checkout[Isi Data & Checkout]
     end
 
-    subgraph Payment [Layanan Payment Gateway]
+    %% Zona Payment Gateway
+    subgraph Payment [Payment Gateway]
         Checkout --> TampilBayar[Generate VA / QRIS]
-        TampilBayar --> ProsesBayar[Pelanggan Membayar DP]
-        ProsesBayar --> KirimWebhook[API Mengirim Webhook 'Sukses']
+        TampilBayar --> ProsesBayar[Pelanggan Membayar Total]
+        ProsesBayar --> KirimWebhook[Kirim Webhook 'Settlement']
     end
 
-    subgraph Kasir [Antarmuka Kasir Luring / POS]
-        PilihJalur -->|Walk-in Langsung| PelangganDatang[Pelanggan Tiba di Kedai]
-        PelangganDatang --> BukaPOS[Kasir Buka Dashboard POS]
-        BukaPOS --> CekMejaPOS{Cek Status Meja via Socket.io}
-        CekMejaPOS -->|Penuh/Direservasi| Tunggu[Waiting List]
-        CekMejaPOS -->|Kosong| InputPesanan[Kasir Input Pesanan]
-        InputPesanan --> BayarKasir[Proses Pembayaran Tunai/QRIS Kasir]
+    %% Zona POS Kasir
+    subgraph Kasir [Antarmuka Kasir & POS]
+        PilihJalur -->|Walk-in| KasirPOS[Kasir Input Pesanan Manual]
+        
+        KirimWebhook -.->|Socket.io Emit| NotifPOS[Meja di POS Jadi Merah]
+        NotifPOS --> TungguTiba[Tunggu Pelanggan Tiba]
+        TungguTiba --> KlikTiba[Kasir Klik 'Pelanggan Tiba']
+        KlikTiba --> Dapur[Kirim Tiket ke Dapur / Mulai Masak]
+        Dapur --> TambahPesanan{Ada Tambahan?}
+        TambahPesanan -->|Ya| KasirPOS
+        TambahPesanan -->|Tidak| SelesaiK[Selesai]
+        KasirPOS --> BayarKasir[Proses Bayar Tunai/QRIS]
     end
 
-    subgraph Sistem [Sistem Informasi Terpadu & Database]
-        KirimWebhook --> Validasi[Backend Validasi Pembayaran]
-        Validasi --> KunciMeja[Emit Socket.io: Kunci Meja di Layar POS]
-        KunciMeja --> SimpanDB[(Database Transaksi Pusat)]
+    %% Zona Backend & Database
+    subgraph Sistem [Sistem Terpadu & Basis Data]
+        KirimWebhook --> Validasi[Validasi Signature SHA512]
+        Validasi --> SimpanDB[(Database Transaksi Pusat)]
         BayarKasir --> SimpanDB
         SimpanDB --> RekapLaporan[Generate Laporan Pendapatan]
     end
-
-    RekapLaporan --> Selesai([Selesai])
 ```
 
 ---
 
-## 7. Perancangan Basis Data (ERD)
+## 8. Perancangan Basis Data (ERD)
+*Catatan: Struktur telah mendukung pre-order karena entitas `RESERVASI` memiliki relasi langsung dengan pembuatan keranjang `DETAIL_TRANSAKSI` lewat tabel sentral `TRANSAKSI`.*
 
 ```mermaid
 erDiagram
@@ -113,7 +127,7 @@ erDiagram
         uuid id PK
         uuid reservasi_id FK "Nullable"
         uuid kasir_id FK "Nullable"
-        string tipe_pesanan "Enum: online, walk_in"
+        string tipe_pesanan "Enum: online_preorder, walk_in"
         int total_tagihan
         timestamp tanggal_transaksi
     }
@@ -135,29 +149,28 @@ erDiagram
 
     USERS ||--o{ RESERVASI : "melakukan"
     MEJA ||--o{ RESERVASI : "dipesan_pada"
-    RESERVASI ||--o| TRANSAKSI : "menjadi"
-    USERS ||--o{ TRANSAKSI : "melayani (sebagai kasir)"
-    TRANSAKSI ||--|{ DETAIL_TRANSAKSI : "memiliki_item"
-    MENU ||--o{ DETAIL_TRANSAKSI : "terdapat_pada"
-    TRANSAKSI ||--o| PAYMENT_GATEWAY : "dibayar_melalui"
+    RESERVASI ||--o| TRANSAKSI : "membuat"
+    USERS ||--o{ TRANSAKSI : "melayani"
+    TRANSAKSI ||--|{ DETAIL_TRANSAKSI : "berisi_item"
+    MENU ||--o{ DETAIL_TRANSAKSI : "tercatat_sebagai"
+    TRANSAKSI ||--o| PAYMENT_GATEWAY : "diverifikasi_oleh"
 ```
 
 ---
 
-## 8. Rincian Fitur Utama
+## 9. Rincian Fitur Utama
 
-### 8.1 Modul Reservasi Daring (Pelanggan)
-* **Katalog Interaktif:** Menampilkan galeri menu dan foto suasana kedai.
-* **Manajemen Jadwal:** Validasi kalender untuk memastikan tanggal dan waktu belum terlewat, dipadukan dengan cek status ketersediaan meja dari basis data.
-* **Snap Pembayaran:** Integrasi pop-up Midtrans untuk pembayaran DP secara instan di dalam antarmuka web.
+### 9.1 Modul Reservasi & Self-Ordering Daring (Pelanggan)
+* **Katalog Interaktif (Zustand):** Mengelola *state* keranjang belanja pelanggan secara global di *browser* saat mereka memilih meja dan menu.
+* **Manajemen Jadwal:** Validasi ketersediaan meja berdasarkan *timestamp* di PostgreSQL.
+* **Checkout & Payment:** Mengirim *payload* detil pesanan (termasuk harga menu) ke Midtrans Snap API agar rincian muncul di halaman pembayaran.
 
-### 8.2 Modul POS (Kasir)
-* **Layout SPA:** Layar terbagi dua: Daftar Menu (kiri) dan Keranjang/Tagihan (kanan).
-* **Keranjang Global (Zustand):** Kasir dapat memasukkan pesanan, menghapusnya, atau mengubah kuantitas secara responsif.
-* **Peta Meja *Real-Time*:** Visualisasi grid meja dengan warna yang diatur via Socket.io. Hijau (tersedia), Merah (direservasi daring), Kuning (diisi *walk-in*).
-* **Cetak Struk:** Integrasi komponen `react-to-print` untuk mencetak bukti transaksi fisik ke *printer thermal*.
+### 9.2 Modul POS (Kasir)
+* **Peta Meja *Real-Time* (Socket.io):** Sinkronisasi instan warna meja.
+* **Integrasi Pre-Order:** Ketika Kasir mengeklik meja yang "Direservasi Daring", keranjang kasir (*cart*) langsung menampilkan menu-menu yang sudah dibayar pelanggan tersebut secara otomatis (menarik data dari `DETAIL_TRANSAKSI`).
+* **Fitur "Pelanggan Tiba" (Fire Order):** Tombol khusus di POS untuk mengirimkan tiket instruksi masak ke area dapur, mencegah pesanan *pre-order* menjadi dingin sebelum pelanggan benar-benar tiba di lokasi.
+* **Penggabungan Tagihan (Add-on):** Jika pelanggan *pre-order* memesan tambahan (misal: air mineral) secara luring, kasir dapat menambahkannya ke meja yang sama tanpa mengganggu pembayaran pertama yang sudah lunas.
 
-### 8.3 Modul Administrator
-* **Dashboard Keuangan:** Grafik batang/garis pendapatan harian, persentase kontribusi jalur *online* vs *walk-in*.
-* **Master Data:** Operasi CRUD penuh untuk tabel `menu` (ubah harga/stok) dan tabel `meja`.
-* **Manajemen Pembatalan:** Tombol manual untuk membatalkan reservasi (melepas kuncian meja) dan menyesuaikan laporan secara otomatis.
+### 9.3 Modul Administrator
+* **Dashboard Keuangan:** Rekapitulasi pendapatan sentral yang tidak membedakan uang masuk dari web maupun laci kasir tunai.
+* **Master Data & Hak Akses:** Pengelolaan menu, ketersediaan meja, dan pembuatan akun Kasir baru (pemberian akses *Role*).

@@ -2,15 +2,30 @@ import React, { useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet';
 import useCartStore from '../../stores/cartStore';
+import useUIStore from '../../stores/uiStore';
 import POSTopBar from './POSTopBar';
 import MenuPanel from './MenuPanel';
 import CartPanel from './CartPanel';
+import ReservationManagement from '../admin/ReservationManagement';
 
 const POSLayout = () => {
     const [mobileCartOpen, setMobileCartOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const itemCount = useCartStore((s) => s.getItemCount);
+    const activeView = useUIStore((s) => s.posActiveView);
 
+    // Reservation view
+    if (activeView === 'reservation') {
+        return (
+            <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto bg-[#F5F0EB] p-6">
+                    <ReservationManagement />
+                </div>
+            </div>
+        );
+    }
+
+    // Default: Menu view
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
             {/* Top Bar with Search */}
@@ -57,3 +72,4 @@ const POSLayout = () => {
 };
 
 export default POSLayout;
+

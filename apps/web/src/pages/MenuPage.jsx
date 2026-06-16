@@ -41,8 +41,8 @@ const MenuPage = () => {
     return (
         <div className="min-h-screen flex flex-col bg-[#F8F5F2]">
             <Navbar />
-            <main className="flex-grow pt-28 pb-20">
-                <div className="container mx-auto px-4">
+            <main className="flex-grow pt-10 pb-20">
+                <div className="container mx-auto px-8">
                     {/* Page Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -50,7 +50,7 @@ const MenuPage = () => {
                         className="text-center max-w-2xl mx-auto mb-12"
                     >
                         <h1 className="font-heading text-5xl md:text-6xl text-primary mb-4 font-bold">Menu Kami</h1>
-                        <p className="text-muted-foreground text-lg leading-relaxed">
+                        <p className="text-muted-foreground text-sm md:text-lg leading-relaxed px-6">
                             Crafted with passion, served with love. Explore our selection of premium beans and handcrafted pastries, made to perfect your daily ritual.
                         </p>
                     </motion.div>

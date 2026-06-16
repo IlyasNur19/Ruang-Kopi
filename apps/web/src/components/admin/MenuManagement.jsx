@@ -99,21 +99,48 @@ const MenuManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Validate price before sending
+        const priceValue = parseInt(formData.price);
+        if (isNaN(priceValue) || priceValue <= 0) {
+            alert('Harga harus berupa angka positif. Contoh: 35000');
+            return;
+        }
+
         try {
             setSaving(true);
 
+            // Build data object — only include valid fields to avoid Zod validation errors
             const data = {
                 name: formData.name,
-                description: formData.description,
-                price: parseInt(formData.price),
-                categoryId: parseInt(formData.categoryId),
+                price: priceValue,
                 available: formData.available,
-                image: formData.image,
             };
+
+            // description: only include if non-empty
+            if (formData.description && formData.description.trim() !== '') {
+                data.description = formData.description.trim();
+            }
+
+            // categoryId: only include if it's a valid number
+            const catId = parseInt(formData.categoryId);
+            if (!isNaN(catId)) {
+                data.categoryId = catId;
+            }
+
+            // image: only include if it's a non-empty URL string
+            if (formData.image && formData.image.trim() !== '') {
+                data.image = formData.image.trim();
+            } else if (editingItem) {
+                // When clearing an existing image, explicitly set to null
+                data.image = null;
+            }
 
             if (editingItem) {
                 await menuApi.update(editingItem.id, data);
             } else {
+                // Create must include all required fields
+                if (!data.name) throw new Error('Name is required');
+                if (!data.categoryId) throw new Error('Category is required');
                 await menuApi.create(data);
             }
 
@@ -121,7 +148,7 @@ const MenuManagement = () => {
             fetchData(); // Refresh the list
         } catch (err) {
             console.error('Error saving item:', err);
-            alert('Failed to save item. Please try again.');
+            alert('Gagal menyimpan: ' + (err.message || 'Silakan coba lagi.'));
         } finally {
             setSaving(false);
         }
