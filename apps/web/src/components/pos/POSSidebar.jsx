@@ -5,6 +5,7 @@ import {
     UtensilsCrossed,
     Grid3X3,
     CalendarCheck,
+    LayoutDashboard,
     LogOut,
     User,
 } from 'lucide-react';
@@ -13,6 +14,7 @@ import { useAuth } from '../../context/AuthContext';
 import useUIStore from '../../stores/uiStore';
 
 const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'menu', label: 'Menu', icon: UtensilsCrossed },
     { id: 'tables', label: 'Peta Meja', icon: Grid3X3 },
     { id: 'reservation', label: 'Reservasi', icon: CalendarCheck },

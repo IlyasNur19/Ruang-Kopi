@@ -6,7 +6,7 @@ import { create } from 'zustand';
  */
 const useUIStore = create((set) => ({
     // ========== POS ==========
-    posActiveView: 'menu', // 'menu' | 'tables' | 'reservation'
+    posActiveView: 'dashboard', // 'dashboard' | 'menu' | 'tables' | 'reservation'
     posTableMapOpen: false,
     posCheckoutOpen: false,
 

@@ -130,7 +130,7 @@ const ReservationPage = () => {
                 })),
             });
 
-            setSnapToken(snapResult?.snapToken || snapResult?.data?.snapToken);
+            setSnapToken(snapResult?.token || snapResult?.data?.token);
             setStep('payment');
         } catch (err) {
             console.error('Reservation failed:', err);

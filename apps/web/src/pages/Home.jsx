@@ -4,35 +4,39 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
-import { settingsApi, menuApi } from '../services/api';
+import { settingsApi, menuApi, mejaApi } from '../services/api';
 
 
 const Home = () => {
-    const [shopStatus, setShopStatus] = useState('available');
+    const [liveStatus, setLiveStatus] = useState({ text: 'Buka · Memuat...', color: 'bg-green-500' });
     const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80');
     const [menuItems, setMenuItems] = useState([]);
     const [spaceImages, setSpaceImages] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const statusConfig = {
-        available: { text: 'Buka · Meja Tersedia', color: 'bg-green-500' },
-        busy: { text: 'Ramai · Meja Terbatas', color: 'bg-orange-500' },
-        full: { text: 'Penuh · Tidak Ada Meja', color: 'bg-red-500' }
-    };
-    const status = statusConfig[shopStatus] || statusConfig.available;
-
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
-                const [statusData, menuData, heroData, spaceData] = await Promise.all([
-                    settingsApi.getStatus().catch(() => ({ status: 'available' })),
+                const [mejaStatusData, menuData, heroData, spaceData] = await Promise.all([
+                    mejaApi.getStatus().catch(() => null),
                     menuApi.getAll().catch(() => []),
                     settingsApi.getHeroImage().catch(() => ({ heroImage: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80' })),
                     settingsApi.getSpaceImages().catch(() => ({ images: [] })),
                 ]);
 
-                if (statusData?.status) setShopStatus(statusData.status);
+                if (mejaStatusData) {
+                    const { tersedia, total } = mejaStatusData;
+                    if (total === 0) {
+                        setLiveStatus({ text: 'Buka · Meja Tersedia', color: 'bg-green-500' });
+                    } else if (tersedia === 0) {
+                        setLiveStatus({ text: 'Penuh · Tidak Ada Meja', color: 'bg-red-500' });
+                    } else if (tersedia <= 2) {
+                        setLiveStatus({ text: `Ramai · Sisa ${tersedia} Meja`, color: 'bg-orange-500' });
+                    } else {
+                        setLiveStatus({ text: `Buka · ${tersedia} Meja Tersedia`, color: 'bg-green-500' });
+                    }
+                }
                 if (heroData?.heroImage) setHeroImage(heroData.heroImage);
                 if (spaceData?.images) setSpaceImages(spaceData.images);
 
@@ -154,10 +158,10 @@ const Home = () => {
                                 <p className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Live Status</p>
                                 <div className="flex items-center gap-2">
                                     <span className="relative flex h-2 w-2">
-                                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${status.color} opacity-75`}></span>
-                                        <span className={`relative inline-flex rounded-full h-2 w-2 ${status.color}`}></span>
+                                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${liveStatus.color} opacity-75`}></span>
+                                        <span className={`relative inline-flex rounded-full h-2 w-2 ${liveStatus.color}`}></span>
                                     </span>
-                                    <p className="text-sm font-semibold text-white">{status.text}</p>
+                                    <p className="text-sm font-semibold text-white">{liveStatus.text}</p>
                                 </div>
                             </div>
                         </div>

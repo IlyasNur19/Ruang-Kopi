@@ -7,6 +7,7 @@ import POSTopBar from './POSTopBar';
 import MenuPanel from './MenuPanel';
 import CartPanel from './CartPanel';
 import ReservationManagement from '../admin/ReservationManagement';
+import POSDashboard from './POSDashboard';
 
 const POSLayout = () => {
     const [mobileCartOpen, setMobileCartOpen] = useState(false);
@@ -21,6 +22,15 @@ const POSLayout = () => {
                 <div className="flex-1 overflow-y-auto bg-[#F5F0EB] p-6">
                     <ReservationManagement />
                 </div>
+            </div>
+        );
+    }
+
+    // Dashboard view
+    if (activeView === 'dashboard') {
+        return (
+            <div className="flex-1 flex flex-col overflow-hidden">
+                <POSDashboard />
             </div>
         );
     }
