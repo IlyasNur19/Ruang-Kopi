@@ -1,35 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, CalendarDays, Clock, Users, Phone, MapPin, Loader2, CheckCircle, XCircle, AlertTriangle, Check } from 'lucide-react';
+import {
+    User, Phone, Clock, Users, MapPin, Loader2, CheckCircle, XCircle, AlertTriangle,
+    ChevronLeft, ChevronRight, CalendarDays
+} from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { reservationsApi, settingsApi } from '../services/api';
+import { reservationsApi, settingsApi, paymentApi } from '../services/api';
 import { useMutation } from '../hooks/useApi';
+import ReservationCalendar from '../components/reservation/ReservationCalendar';
+import TableSelectionStep from '../components/reservation/TableSelectionStep';
+import PreOrderStep from '../components/reservation/PreOrderStep';
+import ReservationReview from '../components/reservation/ReservationReview';
+import PaymentStep from '../components/reservation/PaymentStep';
 
 const ReservationPage = () => {
+    // Steps: 'form' | 'table' | 'preorder' | 'review' | 'payment' | 'success' | 'error'
+    const [step, setStep] = useState('form');
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
-        date: '',
+        date: null,
         time: '10:00',
         guests: 2,
     });
-    const [step, setStep] = useState('form'); // 'form', 'review', 'success', 'error'
-    const [shopStatus, setShopStatus] = useState('available'); // 'available', 'busy', 'full'
+    const [selectedTable, setSelectedTable] = useState(null);
+    const [cartItems, setCartItems] = useState([]); // { menuId, name, price, qty }
+    const [paymentType, setPaymentType] = useState('dp'); // 'dp' = 30%, 'full' = 100%
+    const [snapToken, setSnapToken] = useState(null);
+    const [shopStatus, setShopStatus] = useState('available');
     const [statusLoading, setStatusLoading] = useState(true);
 
-    // Mutation for creating reservation
-    const { mutate: createReservation, loading, error, reset } = useMutation(reservationsApi.create);
+    const { mutate: createReservation, loading, error } = useMutation(reservationsApi.create);
 
-    // Fetch shop status on mount
     useEffect(() => {
         const fetchStatus = async () => {
             try {
                 const data = await settingsApi.getStatus();
                 setShopStatus(data.status || 'available');
-            } catch (err) {
-                console.error('Failed to fetch status:', err);
-                setShopStatus('available'); // Default to available on error
+            } catch {
+                setShopStatus('available');
             } finally {
                 setStatusLoading(false);
             }
@@ -39,210 +49,150 @@ const ReservationPage = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: name === 'guests' ? parseInt(value) : value
-        }));
+        setFormData((prev) => ({ ...prev, [name]: name === 'guests' ? parseInt(value) : value }));
     };
 
-    const handleReview = (e) => {
+    const handleDateSelect = (date) => {
+        if (!date) {
+            setFormData((prev) => ({ ...prev, date: '' }));
+            return;
+        }
+        // Gunakan local date untuk menghindari offset timezone (WIB = UTC+7)
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        setFormData((prev) => ({ ...prev, date: `${year}-${month}-${day}` }));
+    };
+
+    const handleNextToTable = (e) => {
         e.preventDefault();
+        if (!formData.date) {
+            alert('Silakan pilih tanggal terlebih dahulu.');
+            return;
+        }
+        setStep('table');
+    };
+
+    const handleNextToPreOrder = () => {
+        if (!selectedTable) {
+            alert('Silakan pilih meja terlebih dahulu.');
+            return;
+        }
+        setStep('preorder');
+    };
+
+    const handleNextToReview = () => {
         setStep('review');
     };
 
+    const handleBackToForm = () => setStep('form');
+    const handleBackToTable = () => setStep('table');
+    const handleBackToPreOrder = () => setStep('preorder');
+
+    // Calculate totals — DP = 30% dari total pre-order, Full = 100%
+    const cartTotal = cartItems.reduce((sum, ci) => sum + ci.price * ci.qty, 0);
+    const dpAmount = Math.round(cartTotal * 0.3);
+    const fullAmount = cartTotal;
+    const paymentAmount = paymentType === 'full' ? fullAmount : dpAmount;
+    const hasPreOrder = cartItems.length > 0;
+
     const handleConfirm = async () => {
         try {
-            // Save to database first
-            await createReservation({
+            // 1. Create reservation
+            const reservation = await createReservation({
                 name: formData.name,
                 phone: formData.phone,
                 date: formData.date,
                 time: formData.time,
                 guests: formData.guests,
+                mejaId: selectedTable,
             });
 
-            // Then open WhatsApp
-            handleWhatsApp();
-            setStep('success');
+            // 2. If no pre-order, skip payment — go directly to success
+            if (!hasPreOrder || paymentAmount <= 0) {
+                setStep('success');
+                return;
+            }
+
+            // 3. Get Snap token for payment (DP 30% or Full)
+            const reservationId = reservation?.id || reservation?.data?.id;
+            const snapResult = await paymentApi.getSnapToken({
+                reservationId,
+                amount: paymentAmount,
+                customerName: formData.name,
+                customerPhone: formData.phone,
+                // Include cart items so they can be stored in the transaction
+                items: cartItems.map(ci => ({
+                    id: ci.menuId,
+                    name: ci.name,
+                    price: ci.price,
+                    quantity: ci.qty,
+                })),
+            });
+
+            setSnapToken(snapResult?.token || snapResult?.data?.token);
+            setStep('payment');
         } catch (err) {
             console.error('Reservation failed:', err);
             setStep('error');
         }
     };
 
-    const handleWhatsApp = () => {
-        const { name, date, time, guests } = formData;
-        const whatsappPhone = '6285156432030';
-        const formattedDate = new Date(date).toLocaleDateString('id-ID', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-        const message = `Halo RuangKopi, saya ingin reservasi.%0A%0ANama: ${name}%0ATanggal: ${formattedDate}%0AJam: ${time}%0AJumlah: ${guests} orang%0A%0AMohon konfirmasinya. Terima kasih.`;
-        window.open(`https://wa.me/${whatsappPhone}?text=${message}`, '_blank');
+    const handlePaymentSuccess = () => {
+        setStep('success');
+    };
+
+    const handlePaymentError = () => {
+        setStep('error');
+    };
+
+    const handlePaymentClose = () => {
+        // Popup closed without completing — stay on payment step
     };
 
     const handleReset = () => {
         setStep('form');
-        reset();
-        setFormData({
-            name: '',
-            phone: '',
-            date: '',
-            time: '10:00',
-            guests: 2,
-        });
+        setFormData({ name: '', phone: '', date: null, time: '10:00', guests: 2 });
+        setSelectedTable(null);
+        setCartItems([]);
+        setPaymentType('dp');
+        setSnapToken(null);
     };
 
-    const handleBack = () => {
-        setStep('form');
+    const handleWhatsAppFallback = () => {
+        const { name, date, time, guests } = formData;
+        const whatsappPhone = '6285156432030';
+        const formattedDate = date ? new Date(date).toLocaleDateString('id-ID', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        }) : '';
+        // Include cart items in WhatsApp message
+        let itemsText = '';
+        if (cartItems.length > 0) {
+            itemsText = '%0A%0A*Pre-Order:*%0A' + cartItems.map(ci =>
+                `- ${ci.name} x${ci.qty} (${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(ci.price * ci.qty).replace('IDR', 'Rp')})`
+            ).join('%0A');
+            const cartTotalLocal = cartItems.reduce((sum, ci) => sum + ci.price * ci.qty, 0);
+            const dpLocal = Math.round(cartTotalLocal * 0.3);
+            itemsText += `%0A*Total Pre-Order:* ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(cartTotalLocal).replace('IDR', 'Rp')}`;
+            itemsText += `%0A*DP 30%:* ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(dpLocal).replace('IDR', 'Rp')}`;
+        }
+        const message = `Halo RuangKopi, saya ingin reservasi.%0A%0ANama: ${name}%0ATanggal: ${formattedDate}%0AJam: ${time}%0AJumlah: ${guests} orang%0AMeja: ${selectedTable || '-'}${itemsText}%0A%0AMohon konfirmasinya. Terima kasih.`;
+        window.open(`https://wa.me/${whatsappPhone}?text=${message}`, '_blank');
     };
 
     const timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
     const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8];
 
-    // Status indicator component
-    const StatusWidget = () => {
-        const statusConfig = {
-            available: {
-                color: 'bg-green-500',
-                textColor: 'text-green-700',
-                bgColor: 'bg-green-50',
-                borderColor: 'border-green-200',
-                label: 'Tersedia',
-                description: 'Tempat masih tersedia untuk reservasi',
-                icon: CheckCircle
-            },
-            busy: {
-                color: 'bg-yellow-500',
-                textColor: 'text-yellow-700',
-                bgColor: 'bg-yellow-50',
-                borderColor: 'border-yellow-200',
-                label: 'Hampir Penuh',
-                description: 'Segera reservasi sebelum kehabisan',
-                icon: AlertTriangle
-            },
-            full: {
-                color: 'bg-red-500',
-                textColor: 'text-red-700',
-                bgColor: 'bg-red-50',
-                borderColor: 'border-red-200',
-                label: 'Penuh',
-                description: 'Maaf, tempat sedang penuh. Coba lagi nanti.',
-                icon: XCircle
-            }
-        };
-
-        const config = statusConfig[shopStatus] || statusConfig.available;
-        const Icon = config.icon;
-
-        if (statusLoading) {
-            return (
-                <div className="flex items-center gap-3 p-4 bg-gray-50 border border-gray-200 rounded-xl mb-6">
-                    <Loader2 size={20} className="animate-spin text-gray-400" />
-                    <span className="text-gray-500">Memuat status ketersediaan...</span>
-                </div>
-            );
-        }
-
-        return (
-            <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`flex items-center gap-3 p-4 ${config.bgColor} border ${config.borderColor} rounded-xl mb-6`}
-            >
-                <div className={`w-3 h-3 rounded-full ${config.color} animate-pulse`} />
-                <Icon size={20} className={config.textColor} />
-                <div className="flex-1">
-                    <span className={`font-semibold ${config.textColor}`}>{config.label}</span>
-                    <p className={`text-sm ${config.textColor} opacity-80`}>{config.description}</p>
-                </div>
-            </motion.div>
-        );
-    };
-
-    // Review Modal
-    const ReviewModal = () => {
-        const formattedDate = new Date(formData.date).toLocaleDateString('id-ID', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-
-        return (
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-            >
-                <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.9, opacity: 0 }}
-                    className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
-                >
-                    <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Check size={32} className="text-primary" />
-                        </div>
-                        <h3 className="font-heading text-2xl text-primary font-bold">Konfirmasi Reservasi</h3>
-                        <p className="text-muted-foreground mt-2">Pastikan data berikut sudah benar</p>
-                    </div>
-
-                    <div className="space-y-4 bg-gray-50 p-4 rounded-xl mb-6">
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Nama</span>
-                            <span className="font-medium text-primary">{formData.name}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">No. Telepon</span>
-                            <span className="font-medium text-primary">{formData.phone}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Tanggal</span>
-                            <span className="font-medium text-primary">{formattedDate}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Jam</span>
-                            <span className="font-medium text-primary">{formData.time}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span className="text-muted-foreground">Jumlah Tamu</span>
-                            <span className="font-medium text-primary">{formData.guests} Orang</span>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                        <button
-                            onClick={handleConfirm}
-                            disabled={loading}
-                            className="w-full py-4 bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-green-600 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed"
-                        >
-                            {loading ? (
-                                <>
-                                    <Loader2 size={18} className="animate-spin" /> Memproses...
-                                </>
-                            ) : (
-                                <>
-                                    <Phone size={18} /> Konfirmasi via WhatsApp
-                                </>
-                            )}
-                        </button>
-                        <button
-                            onClick={handleBack}
-                            disabled={loading}
-                            className="w-full py-3 border border-gray-300 text-muted-foreground rounded-xl font-medium hover:border-primary hover:text-primary disabled:opacity-50"
-                        >
-                            Kembali & Edit
-                        </button>
-                    </div>
-                </motion.div>
-            </motion.div>
-        );
-    };
+    // Step indicator — 5 steps
+    const steps = [
+        { id: 'form', label: 'Jadwal' },
+        { id: 'table', label: 'Meja' },
+        { id: 'preorder', label: 'Menu' },
+        { id: 'review', label: 'Review' },
+        { id: 'payment', label: 'Bayar' },
+    ];
+    const activeStepForIndicator = ['success', 'error'].includes(step) ? 'review' : step;
+    const currentStepIndex = steps.findIndex((s) => s.id === activeStepForIndicator);
 
     return (
         <div className="min-h-screen flex flex-col bg-[#F8F5F2]">
@@ -266,53 +216,76 @@ const ReservationPage = () => {
                     </div>
 
                     {/* Right - Form Panel */}
-                    <div className="flex items-center justify-center px-6 py-20 lg:py-0">
+                    <div className="flex items-start justify-center px-6 py-10 lg:py-16 overflow-y-auto">
                         <motion.div
-                            initial={{ opacity: 0, y: 30 }}
+                            key={step}
+                            initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
                             className="w-full max-w-lg"
                         >
-                            {/* Success State */}
+                            {/* ============ SUCCESS ============ */}
                             {step === 'success' && (
                                 <div className="text-center py-10">
                                     <CheckCircle size={64} className="mx-auto text-green-500 mb-6" />
-                                    <h2 className="font-heading text-3xl text-primary mb-4 font-bold">Reservasi Terkirim!</h2>
-                                    <p className="text-muted-foreground mb-6">
-                                        Terima kasih! Silakan kirim pesan WhatsApp untuk konfirmasi. Kami akan segera merespon.
+                                    <h2 className="font-heading text-3xl text-primary mb-4 font-bold">Reservasi Terkonfirmasi!</h2>
+                                    {hasPreOrder ? (
+                                        paymentType === 'full' ? (
+                                            <>
+                                                <p className="text-muted-foreground mb-2">
+                                                    Pembayaran penuh sebesar {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(fullAmount).replace('IDR', 'Rp')} telah berhasil.
+                                                </p>
+                                                <p className="text-sm text-[#6D4C41] mb-2">
+                                                    Pre-order Anda sudah lunas dan akan disiapkan sebelum kedatangan.
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <p className="text-muted-foreground mb-2">
+                                                    DP sebesar {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(dpAmount).replace('IDR', 'Rp')} telah berhasil dibayar.
+                                                </p>
+                                                <p className="text-sm text-[#6D4C41] mb-2">
+                                                    Sisa {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(cartTotal - dpAmount).replace('IDR', 'Rp')} dibayar di kedai. Pre-order Anda akan disiapkan.
+                                                </p>
+                                            </>
+                                        )
+                                    ) : (
+                                        <p className="text-muted-foreground mb-2">
+                                            Reservasi gratis Anda telah dikonfirmasi.
+                                        </p>
+                                    )}
+                                    <p className="text-sm text-[#6D4C41] mb-8">
+                                        Silakan datang tepat waktu. Kami tunggu kedatangan Anda!
                                     </p>
-                                    <div className="flex flex-col gap-3">
-                                        <button
-                                            onClick={handleWhatsApp}
-                                            className="w-full py-3 bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600"
-                                        >
-                                            <Phone size={18} /> Buka WhatsApp Lagi
-                                        </button>
-                                        <button
-                                            onClick={handleReset}
-                                            className="w-full py-3 border border-gray-300 text-muted-foreground rounded-xl font-medium hover:border-primary hover:text-primary"
-                                        >
-                                            Buat Reservasi Lain
-                                        </button>
-                                    </div>
+                                    <button
+                                        onClick={handleReset}
+                                        className="w-full py-3 bg-[#3E2723] text-white rounded-xl font-bold hover:bg-[#4E342E] transition-colors"
+                                    >
+                                        Buat Reservasi Lain
+                                    </button>
                                 </div>
                             )}
 
-                            {/* Error State */}
+                            {/* ============ ERROR ============ */}
                             {step === 'error' && (
                                 <div className="text-center py-10">
                                     <XCircle size={64} className="mx-auto text-red-500 mb-6" />
                                     <h2 className="font-heading text-3xl text-primary mb-4 font-bold">Terjadi Kesalahan</h2>
-                                    <p className="text-red-500 mb-6">{error || 'Gagal menyimpan reservasi. Silakan coba via WhatsApp langsung.'}</p>
+                                    <p className="text-red-500 mb-2">{error || 'Gagal memproses reservasi.'}</p>
+                                    <p className="text-sm text-[#6D4C41] mb-8">
+                                        Anda tetap dapat reservasi melalui WhatsApp.
+                                    </p>
                                     <div className="flex flex-col gap-3">
                                         <button
-                                            onClick={handleWhatsApp}
+                                            onClick={handleWhatsAppFallback}
                                             className="w-full py-3 bg-green-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-600"
                                         >
-                                            <Phone size={18} /> Pesan via WhatsApp
+                                            <Phone size={18} /> Reservasi via WhatsApp
                                         </button>
                                         <button
                                             onClick={handleReset}
-                                            className="w-full py-3 border border-gray-300 text-muted-foreground rounded-xl font-medium hover:border-primary hover:text-primary"
+                                            className="w-full py-3 border border-gray-300 rounded-xl font-medium hover:border-primary hover:text-primary"
                                         >
                                             Coba Lagi
                                         </button>
@@ -320,105 +293,196 @@ const ReservationPage = () => {
                                 </div>
                             )}
 
-                            {/* Form */}
+                            {/* ============ PAYMENT STEP ============ */}
+                            {step === 'payment' && (
+                                <div>
+                                    <h2 className="font-heading text-2xl text-primary mb-2 font-bold text-center">
+                                        {paymentType === 'full' ? 'Pembayaran Penuh' : 'Pembayaran DP 30%'}
+                                    </h2>
+                                    <p className="text-center text-sm text-[#6D4C41] mb-4">
+                                        {paymentType === 'full'
+                                            ? `Bayar penuh ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(fullAmount).replace('IDR', 'Rp')}`
+                                            : `Bayar uang muka ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(dpAmount).replace('IDR', 'Rp')} · Sisa ${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(cartTotal - dpAmount).replace('IDR', 'Rp')} di kedai`
+                                        }
+                                    </p>
+                                    <PaymentStep
+                                        snapToken={snapToken}
+                                        onSuccess={handlePaymentSuccess}
+                                        onError={handlePaymentError}
+                                        onClose={handlePaymentClose}
+                                    />
+                                    <div className="text-center mt-4">
+                                        <button
+                                            onClick={handleWhatsAppFallback}
+                                            className="text-sm text-[#6D4C41] underline hover:text-[#3E2723]"
+                                        >
+                                            Atau reservasi via WhatsApp
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* ============ REVIEW STEP ============ */}
+                            {step === 'review' && (
+                                <ReservationReview
+                                    formData={formData}
+                                    selectedTable={selectedTable}
+                                    cartItems={cartItems}
+                                    paymentType={paymentType}
+                                    onPaymentTypeChange={setPaymentType}
+                                    onConfirm={handleConfirm}
+                                    onBack={handleBackToPreOrder}
+                                    loading={loading}
+                                />
+                            )}
+
+                            {/* ============ PRE-ORDER STEP ============ */}
+                            {step === 'preorder' && (
+                                <PreOrderStep
+                                    cartItems={cartItems}
+                                    onCartChange={setCartItems}
+                                    onNext={handleNextToReview}
+                                    onBack={handleBackToTable}
+                                />
+                            )}
+
+                            {/* ============ TABLE SELECTION STEP ============ */}
+                            {step === 'table' && (
+                                <div>
+                                    <button onClick={handleBackToForm} className="flex items-center gap-1 text-[#6D4C41] hover:text-[#3E2723] mb-4 text-sm">
+                                        <ChevronLeft size={16} /> Kembali
+                                    </button>
+                                    <h2 className="font-heading text-2xl text-primary mb-2 font-bold">Pilih Meja</h2>
+                                    <p className="text-muted-foreground mb-6 text-sm">
+                                        {formData.date ? (
+                                            <>Meja tersedia untuk tanggal <strong>{new Date(formData.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</strong> jam <strong>{formData.time}</strong></>
+                                        ) : 'Pilih meja yang tersedia.'}
+                                    </p>
+                                    <TableSelectionStep
+                                        selectedTable={selectedTable}
+                                        onSelect={setSelectedTable}
+                                        date={formData.date}
+                                        time={formData.time}
+                                    />
+                                    <button
+                                        onClick={handleNextToPreOrder}
+                                        disabled={!selectedTable}
+                                        className="w-full mt-6 py-4 bg-[#3E2723] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-[#4E342E] disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        Lanjut Pre-Order Menu
+                                        <ChevronRight size={18} />
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* ============ FORM STEP ============ */}
                             {step === 'form' && (
                                 <>
-                                    <span className="inline-block px-4 py-1.5 bg-gray-100 text-xs font-bold uppercase tracking-widest text-muted-foreground rounded-full mb-6">Book Your Spot</span>
-                                    <h1 className="font-heading text-4xl md:text-5xl text-primary mb-4 font-bold">Reservasi Meja Anda</h1>
+                                    <span className="inline-block px-4 py-1.5 bg-gray-100 text-xs font-bold uppercase tracking-widest text-muted-foreground rounded-full mb-6">
+                                        Book Your Spot
+                                    </span>
+                                    <h1 className="font-heading text-4xl md:text-5xl text-primary mb-4 font-bold">
+                                        Reservasi Meja Anda
+                                    </h1>
                                     <p className="text-muted-foreground mb-8 leading-relaxed">
-                                        Nikmati momen terbaik bersama kopi terbaik. Silakan isi formulir di bawah ini.
+                                        Nikmati momen terbaik bersama kopi terbaik. Pilih jadwal, meja, dan pre-order menu favorit Anda.
                                     </p>
 
-                                    {/* Status Widget */}
-                                    <StatusWidget />
+                                    {/* Step Indicator */}
+                                    <div className="flex items-center justify-center gap-2 mb-8">
+                                        {steps.map((s, i) => (
+                                            <React.Fragment key={s.id}>
+                                                <div className={`flex items-center gap-1.5 text-xs font-medium ${i <= currentStepIndex ? 'text-[#3E2723]' : 'text-[#6D4C41]/40'}`}>
+                                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${i <= currentStepIndex ? 'bg-[#3E2723] text-white' : 'bg-[#E0D8D0] text-[#6D4C41]'}`}>
+                                                        {i < currentStepIndex ? '✓' : i + 1}
+                                                    </div>
+                                                    <span className="hidden sm:inline">{s.label}</span>
+                                                </div>
+                                                {i < steps.length - 1 && <div className="w-6 h-px bg-[#3E2723]/15" />}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
 
-                                    {/* Form - Disabled when full */}
-                                    <form onSubmit={handleReview} className={`space-y-5 ${shopStatus === 'full' ? 'opacity-50 pointer-events-none' : ''}`}>
-                                        <div>
-                                            <label className="block text-sm font-medium text-foreground mb-2">Nama Lengkap</label>
-                                            <div className="relative">
-                                                <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                                <input
-                                                    type="text"
-                                                    name="name"
-                                                    value={formData.name}
-                                                    placeholder="Masukkan nama anda"
-                                                    required
-                                                    onChange={handleChange}
-                                                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                                                />
-                                            </div>
-                                        </div>
+                                    {/* Calendar */}
+                                    <div className="mb-6">
+                                        <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-3">
+                                            <CalendarDays size={16} className="text-[#6D4C41]" />
+                                            Pilih Tanggal
+                                        </label>
+                                        <ReservationCalendar
+                                            selected={formData.date ? new Date(formData.date) : null}
+                                            onSelect={handleDateSelect}
+                                        />
+                                    </div>
 
-                                        <div>
-                                            <label className="block text-sm font-medium text-foreground mb-2">No. Telepon</label>
-                                            <div className="relative">
-                                                <Phone size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                                <input
-                                                    type="tel"
-                                                    name="phone"
-                                                    value={formData.phone}
-                                                    placeholder="08xxxxxxxxxx"
-                                                    required
-                                                    onChange={handleChange}
-                                                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                                                />
-                                            </div>
-                                        </div>
-
+                                    {/* Time + Guests */}
+                                    <form onSubmit={handleNextToTable} className="space-y-5">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-foreground mb-2">Tanggal</label>
-                                                <div className="relative">
-                                                    <CalendarDays size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                                    <input
-                                                        type="date"
-                                                        name="date"
-                                                        value={formData.date}
-                                                        required
-                                                        min={new Date().toISOString().split('T')[0]}
-                                                        onChange={handleChange}
-                                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                                                    />
-                                                </div>
+                                                <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
+                                                    <Clock size={16} className="text-[#6D4C41]" /> Jam
+                                                </label>
+                                                <select
+                                                    name="time"
+                                                    value={formData.time}
+                                                    onChange={handleChange}
+                                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                                >
+                                                    {timeSlots.map((t) => <option key={t} value={t}>{t}</option>)}
+                                                </select>
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-foreground mb-2">Jam</label>
-                                                <div className="relative">
-                                                    <Clock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                                                    <select
-                                                        name="time"
-                                                        value={formData.time}
-                                                        onChange={handleChange}
-                                                        className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
-                                                    >
-                                                        {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-foreground mb-2">Jumlah Tamu</label>
-                                            <div className="relative">
-                                                <Users size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                                                <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
+                                                    <Users size={16} className="text-[#6D4C41]" /> Tamu
+                                                </label>
                                                 <select
                                                     name="guests"
                                                     value={formData.guests}
                                                     onChange={handleChange}
-                                                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
+                                                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all appearance-none"
                                                 >
-                                                    {guestOptions.map(g => <option key={g} value={g}>{g} Orang</option>)}
+                                                    {guestOptions.map((g) => <option key={g} value={g}>{g} Orang</option>)}
                                                 </select>
                                             </div>
                                         </div>
 
+                                        <div>
+                                            <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
+                                                <User size={16} className="text-[#6D4C41]" /> Nama Lengkap
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="name"
+                                                value={formData.name}
+                                                placeholder="Masukkan nama anda"
+                                                required
+                                                onChange={handleChange}
+                                                className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
+                                                <Phone size={16} className="text-[#6D4C41]" /> No. Telepon
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                name="phone"
+                                                value={formData.phone}
+                                                placeholder="08xxxxxxxxxx"
+                                                required
+                                                onChange={handleChange}
+                                                className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                                            />
+                                        </div>
+
                                         <button
                                             type="submit"
-                                            disabled={shopStatus === 'full'}
-                                            className="w-full py-4 bg-primary text-white rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:bg-[#2D2420] hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                                            disabled={!formData.date}
+                                            className="w-full py-4 bg-[#3E2723] text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-[#4E342E] hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                                         >
-                                            Review Reservasi
+                                            Pilih Meja
+                                            <ChevronRight size={18} />
                                         </button>
                                     </form>
 
@@ -437,11 +501,6 @@ const ReservationPage = () => {
                 </div>
             </main>
             <Footer />
-
-            {/* Review Modal */}
-            <AnimatePresence>
-                {step === 'review' && <ReviewModal />}
-            </AnimatePresence>
         </div>
     );
 };

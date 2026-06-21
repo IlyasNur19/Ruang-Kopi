@@ -15,5 +15,10 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "midtrans-client": "^1.4.3",
+    "socket.io": "^4.8.3",
+    "uuid": "^14.0.0"
+  }
 }

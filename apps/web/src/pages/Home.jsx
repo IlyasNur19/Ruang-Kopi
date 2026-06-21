@@ -4,35 +4,39 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
-import { settingsApi, menuApi } from '../services/api';
+import { settingsApi, menuApi, mejaApi } from '../services/api';
 
 
 const Home = () => {
-    const [shopStatus, setShopStatus] = useState('available');
+    const [liveStatus, setLiveStatus] = useState({ text: 'Buka · Memuat...', color: 'bg-green-500' });
     const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80');
     const [menuItems, setMenuItems] = useState([]);
     const [spaceImages, setSpaceImages] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const statusConfig = {
-        available: { text: 'Buka · Meja Tersedia', color: 'bg-green-500' },
-        busy: { text: 'Ramai · Meja Terbatas', color: 'bg-orange-500' },
-        full: { text: 'Penuh · Tidak Ada Meja', color: 'bg-red-500' }
-    };
-    const status = statusConfig[shopStatus] || statusConfig.available;
-
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
-                const [statusData, menuData, heroData, spaceData] = await Promise.all([
-                    settingsApi.getStatus().catch(() => ({ status: 'available' })),
+                const [mejaStatusData, menuData, heroData, spaceData] = await Promise.all([
+                    mejaApi.getStatus().catch(() => null),
                     menuApi.getAll().catch(() => []),
                     settingsApi.getHeroImage().catch(() => ({ heroImage: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80' })),
                     settingsApi.getSpaceImages().catch(() => ({ images: [] })),
                 ]);
 
-                if (statusData?.status) setShopStatus(statusData.status);
+                if (mejaStatusData) {
+                    const { tersedia, total } = mejaStatusData;
+                    if (total === 0) {
+                        setLiveStatus({ text: 'Buka · Meja Tersedia', color: 'bg-green-500' });
+                    } else if (tersedia === 0) {
+                        setLiveStatus({ text: 'Penuh · Tidak Ada Meja', color: 'bg-red-500' });
+                    } else if (tersedia <= 2) {
+                        setLiveStatus({ text: `Ramai · Sisa ${tersedia} Meja`, color: 'bg-orange-500' });
+                    } else {
+                        setLiveStatus({ text: `Buka · ${tersedia} Meja Tersedia`, color: 'bg-green-500' });
+                    }
+                }
                 if (heroData?.heroImage) setHeroImage(heroData.heroImage);
                 if (spaceData?.images) setSpaceImages(spaceData.images);
 
@@ -86,9 +90,9 @@ const Home = () => {
                 {/* ========================================== */}
                 {/* HERO SECTION */}
                 {/* ========================================== */}
-                <section className="relative min-h-[600px] md:min-h-[700px] flex items-center max-w-[1400px] mx-auto overflow-hidden">
+                <section className="relative min-h-[600px] md:min-h-[800px] flex items-center max-w-[1400px] mx-auto overflow-hidden">
                     {/* Background Container with curved edges */}
-                    <div className="absolute inset-4 md:inset-8 rounded-[2rem] md:rounded-[3rem] overflow-hidden">
+                    <div className="absolute inset-5 md:inset-4 rounded-[2rem] md:rounded-[3rem] overflow-hidden">
                         <img
                             className="absolute inset-0 w-full h-full object-cover"
                             src={heroImage}
@@ -99,7 +103,7 @@ const Home = () => {
                     </div>
 
                     {/* Content Container */}
-                    <div className="relative z-10 max-w-[1200px] mx-auto w-full px-8 md:px-16 flex flex-col justify-end pb-16 md:pb-20 h-full min-h-[600px] md:min-h-[700px]">
+                    <div className="relative z-10 max-w-[1200px] mx-auto w-full px-12 md:px-10 flex flex-col justify-center pb-20 md:pb-36 h-full min-h-[600px] md:min-h-[800px] ">
                         {/* Hero Content - directly on image */}
                         <motion.div
                             initial="hidden"
@@ -115,59 +119,59 @@ const Home = () => {
 
                             {/* Headline */}
                             <motion.div variants={fadeInUp} custom={0}>
-                                <img src='/icon-ruang-kopi-putih.png' className=' w-52 md:w-80' alt='RuangKopi Icon' />
+                                <img src='/icon-ruang-kopi-putih.png' className=' w-40 md:w-80' alt='RuangKopi Icon' />
                             </motion.div>
 
-                            <motion.h1 variants={fadeInUp} custom={1} className="font-serif text-[50px] md:text-[64px] leading-[1.1]  text-white mb-3 tracking-tight">
+                            <motion.h1 variants={fadeInUp} custom={1} className="font-serif text-[45px] md:text-[120px] leading-[1.1]  text-white mb-3 tracking-tight">
                                 ruang kopi
                             </motion.h1>
 
                             {/* Subheading */}
-                            <motion.p variants={fadeInUp} custom={2} className="text-white/70 text-xs max-w-md mb-8 leading-relaxed pr-20">
+                            <motion.p variants={fadeInUp} custom={2} className="text-white/70 text-xs md:text-sm max-w-md mb-8 mt-0 md:mt-5 leading-relaxed pr-20">
                                 Kopi artisanal yang diseduh dengan presisi. Temukan ritme lambat di tengah hiruk-pikuk kota.
                             </motion.p>
 
                             {/* CTA Button */}
-                            <motion.div variants={fadeInUp} custom={3} className="flex gap-4">
+                            <motion.div variants={fadeInUp} custom={3} className="flex gap-3">
                                 <Link
                                     to="/reservation"
-                                    className="inline-flex items-center gap-2 px-3 py-2 md:px-8 md:py3.5 border-2 border-white text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-white hover:text-[#3E2723] transition-all duration-300 active:scale-95"
+                                    className="inline-flex items-center gap-2 px-3 py-2 md:px-8 md:py-3.5  bg-white/15 backdrop-blur-sm border border-white/30 text-white rounded-full text-xs md:text-sm font-semibold tracking-wide uppercase hover:bg-white/25 transition-all duration-300 active:scale-95"
                                 >
-                                    Visit Us
+                                    Reservation
                                 </Link>
                                 <Link
                                     to="/menu"
-                                    className="inline-flex items-center gap-2 px-3 py-2 md:px-8 md:py-3.5  bg-white/15 backdrop-blur-sm border border-white/30 text-white rounded-full text-sm font-semibold tracking-wide uppercase hover:bg-white/25 transition-all duration-300 active:scale-95"
+                                    className="inline-flex items-center gap-2 px-3 py-2 md:px-8 md:py-3.5  bg-white/15 backdrop-blur-sm border border-white/30 text-white rounded-full text-xs md:text-sm font-semibold tracking-wide uppercase hover:bg-white/25 transition-all duration-300 active:scale-95"
                                 >
                                     Lihat Menu
                                     <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
                                 </Link>
                             </motion.div>
 
-                            {/* Status Widget */}
-                            <motion.div variants={fadeInUp} custom={4} className="mt-8 inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 md:pr-5">
-                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white">
-                                    <span className="material-symbols-outlined text-[20px]">table_restaurant</span>
-                                </div>
-                                <div>
-                                    <p className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Live Status</p>
-                                    <div className="flex items-center gap-2">
-                                        <span className="relative flex h-2 w-2">
-                                            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${status.color} opacity-75`}></span>
-                                            <span className={`relative inline-flex rounded-full h-2 w-2 ${status.color}`}></span>
-                                        </span>
-                                        <p className="text-sm font-semibold text-white">{status.text}</p>
-                                    </div>
-                                </div>
-                            </motion.div>
                         </motion.div>
+                        {/* Status Widget */}
+                        <div className="absolute bottom-10 md:bottom-24 left-9 right-9 md:left-[70px] md:right-auto z-20 flex md:inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 md:scale-125 justify-center md:justify-start">
+                            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white">
+                                <span className="material-symbols-outlined text-[20px]">table_restaurant</span>
+                            </div>
+                            <div>
+                                <p className="text-[10px] uppercase tracking-wider text-white/70 mb-0.5">Live Status</p>
+                                <div className="flex items-center gap-2">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${liveStatus.color} opacity-75`}></span>
+                                        <span className={`relative inline-flex rounded-full h-2 w-2 ${liveStatus.color}`}></span>
+                                    </span>
+                                    <p className="text-sm font-semibold text-white">{liveStatus.text}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 {/* ========================================== */}
                 {/* KOLEKSI PILIHAN SECTION */}
                 {/* ========================================== */}
-                <section className="py-5 md:py-28 px-4 md:px-8 max-w-[1200px] mx-auto bg-[#F5F0EB]">
+                <section className="py-5 md:py-10 px-8 md:px-8 max-w-[1200px] mx-auto bg-[#F5F0EB]">
                     {/* Header & Filters */}
                     <div className="text-center mb-12">
                         <motion.h2

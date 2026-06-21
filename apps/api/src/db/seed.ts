@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { db } from './index.js';
-import { categories, menuItems, galleryImages, users, shopSettings } from './schema.js';
+import { categories, menuItems, galleryImages, users, meja, shopSettings } from './schema.js';
 import bcrypt from 'bcryptjs';
 
 async function seed() {
@@ -64,6 +64,27 @@ async function seed() {
         role: 'admin',
     }).onConflictDoNothing();
 
+    // Seed meja (tables) for POS system
+    console.log('🪑 Seeding tables...');
+    const mejaData = [
+        { nomor_meja: 'A1', kapasitas: 2, status: 'tersedia' },
+        { nomor_meja: 'A2', kapasitas: 2, status: 'tersedia' },
+        { nomor_meja: 'A3', kapasitas: 4, status: 'tersedia' },
+        { nomor_meja: 'A4', kapasitas: 4, status: 'tersedia' },
+        { nomor_meja: 'B1', kapasitas: 2, status: 'tersedia' },
+        { nomor_meja: 'B2', kapasitas: 6, status: 'tersedia' },
+        { nomor_meja: 'B3', kapasitas: 6, status: 'tersedia' },
+        { nomor_meja: 'C1', kapasitas: 4, status: 'tersedia' },
+        { nomor_meja: 'C2', kapasitas: 4, status: 'tersedia' },
+        { nomor_meja: 'Outdoor 1', kapasitas: 4, status: 'tersedia' },
+        { nomor_meja: 'Outdoor 2', kapasitas: 6, status: 'tersedia' },
+        { nomor_meja: 'VIP', kapasitas: 8, status: 'tersedia' },
+    ];
+
+    for (const table of mejaData) {
+        await db.insert(meja).values(table).onConflictDoNothing();
+    }
+
     // Seed shop settings
     console.log('⚙️ Seeding shop settings...');
     await db.insert(shopSettings).values({
@@ -75,6 +96,10 @@ async function seed() {
     console.log('\n📧 Admin credentials:');
     console.log('   Email: admin@ruangkopi.com');
     console.log('   Password: admin123');
+    console.log('\n🪑 Tables seeded:');
+    mejaData.forEach((t) => {
+        console.log(`   ${t.nomor_meja} (${t.kapasitas} seats) - ${t.status}`);
+    });
 }
 
 seed().catch(console.error);

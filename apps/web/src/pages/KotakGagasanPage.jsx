@@ -58,7 +58,7 @@ const KotakGagasanPage = () => {
     return (
         <div className="min-h-screen flex flex-col bg-[#F8F5F2]">
             <Navbar />
-            <main className="flex-grow flex items-center justify-center py-24 px-4">
+            <main className="flex-grow flex items-center justify-center py-10 px-4">
                 <div className="w-full max-w-2xl">
                     {/* Success State */}
                     {submitted && !error && (
@@ -132,10 +132,10 @@ const KotakGagasanPage = () => {
                             animate={{ opacity: 1, y: 0 }}
                         >
                             <div className="text-center mb-12">
-                                <h1 className="font-['Baskervville'] text-5xl md:text-6xl text-[#3E2723] mb-4 italic">
+                                <h1 className="font-serif text-5xl md:text-6xl text-[#3E2723] mb-4 italic">
                                     Kotak Gagasan
                                 </h1>
-                                <p className="text-[#6D4C41] max-w-lg mx-auto italic">
+                                <p className="text-[#6D4C41] max-w-lg mx-auto text-sm md:text-lg italic px-5">
                                     Setiap tegukan punya cerita, setiap ide punya tempat. Mari berkolaborasi menciptakan ruang yang lebih hangat untuk kita semua.
                                 </p>
                             </div>
@@ -182,8 +182,8 @@ const KotakGagasanPage = () => {
                                                 type="button"
                                                 onClick={() => handleTopicSelect(topic)}
                                                 className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${formData.topic === topic
-                                                        ? 'bg-[#3E2723] text-white'
-                                                        : 'bg-white border border-gray-200 text-[#6D4C41] hover:border-[#8D6E63]'
+                                                    ? 'bg-[#3E2723] text-white'
+                                                    : 'bg-white border border-gray-200 text-[#6D4C41] hover:border-[#8D6E63]'
                                                     }`}
                                             >
                                                 {topic}

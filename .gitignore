@@ -22,7 +22,9 @@ packages/*/dist
 
 # Environment
 .env
+.env*
 apps/*/.env
+apps/*/.env*
 
 # Editor directories and files
 .vscode/*

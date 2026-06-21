@@ -3,6 +3,9 @@ import { motion } from 'framer-motion';
 import { Coffee, AlertTriangle, CheckCircle, XCircle, Users, Calendar, ShoppingBag, Loader2 } from 'lucide-react';
 import { menuApi, reservationsApi, settingsApi } from '../../services/api';
 import { Card, CardContent } from '../ui/card';
+import RevenueBarChart from './RevenueBarChart';
+import TransactionTypePieChart from './TransactionTypePieChart';
+import RecentTransactionsTable from './RecentTransactionsTable';
 
 const DashboardOverview = () => {
     const [shopStatus, setShopStatus] = useState('available');
@@ -170,6 +173,27 @@ const DashboardOverview = () => {
                     </motion.div>
                 ))}
             </div>
+
+            {/* Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="border-none shadow-sm">
+                    <CardContent className="p-6">
+                        <RevenueBarChart />
+                    </CardContent>
+                </Card>
+                <Card className="border-none shadow-sm">
+                    <CardContent className="p-6">
+                        <TransactionTypePieChart />
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Recent Transactions */}
+            <Card className="border-none shadow-sm">
+                <CardContent className="p-6">
+                    <RecentTransactionsTable />
+                </CardContent>
+            </Card>
 
             {/* Status Section */}
             <section>
