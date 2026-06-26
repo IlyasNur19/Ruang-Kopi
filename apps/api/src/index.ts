@@ -58,14 +58,16 @@ app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Start server with Socket.io
-httpServer.listen(PORT, () => {
-    console.log(`🚀 RuangKopi API server running on http://localhost:${PORT}`);
-    console.log(`🔌 Socket.io server attached`);
-    console.log(`📚 API Base: /api`);
-    console.log(`   Routes: auth, menu, categories, gallery, reservations, settings, upload, ideas`);
-    console.log(`   Routes: meja, transaksi, dashboard, payment`);
-});
+// Start server with Socket.io (Only if NOT in serverless environment)
+if (!process.env.VERCEL) {
+    httpServer.listen(PORT, () => {
+        console.log(`🚀 RuangKopi API server running on http://localhost:${PORT}`);
+        console.log(`🔌 Socket.io server attached`);
+        console.log(`📚 API Base: /api`);
+        console.log(`   Routes: auth, menu, categories, gallery, reservations, settings, upload, ideas`);
+        console.log(`   Routes: meja, transaksi, dashboard, payment`);
+    });
+}
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
