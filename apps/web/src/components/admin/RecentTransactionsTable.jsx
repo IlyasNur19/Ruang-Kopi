@@ -68,23 +68,23 @@ const RecentTransactionsTable = () => {
                     {transactions.map((tx) => (
                         <TableRow key={tx.id}>
                             <TableCell className="text-xs">
-                                <div>{formatDateShort(tx.tanggal_transaksi || tx.createdAt)}</div>
-                                <div className="text-[#6D4C41]/60">{formatTime(tx.tanggal_transaksi || tx.createdAt)}</div>
+                                <div>{formatDateShort(tx.createdAt)}</div>
+                                <div className="text-[#6D4C41]/60">{formatTime(tx.createdAt)}</div>
                             </TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-1.5">
-                                    {tx.tipe_pesanan === 'online' || tx.orderType === 'online' ? (
+                                    {tx.tipePesanan === 'online' ? (
                                         <Globe size={12} className="text-blue-500" />
                                     ) : (
                                         <ShoppingBag size={12} className="text-amber-500" />
                                     )}
                                     <span className="text-xs capitalize">
-                                        {tx.tipe_pesanan === 'online' || tx.orderType === 'online' ? 'Online' : 'Walk-in'}
+                                        {tx.tipePesanan === 'online' ? 'Online' : 'Walk-in'}
                                     </span>
                                 </div>
                             </TableCell>
                             <TableCell className="text-right text-xs font-semibold">
-                                {formatCurrency(tx.total_tagihan || tx.total)}
+                                {formatCurrency(tx.total)}
                             </TableCell>
                             <TableCell>
                                 <Badge variant={tx.status === 'completed' || tx.status === 'selesai' ? 'success' : 'default'} className="text-[10px]">

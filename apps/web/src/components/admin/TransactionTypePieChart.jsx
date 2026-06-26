@@ -17,11 +17,10 @@ const TransactionTypePieChart = () => {
                 setLoading(true);
                 setError(null);
                 const result = await dashboardApi.getRevenueByType();
-                const chartData = Array.isArray(result) ? result : result?.data || [];
-
+                const byOrderType = result?.byOrderType || [];
                 const formatted = [
-                    { name: 'Online', value: chartData.find((d) => d.type === 'online')?.total || 0 },
-                    { name: 'Walk-in', value: chartData.find((d) => d.type === 'walk_in')?.total || 0 },
+                    { name: 'Online', value: byOrderType.find((d) => d.name === 'Online')?.value || 0 },
+                    { name: 'Walk-in', value: (byOrderType.find((d) => d.name === 'Dine In')?.value || 0) + (byOrderType.find((d) => d.name === 'Take Away')?.value || 0) },
                 ];
                 setData(formatted);
                 setTotal(formatted.reduce((sum, d) => sum + d.value, 0));

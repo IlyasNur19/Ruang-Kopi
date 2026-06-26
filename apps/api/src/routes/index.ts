@@ -265,10 +265,19 @@ router.get('/dashboard/recent-transactions', authMiddleware, dashboardController
 // Payment validation schema
 const createPaymentSchema = z.object({
     reservationId: z.number().optional().nullable(),
+    transaksiId: z.number().optional().nullable(),
     amount: z.number().positive('Amount must be positive'),
     customerName: z.string().min(1, 'Customer name is required').optional(),
     customerEmail: z.string().email('Valid email is required').optional(),
     customerPhone: z.string().optional(),
+    items: z.array(z.object({
+        id: z.union([z.string(), z.number()]).optional(),
+        menuId: z.number().optional(),
+        price: z.number(),
+        quantity: z.number().optional(),
+        qty: z.number().optional(),
+        name: z.string(),
+    })).optional(),
 });
 
 // Public routes (no auth required)

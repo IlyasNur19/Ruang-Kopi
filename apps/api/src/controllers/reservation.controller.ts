@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../db/index.js';
 import { reservations, meja, users } from '../db/schema.js';
-import { eq, desc, and } from 'drizzle-orm';
+import { eq, desc, and, inArray } from 'drizzle-orm';
 import { emitNewReservation, emitTableUpdate } from '../services/socket.service.js';
 
 export const reservationController = {
-    // GET /api/reservations — Admin: get all reservations
+    // GET /api/reservations — Admin: get all reservations (optimized: batch enrichment)
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const allReservations = await db
@@ -13,22 +13,43 @@ export const reservationController = {
                 .from(reservations)
                 .orderBy(desc(reservations.createdAt));
 
-            // Enrich with table info
-            const enriched = await Promise.all(
-                allReservations.map(async (r) => {
-                    let mejaInfo = null;
-                    if (r.mejaId) {
-                        const [m] = await db.select().from(meja).where(eq(meja.id, r.mejaId));
-                        mejaInfo = m || null;
-                    }
-                    let userInfo = null;
-                    if (r.userId) {
-                        const [u] = await db.select().from(users).where(eq(users.id, r.userId));
-                        userInfo = u ? { id: u.id, name: u.name, email: u.email } : null;
-                    }
-                    return { ...r, meja: mejaInfo, user: userInfo };
-                })
-            );
+            if (allReservations.length === 0) {
+                res.json([]);
+                return;
+            }
+
+            // Collect unique IDs for batch lookup
+            const mejaIds: number[] = [...new Set(
+                allReservations
+                    .filter((r) => r.mejaId !== null)
+                    .map((r) => r.mejaId as number)
+            )];
+            const userIds: number[] = [...new Set(
+                allReservations
+                    .filter((r) => r.userId !== null)
+                    .map((r) => r.userId as number)
+            )];
+
+            // Batch fetch all tables and users in 2 queries (instead of N×2)
+            const [allMeja, allUsers] = await Promise.all([
+                mejaIds.length > 0
+                    ? db.select().from(meja).where(inArray(meja.id, mejaIds))
+                    : Promise.resolve([]),
+                userIds.length > 0
+                    ? db.select({ id: users.id, name: users.name, email: users.email }).from(users).where(inArray(users.id, userIds))
+                    : Promise.resolve([]),
+            ]);
+
+            // Build lookup maps
+            const mejaMap = new Map(allMeja.map((m) => [m.id, m]));
+            const userMap = new Map(allUsers.map((u) => [u.id, u]));
+
+            // Merge in memory (fast, single pass)
+            const enriched = allReservations.map((r) => ({
+                ...r,
+                meja: r.mejaId ? mejaMap.get(r.mejaId) || null : null,
+                user: r.userId ? userMap.get(r.userId) || null : null,
+            }));
 
             res.json(enriched);
         } catch (error) {

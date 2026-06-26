@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../db/index.js';
-import { paymentGateway, reservations, meja, transaksi } from '../db/schema.js';
+import { paymentGateway, reservations, meja, transaksi, detailTransaksi } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 import {
     createSnapTransaction,
@@ -10,6 +10,7 @@ import {
 import {
     emitPaymentConfirmed,
     emitTableUpdate,
+    emitNewTransaction,
 } from '../services/socket.service.js';
 
 /**
@@ -27,13 +28,56 @@ export const paymentController = {
     /**
      * POST /api/payment/snap-token
      * Generate a Midtrans Snap token for the popup payment flow
-     * Used for online reservation down payment (DP)
+     * Used for:
+     *   - Online reservation down payment (DP) — via reservationId
+     *   - POS QRIS payment — via transaksiId
      */
     createSnapToken: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { reservationId, amount, customerName, customerEmail, customerPhone } = req.body;
+            const { reservationId, transaksiId, amount, customerName, customerEmail, customerPhone, items: requestItems } = req.body;
 
             const orderId = generateMidtransOrderId();
+
+            // Build items list for Midtrans
+            let snapItems: Array<{ id: string; price: number; quantity: number; name: string }> = [];
+
+            if (transaksiId) {
+                // POS flow: fetch transaction items from database
+                const [existingTransaction] = await db
+                    .select()
+                    .from(transaksi)
+                    .where(eq(transaksi.id, transaksiId));
+
+                if (!existingTransaction) {
+                    res.status(404).json({ error: 'Transaksi tidak ditemukan' });
+                    return;
+                }
+
+                // Use request items if provided, otherwise create a single item
+                if (requestItems && requestItems.length > 0) {
+                    snapItems = requestItems.map((item: { id?: string; menuId?: number; price: number; quantity?: number; qty?: number; name: string }) => ({
+                        id: String(item.id || item.menuId || 'ITEM'),
+                        price: item.price,
+                        quantity: item.quantity || item.qty || 1,
+                        name: item.name,
+                    }));
+                } else {
+                    snapItems = [{
+                        id: `TRX-${transaksiId}`,
+                        price: amount,
+                        quantity: 1,
+                        name: `Pembayaran Transaksi #${existingTransaction.orderId}`,
+                    }];
+                }
+            } else {
+                // Reservation DP flow (existing behavior)
+                snapItems = [{
+                    id: 'DP-RESERVASI',
+                    price: amount,
+                    quantity: 1,
+                    name: 'Uang Muka Reservasi - Ruang Kopi',
+                }];
+            }
 
             // Generate Snap token via Midtrans API
             const { token, redirect_url } = await createSnapTransaction({
@@ -42,21 +86,14 @@ export const paymentController = {
                 customerName,
                 customerEmail,
                 customerPhone,
-                items: [
-                    {
-                        id: 'DP-RESERVASI',
-                        price: amount,
-                        quantity: 1,
-                        name: 'Uang Muka Reservasi - Ruang Kopi',
-                    },
-                ],
+                items: snapItems,
             });
 
             // Insert payment record into database
             const [payment] = await db
                 .insert(paymentGateway)
                 .values({
-                    transaksiId: null, // Will be linked when transaction is created
+                    transaksiId: transaksiId || null,
                     reservasiId: reservationId || null,
                     orderIdMidtrans: orderId,
                     metodePembayaran: null,
@@ -96,6 +133,7 @@ export const paymentController = {
             next(error);
         }
     },
+
 
     /**
      * POST /api/payment/webhook
@@ -218,6 +256,19 @@ export const paymentController = {
                         .update(transaksi)
                         .set({ status: 'completed' })
                         .where(eq(transaksi.id, payment.transaksiId));
+
+                    // Emit real-time update so POS dashboard refreshes
+                    const [updatedTrx] = await db
+                        .select()
+                        .from(transaksi)
+                        .where(eq(transaksi.id, payment.transaksiId));
+                    if (updatedTrx) {
+                        const trxItems = await db
+                            .select()
+                            .from(detailTransaksi)
+                            .where(eq(detailTransaksi.transaksiId, updatedTrx.id));
+                        emitNewTransaction({ ...updatedTrx, items: trxItems });
+                    }
                 } else if (internalStatus === 'cancel' || internalStatus === 'expire') {
                     await db
                         .update(transaksi)

@@ -90,7 +90,7 @@ const Home = () => {
                 {/* ========================================== */}
                 {/* HERO SECTION */}
                 {/* ========================================== */}
-                <section className="relative min-h-[600px] md:min-h-[800px] flex items-center max-w-[1400px] mx-auto overflow-hidden">
+                <section className="relative min-h-[600px] md:min-h-[00px] flex items-center max-w-[1400px] mx-auto overflow-hidden">
                     {/* Background Container with curved edges */}
                     <div className="absolute inset-5 md:inset-4 rounded-[2rem] md:rounded-[3rem] overflow-hidden">
                         <img

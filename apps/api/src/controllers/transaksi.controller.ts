@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../db/index.js';
 import { transaksi, detailTransaksi, meja, reservations } from '../db/schema.js';
-import { eq, desc, sql, and } from 'drizzle-orm';
+import { eq, desc, sql, and, inArray, gte, lte } from 'drizzle-orm';
 import { emitNewTransaction, emitTableUpdate } from '../services/socket.service.js';
 
 /**
@@ -57,7 +57,7 @@ export const transaksiController = {
                         total,
                         amountPaid: amountPaid || total,
                         change: change || 0,
-                        status: 'completed',
+                        status: paymentMethod === 'cash' ? 'completed' : 'pending',
                     })
                     .returning();
 
@@ -125,7 +125,7 @@ export const transaksiController = {
         }
     },
 
-    // GET /api/transaksi — Get all transactions with optional date filters
+    // GET /api/transaksi — Get all transactions with optional date filters (optimized: batch enrichment)
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { startDate, endDate, tipePesanan, page, limit } = req.query;
@@ -148,25 +148,40 @@ export const transaksiController = {
 
             const allTransaksi = await query;
 
-            // Enrich with table and reservation info
-            const enriched = await Promise.all(
-                allTransaksi.map(async (t) => {
-                    let mejaInfo = null;
-                    if (t.mejaId) {
-                        const [m] = await db.select().from(meja).where(eq(meja.id, t.mejaId));
-                        mejaInfo = m || null;
-                    }
-                    let reservasiInfo = null;
-                    if (t.reservasiId) {
-                        const [r] = await db
-                            .select()
-                            .from(reservations)
-                            .where(eq(reservations.id, t.reservasiId));
-                        reservasiInfo = r || null;
-                    }
-                    return { ...t, meja: mejaInfo, reservasi: reservasiInfo };
-                })
-            );
+            if (allTransaksi.length === 0) {
+                res.json([]);
+                return;
+            }
+
+            // Batch enrichment: collect unique IDs, fetch in 2 queries instead of N*2
+            const mejaIds: number[] = [...new Set(
+                allTransaksi
+                    .filter((t) => t.mejaId !== null)
+                    .map((t) => t.mejaId as number)
+            )];
+            const reservasiIds: number[] = [...new Set(
+                allTransaksi
+                    .filter((t) => t.reservasiId !== null)
+                    .map((t) => t.reservasiId as number)
+            )];
+
+            const [allMeja, allReservasi] = await Promise.all([
+                mejaIds.length > 0
+                    ? db.select().from(meja).where(inArray(meja.id, mejaIds))
+                    : Promise.resolve([]),
+                reservasiIds.length > 0
+                    ? db.select().from(reservations).where(inArray(reservations.id, reservasiIds))
+                    : Promise.resolve([]),
+            ]);
+
+            const mejaMap = new Map(allMeja.map((m) => [m.id, m]));
+            const reservasiMap = new Map(allReservasi.map((r) => [r.id, r]));
+
+            const enriched = allTransaksi.map((t) => ({
+                ...t,
+                meja: t.mejaId ? mejaMap.get(t.mejaId) || null : null,
+                reservasi: t.reservasiId ? reservasiMap.get(t.reservasiId) || null : null,
+            }));
 
             res.json(enriched);
         } catch (error) {
@@ -174,7 +189,7 @@ export const transaksiController = {
         }
     },
 
-    // GET /api/transaksi/recent?limit=10 — Get recent transactions with items
+    // GET /api/transaksi/recent?limit=10 — Get recent transactions with items (optimized: batch queries)
     getRecent: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const limit = parseInt(req.query.limit as string) || 10;
@@ -185,23 +200,52 @@ export const transaksiController = {
                 .orderBy(desc(transaksi.createdAt))
                 .limit(limit);
 
-            // Enrich with items and table info
-            const enriched = await Promise.all(
-                recentTransaksi.map(async (t) => {
-                    const items = await db
-                        .select()
-                        .from(detailTransaksi)
-                        .where(eq(detailTransaksi.transaksiId, t.id));
+            if (recentTransaksi.length === 0) {
+                res.json([]);
+                return;
+            }
 
-                    let mejaInfo = null;
-                    if (t.mejaId) {
-                        const [m] = await db.select().from(meja).where(eq(meja.id, t.mejaId));
-                        mejaInfo = m || null;
-                    }
+            // Batch: fetch all items + all tables in 2 queries
+            const transaksiIds: number[] = recentTransaksi
+                .map((t) => t.id)
+                .filter((id): id is number => id !== null);
+            const mejaIds: number[] = [...new Set(
+                recentTransaksi
+                    .filter((t) => t.mejaId !== null)
+                    .map((t) => t.mejaId as number)
+            )];
 
-                    return { ...t, items, meja: mejaInfo };
-                })
-            );
+            // Always query since transaksiIds is guaranteed non-empty after the guard above
+            const allItems = await db
+                .select()
+                .from(detailTransaksi)
+                .where(inArray(detailTransaksi.transaksiId, transaksiIds));
+
+            const allMeja = mejaIds.length > 0
+                ? await db.select().from(meja).where(inArray(meja.id, mejaIds))
+                : [];
+
+            // Group items by transaction ID
+            const itemsByTransaksiId = new Map<number, typeof allItems>();
+            allItems.forEach((item) => {
+                const tid = item.transaksiId;
+                if (tid === null) return;
+                const existing = itemsByTransaksiId.get(tid);
+                if (existing) {
+                    existing.push(item);
+                } else {
+                    itemsByTransaksiId.set(tid, [item]);
+                }
+            });
+
+            // Build table lookup
+            const mejaMap = new Map(allMeja.map((m) => [m.id, m]));
+
+            const enriched = recentTransaksi.map((t) => ({
+                ...t,
+                items: itemsByTransaksiId.get(t.id) || [],
+                meja: t.mejaId ? mejaMap.get(t.mejaId) || null : null,
+            }));
 
             res.json(enriched);
         } catch (error) {
@@ -209,53 +253,45 @@ export const transaksiController = {
         }
     },
 
-    // GET /api/transaksi/summary — Get transaction summary for dashboard
+    // GET /api/transaksi/summary — Get transaction summary for dashboard (optimized with SQL aggregation)
     getSummary: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { startDate, endDate } = req.query;
 
-            let query = db.select().from(transaksi);
-
+            // Build WHERE conditions
+            const conditions = [];
             if (startDate) {
-                query = query.where(
-                    sql`${transaksi.createdAt} >= ${startDate}::timestamp`
-                ) as any;
+                conditions.push(gte(transaksi.createdAt, new Date(startDate as string)));
             }
             if (endDate) {
-                query = query.where(
-                    sql`${transaksi.createdAt} <= ${endDate}::timestamp`
-                ) as any;
+                conditions.push(lte(transaksi.createdAt, new Date(endDate as string)));
             }
 
-            const allTransaksi = await query;
+            // Single query with SQL aggregation — no full table scan to Node.js memory
+            const [result] = await db
+                .select({
+                    totalTransaksi: sql<number>`CAST(COUNT(*) AS INTEGER)`,
+                    totalPendapatan: sql<number>`CAST(COALESCE(SUM(${transaksi.total}), 0) AS INTEGER)`,
+                    cashRevenue: sql<number>`CAST(COALESCE(SUM(CASE WHEN ${transaksi.paymentMethod} = 'cash' THEN ${transaksi.total} ELSE 0 END), 0) AS INTEGER)`,
+                    qrisRevenue: sql<number>`CAST(COALESCE(SUM(CASE WHEN ${transaksi.paymentMethod} = 'qris' THEN ${transaksi.total} ELSE 0 END), 0) AS INTEGER)`,
+                    onlineRevenue: sql<number>`CAST(COALESCE(SUM(CASE WHEN ${transaksi.tipePesanan} = 'online' THEN ${transaksi.total} ELSE 0 END), 0) AS INTEGER)`,
+                    dineInRevenue: sql<number>`CAST(COALESCE(SUM(CASE WHEN ${transaksi.tipePesanan} = 'dine_in' THEN ${transaksi.total} ELSE 0 END), 0) AS INTEGER)`,
+                    takeAwayRevenue: sql<number>`CAST(COALESCE(SUM(CASE WHEN ${transaksi.tipePesanan} = 'take_away' THEN ${transaksi.total} ELSE 0 END), 0) AS INTEGER)`,
+                })
+                .from(transaksi)
+                .where(conditions.length > 0 ? and(...conditions) : undefined);
 
             const summary = {
-                totalTransaksi: allTransaksi.length,
-                totalPendapatan: allTransaksi.reduce(
-                    (sum, t) => sum + t.total,
-                    0
-                ),
-                rataRata: allTransaksi.length
-                    ? Math.round(
-                          allTransaksi.reduce((sum, t) => sum + t.total, 0) /
-                              allTransaksi.length
-                      )
+                totalTransaksi: result?.totalTransaksi || 0,
+                totalPendapatan: result?.totalPendapatan || 0,
+                rataRata: result?.totalTransaksi
+                    ? Math.round((result.totalPendapatan || 0) / result.totalTransaksi)
                     : 0,
-                cash: allTransaksi
-                    .filter((t) => t.paymentMethod === 'cash')
-                    .reduce((sum, t) => sum + t.total, 0),
-                qris: allTransaksi
-                    .filter((t) => t.paymentMethod === 'qris')
-                    .reduce((sum, t) => sum + t.total, 0),
-                online: allTransaksi
-                    .filter((t) => t.tipePesanan === 'online')
-                    .reduce((sum, t) => sum + t.total, 0),
-                dineIn: allTransaksi
-                    .filter((t) => t.tipePesanan === 'dine_in')
-                    .reduce((sum, t) => sum + t.total, 0),
-                takeAway: allTransaksi
-                    .filter((t) => t.tipePesanan === 'take_away')
-                    .reduce((sum, t) => sum + t.total, 0),
+                cash: result?.cashRevenue || 0,
+                qris: result?.qrisRevenue || 0,
+                online: result?.onlineRevenue || 0,
+                dineIn: result?.dineInRevenue || 0,
+                takeAway: result?.takeAwayRevenue || 0,
             };
 
             res.json(summary);

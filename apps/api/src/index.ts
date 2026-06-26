@@ -28,6 +28,15 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Root endpoint to prevent 404 on base URL
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Welcome to RuangKopi API',
+        status: 'running',
+        docs: '/api/health'
+    });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({

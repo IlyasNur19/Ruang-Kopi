@@ -92,8 +92,7 @@ const RevenueBarChart = () => {
                     <YAxis tick={{ fontSize: 11, fill: '#6D4C41' }} axisLine={false} tickLine={false} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
-                    <Bar dataKey="online" name="Online" fill="#8D6E63" radius={[6, 6, 0, 0]} />
-                    <Bar dataKey="walk_in" name="Walk-in" fill="#D7CCC8" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="revenue" name="Pendapatan" fill="#8D6E63" radius={[6, 6, 0, 0]} />
                 </BarChart>
             </ResponsiveContainer>
         </div>

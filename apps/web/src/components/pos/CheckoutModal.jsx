@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, CheckCircle, Loader2 } from 'lucide-react';
+import { X, CheckCircle, Loader2, QrCode } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { formatCurrency } from '../../lib/utils';
 import useCartStore from '../../stores/cartStore';
 import useUIStore from '../../stores/uiStore';
-import { transaksiApi } from '../../services/api';
+import { transaksiApi, paymentApi } from '../../services/api';
+import { loadSnapScript, openSnapPopup } from '../../lib/midtrans';
 import PaymentMethodSelector from './PaymentMethodSelector';
 
 const CheckoutModal = () => {
     const setOpen = useUIStore((s) => s.setPosCheckoutOpen);
     const { items, getSummary, tableId, customerName, orderType, clearCart } = useCartStore();
 
-    const [step, setStep] = useState('payment'); // 'payment' | 'processing' | 'success'
+    const [step, setStep] = useState('payment'); // 'payment' | 'processing' | 'midtrans' | 'success'
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const [amountPaid, setAmountPaid] = useState('');
     const [loading, setLoading] = useState(false);
@@ -20,6 +21,15 @@ const CheckoutModal = () => {
 
     const total = getSummary().total;
     const change = amountPaid ? Math.max(0, parseInt(amountPaid) - total) : 0;
+
+    // Preload Midtrans Snap script when non-cash payment is selected
+    useEffect(() => {
+        if (paymentMethod !== 'cash') {
+            loadSnapScript().catch(() => {});
+        }
+    }, [paymentMethod]);
+
+    const isMidtransPayment = paymentMethod === 'qris' || paymentMethod === 'card';
 
     const handleCheckout = async () => {
         if (paymentMethod === 'cash' && (!amountPaid || parseInt(amountPaid) < total)) {
@@ -43,24 +53,100 @@ const CheckoutModal = () => {
                 tableId,
                 customerName,
                 orderType,
-                paymentMethod,
+                paymentMethod: isMidtransPayment ? 'qris' : paymentMethod,
                 amountPaid: paymentMethod === 'cash' ? parseInt(amountPaid) : total,
                 change: paymentMethod === 'cash' ? change : 0,
             };
 
-            // Submit to backend
-            await transaksiApi.create(transactionData);
+            // Step 1: Create transaction in database
+            const transactionResult = await transaksiApi.create(transactionData);
 
-            setStep('success');
+            if (isMidtransPayment) {
+                // Calculate tax for Midtrans item_details
+                const subtotal = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                const tax = total - subtotal; // PPN 11%
 
-            // Auto-close after 2s and clear cart
-            setTimeout(() => {
-                clearCart();
-                setOpen(false);
-                setStep('payment');
-                setAmountPaid('');
-                setPaymentMethod('cash');
-            }, 2000);
+                // Build Midtrans items (must sum up to gross_amount exactly)
+                const midtransItems = items.map((item) => ({
+                    id: String(item.menuId),
+                    price: item.price,
+                    quantity: item.qty,
+                    name: item.name,
+                }));
+
+                // Add tax as a separate line item so the total matches
+                if (tax > 0) {
+                    midtransItems.push({
+                        id: 'TAX-PPN',
+                        price: tax,
+                        quantity: 1,
+                        name: 'PPN 11%',
+                    });
+                }
+
+                // Step 2: Get Midtrans Snap Token
+                const snapData = await paymentApi.getSnapToken({
+                    transaksiId: transactionResult.id,
+                    amount: total,
+                    customerName: customerName || 'Pelanggan',
+                    items: midtransItems,
+                });
+
+                setLoading(false);
+                setStep('midtrans');
+
+                // Step 3: Open Midtrans Snap Popup
+                await loadSnapScript();
+                openSnapPopup(snapData.token, {
+                    onSuccess: (result) => {
+                        console.log('[POS Midtrans] Payment success:', result);
+                        setStep('success');
+                        // Auto-close after 2s and clear cart
+                        setTimeout(() => {
+                            clearCart();
+                            setOpen(false);
+                            setStep('payment');
+                            setAmountPaid('');
+                            setPaymentMethod('cash');
+                        }, 2000);
+                    },
+                    onPending: (result) => {
+                        console.log('[POS Midtrans] Payment pending:', result);
+                        // Treat pending as success — webhook will confirm later
+                        setStep('success');
+                        setTimeout(() => {
+                            clearCart();
+                            setOpen(false);
+                            setStep('payment');
+                            setAmountPaid('');
+                            setPaymentMethod('cash');
+                        }, 2000);
+                    },
+                    onError: (result) => {
+                        console.error('[POS Midtrans] Payment error:', result);
+                        setStep('payment');
+                        setError(result?.status_message || 'Pembayaran gagal. Silakan coba lagi.');
+                    },
+                    onClose: () => {
+                        console.log('[POS Midtrans] Popup closed by user');
+                        // User closed popup without finishing payment
+                        setStep('payment');
+                        setError('Popup pembayaran ditutup. Silakan coba lagi atau pilih metode lain.');
+                    },
+                });
+            } else {
+                // Cash payment — immediately successful
+                setStep('success');
+
+                // Auto-close after 2s and clear cart
+                setTimeout(() => {
+                    clearCart();
+                    setOpen(false);
+                    setStep('payment');
+                    setAmountPaid('');
+                    setPaymentMethod('cash');
+                }, 2000);
+            }
         } catch (err) {
             console.error('Checkout failed:', err);
             setError(err.message || 'Gagal memproses pembayaran.');
@@ -68,6 +154,11 @@ const CheckoutModal = () => {
             setLoading(false);
         }
     };
+
+    // When Midtrans popup is open, hide the dialog so it doesn't block the iframe
+    if (step === 'midtrans') {
+        return null;
+    }
 
     return (
         <Dialog open={true} onOpenChange={() => {}}>
@@ -129,13 +220,19 @@ const CheckoutModal = () => {
                                 </div>
                             )}
 
-                            {/* QRIS Info */}
-                            {paymentMethod === 'qris' && (
+                            {/* QRIS / Card Info */}
+                            {isMidtransPayment && (
                                 <div className="bg-[#F5F0EB] p-4 rounded-xl text-center">
-                                    <p className="text-sm text-[#6D4C41] mb-2">Scan QR Code untuk membayar</p>
-                                    <div className="w-40 h-40 mx-auto bg-white rounded-xl flex items-center justify-center border border-[#3E2723]/10">
-                                        <span className="text-[#3E2723]/20 text-xs">QRIS Code</span>
+                                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 border border-[#3E2723]/10">
+                                        <QrCode size={24} className="text-[#3E2723]" />
                                     </div>
+                                    <p className="text-sm font-medium text-[#3E2723] mb-1">
+                                        Pembayaran via Midtrans
+                                    </p>
+                                    <p className="text-xs text-[#6D4C41]">
+                                        Klik "Konfirmasi" untuk membuka popup pembayaran.
+                                        Pelanggan bisa scan QR atau bayar lewat metode lain.
+                                    </p>
                                 </div>
                             )}
 
