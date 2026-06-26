@@ -30,6 +30,7 @@ const ReservationPage = () => {
     const [snapToken, setSnapToken] = useState(null);
     const [shopStatus, setShopStatus] = useState('available');
     const [statusLoading, setStatusLoading] = useState(true);
+    const [reservationErrorMsg, setReservationErrorMsg] = useState('');
 
     const { mutate: createReservation, loading, error } = useMutation(reservationsApi.create);
 
@@ -134,6 +135,7 @@ const ReservationPage = () => {
             setStep('payment');
         } catch (err) {
             console.error('Reservation failed:', err);
+            setReservationErrorMsg(err.message || 'Terjadi kesalahan sistem');
             setStep('error');
         }
     };
@@ -272,8 +274,11 @@ const ReservationPage = () => {
                                 <div className="text-center py-10">
                                     <XCircle size={64} className="mx-auto text-red-500 mb-6" />
                                     <h2 className="font-heading text-3xl text-primary mb-4 font-bold">Terjadi Kesalahan</h2>
-                                    <p className="text-red-500 mb-2">{error || 'Gagal memproses reservasi.'}</p>
-                                    <p className="text-sm text-[#6D4C41] mb-8">
+                                    <p className="text-red-500 mb-2 font-medium">Gagal memproses reservasi.</p>
+                                    <p className="text-sm text-red-400 mb-6 bg-red-50 p-3 rounded-lg border border-red-100">
+                                        Error: {reservationErrorMsg}
+                                    </p>
+                                    <p className="text-muted-foreground mb-8">
                                         Anda tetap dapat reservasi melalui WhatsApp.
                                     </p>
                                     <div className="flex flex-col gap-3">
