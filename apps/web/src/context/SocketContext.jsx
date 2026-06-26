@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import useTableStore from '../stores/tableStore';
+import useNotificationStore from '../stores/notificationStore';
 
 const SocketContext = createContext(null);
 
@@ -12,6 +13,7 @@ export function SocketProvider({ children }) {
     const socketRef = useRef(null);
     const updateTableStatus = useTableStore((s) => s.updateTableStatus);
     const setTables = useTableStore((s) => s.setTables);
+    const addNotification = useNotificationStore((s) => s.addNotification);
 
     const connect = useCallback(() => {
         const token = localStorage.getItem('ruangkopi_token');
@@ -72,10 +74,34 @@ export function SocketProvider({ children }) {
             }
         });
 
-        // New reservation created online
+        // New transaction (POS checkout) notification for admin
+        socket.on('new-transaction', (transaction) => {
+            addNotification({
+                type: 'transaction',
+                title: 'Transaksi Baru',
+                message: `Order #${transaction.orderId} - Rp ${(transaction.total || 0).toLocaleString('id-ID')}`,
+                data: transaction,
+            });
+        });
+
+        // New reservation created online — notification for admin
         socket.on('new:reservation', (reservation) => {
-            console.log('[Socket] New reservation:', reservation);
-            // Admin can listen for this to update dashboard
+            addNotification({
+                type: 'reservation',
+                title: 'Reservasi Baru',
+                message: `${reservation.name} - ${reservation.date} ${reservation.time} (${reservation.guests} tamu)`,
+                data: reservation,
+            });
+        });
+
+        // New Kotak Gagasan idea submitted — notification for admin
+        socket.on('new:idea', (idea) => {
+            addNotification({
+                type: 'idea',
+                title: 'Gagasan Baru',
+                message: `${idea.name} - ${idea.topic}: "${idea.message?.substring(0, 60)}${idea.message?.length > 60 ? '...' : ''}"`,
+                data: idea,
+            });
         });
 
         // Payment confirmed via webhook
@@ -89,7 +115,7 @@ export function SocketProvider({ children }) {
         socketRef.current = socket;
 
         return socket;
-    }, [updateTableStatus, setTables]);
+    }, [updateTableStatus, setTables, addNotification]);
 
     useEffect(() => {
         const socket = connect();

@@ -172,3 +172,10 @@ export function emitPaymentConfirmed(data: { tableId?: number; reservationId?: n
 export function emitNewTransaction(transaction: any) {
     io?.to('pos-room').emit('new-transaction', transaction);
 }
+
+/**
+ * Notify POS clients of a new Kotak Gagasan submission
+ */
+export function emitNewIdea(idea: any) {
+    io?.to('pos-room').emit('new:idea', idea);
+}

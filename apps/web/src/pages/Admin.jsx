@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Coffee, Image, Calendar, Bell, User, LogOut, Menu, X, Home, Lightbulb, ImageIcon, Grid3X3 } from 'lucide-react';
+import { LayoutDashboard, Coffee, Image, Calendar, User, LogOut, Menu, X, Home, Lightbulb, ImageIcon, Grid3X3 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { SocketProvider } from '../context/SocketContext';
+import NotificationBell from '../components/admin/NotificationBell';
 import DashboardOverview from '../components/admin/DashboardOverview';
 import MenuManagement from '../components/admin/MenuManagement';
 import GalleryManagement from '../components/admin/GalleryManagement';
@@ -53,7 +55,8 @@ const Admin = () => {
     ];
 
     return (
-        <div className="flex min-h-screen bg-muted/40 font-sans">
+        <SocketProvider>
+            <div className="flex min-h-screen bg-muted/40 font-sans">
             {/* Mobile Overlay */}
             {sidebarOpen && (
                 <div
@@ -128,10 +131,7 @@ const Admin = () => {
 
                     {/* Right side items */}
                     <div className="flex items-center gap-4 lg:gap-6 ml-auto">
-                        <button className="relative text-muted-foreground hover:text-foreground transition-colors">
-                            <Bell size={20} />
-                            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full border border-background"></span>
-                        </button>
+                        <NotificationBell onNavigate={(tab) => handleTabChange(tab)} />
                         <div className="flex items-center gap-3 cursor-pointer group">
                             <div className="text-right hidden sm:block">
                                 <span className="block font-semibold text-sm text-foreground">
@@ -153,6 +153,7 @@ const Admin = () => {
                 </div>
             </main>
         </div>
+        </SocketProvider>
     );
 };
 

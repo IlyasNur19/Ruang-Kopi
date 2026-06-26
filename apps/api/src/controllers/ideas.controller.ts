@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { db } from '../db/index.js';
 import { ideas } from '../db/schema.js';
 import { eq, desc } from 'drizzle-orm';
+import { emitNewIdea } from '../services/socket.service.js';
 
 export const ideasController = {
     // GET /api/ideas
@@ -33,6 +34,9 @@ export const ideasController = {
                     status: 'Baru',
                 })
                 .returning();
+
+            // Emit real-time notification to admin dashboard
+            emitNewIdea(newIdea);
 
             res.status(201).json(newIdea);
         } catch (error) {
