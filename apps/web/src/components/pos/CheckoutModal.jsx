@@ -101,26 +101,12 @@ const CheckoutModal = () => {
                     onSuccess: (result) => {
                         console.log('[POS Midtrans] Payment success:', result);
                         setStep('success');
-                        // Auto-close after 2s and clear cart
-                        setTimeout(() => {
-                            clearCart();
-                            setOpen(false);
-                            setStep('payment');
-                            setAmountPaid('');
-                            setPaymentMethod('cash');
-                        }, 2000);
+                        // Removed auto-close so user can print receipt
                     },
                     onPending: (result) => {
                         console.log('[POS Midtrans] Payment pending:', result);
-                        // Treat pending as success — webhook will confirm later
                         setStep('success');
-                        setTimeout(() => {
-                            clearCart();
-                            setOpen(false);
-                            setStep('payment');
-                            setAmountPaid('');
-                            setPaymentMethod('cash');
-                        }, 2000);
+                        // Removed auto-close so user can print receipt
                     },
                     onError: (result) => {
                         console.error('[POS Midtrans] Payment error:', result);
@@ -137,15 +123,6 @@ const CheckoutModal = () => {
             } else {
                 // Cash payment — immediately successful
                 setStep('success');
-
-                // Auto-close after 2s and clear cart
-                setTimeout(() => {
-                    clearCart();
-                    setOpen(false);
-                    setStep('payment');
-                    setAmountPaid('');
-                    setPaymentMethod('cash');
-                }, 2000);
             }
         } catch (err) {
             console.error('Checkout failed:', err);
@@ -159,6 +136,18 @@ const CheckoutModal = () => {
     if (step === 'midtrans') {
         return null;
     }
+
+    const handlePrintReceipt = () => {
+        window.print();
+    };
+
+    const handleFinish = () => {
+        clearCart();
+        setOpen(false);
+        setStep('payment');
+        setAmountPaid('');
+        setPaymentMethod('cash');
+    };
 
     return (
         <Dialog open={true} onOpenChange={() => {}}>
@@ -176,10 +165,25 @@ const CheckoutModal = () => {
                             Total: <span className="font-bold text-[#3E2723]">{formatCurrency(total)}</span>
                         </p>
                         {paymentMethod === 'cash' && change > 0 && (
-                            <p className="text-green-600 font-semibold mt-1">
+                            <p className="text-green-600 font-semibold mt-1 mb-6">
                                 Kembalian: {formatCurrency(change)}
                             </p>
                         )}
+                        <div className="flex gap-3 justify-center mt-4">
+                            <button
+                                onClick={handlePrintReceipt}
+                                className="px-6 py-2.5 rounded-xl border border-[#3E2723] text-[#3E2723] font-medium hover:bg-[#3E2723]/5 flex items-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                                Cetak Nota
+                            </button>
+                            <button
+                                onClick={handleFinish}
+                                className="px-6 py-2.5 rounded-xl bg-[#3E2723] text-white font-medium hover:bg-[#4E342E]"
+                            >
+                                Selesai
+                            </button>
+                        </div>
                     </motion.div>
                 ) : (
                     // Payment Flow

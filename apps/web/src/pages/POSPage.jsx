@@ -49,7 +49,7 @@ const POSPage = () => {
             {checkoutOpen && <CheckoutModal />}
 
             {/* Hidden receipt template for printing */}
-            <div className="hidden">
+            <div className="hidden print:block">
                 <ReceiptTemplate />
             </div>
         </SocketProvider>

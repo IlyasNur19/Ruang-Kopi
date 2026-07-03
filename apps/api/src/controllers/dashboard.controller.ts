@@ -82,10 +82,10 @@ export const dashboardController = {
                 : new Date(end.getTime() - (parseInt(days as string) || 7) * 24 * 60 * 60 * 1000);
             start.setHours(0, 0, 0, 0);
 
-            // SQL GROUP BY query — only returns dates that have transactions
+            // Convert UTC to local Asia/Jakarta timezone for correct grouping
             const rows = await db
                 .select({
-                    date: sql<string>`TO_CHAR(${transaksi.createdAt}::timestamp, 'YYYY-MM-DD')`,
+                    date: sql<string>`TO_CHAR((${transaksi.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD')`,
                     revenue: sql<number>`CAST(COALESCE(SUM(${transaksi.total}), 0) AS INTEGER)`,
                 })
                 .from(transaksi)
@@ -95,8 +95,8 @@ export const dashboardController = {
                         lte(transaksi.createdAt, end),
                     )
                 )
-                .groupBy(sql`TO_CHAR(${transaksi.createdAt}::timestamp, 'YYYY-MM-DD')`)
-                .orderBy(sql`TO_CHAR(${transaksi.createdAt}::timestamp, 'YYYY-MM-DD')`);
+                .groupBy(sql`TO_CHAR((${transaksi.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD')`)
+                .orderBy(sql`TO_CHAR((${transaksi.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD')`);
 
             // Build a map of existing results
             const revenueMap = new Map<string, number>();
@@ -107,7 +107,8 @@ export const dashboardController = {
             // Fill in missing dates with 0
             const dailyRevenue: { date: string; revenue: number }[] = [];
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                const dateKey = d.toISOString().slice(0, 10);
+                // Use local timezone formatting to prevent UTC offset bugs
+                const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
                 dailyRevenue.push({
                     date: dateKey,
                     revenue: revenueMap.get(dateKey) || 0,
