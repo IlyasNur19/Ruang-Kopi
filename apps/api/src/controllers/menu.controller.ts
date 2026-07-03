@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../db/index.js';
-import { menuItems, categories } from '../db/schema.js';
+import { menuItems, categories, detailTransaksi } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 
 export const menuController = {
@@ -109,6 +109,13 @@ export const menuController = {
     delete: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
+
+            // Remove foreign key references in detail_transaksi before deleting the menu item
+            // This prevents the "violates foreign key constraint" error
+            await db
+                .update(detailTransaksi)
+                .set({ menuId: null })
+                .where(eq(detailTransaksi.menuId, id));
 
             const [deletedItem] = await db
                 .delete(menuItems)
