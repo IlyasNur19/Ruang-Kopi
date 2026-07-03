@@ -13,7 +13,7 @@ const ReceiptTemplate = forwardRef((props, ref) => {
     const orderId = generateOrderId();
 
     return (
-        <div ref={ref} className="receipt-container bg-white p-4 font-mono text-xs" style={{ width: '80mm', maxWidth: '80mm' }}>
+        <div ref={ref} className="receipt-container bg-white p-4 font-mono text-xs" style={{ width: '58mm', maxWidth: '58mm' }}>
             {/* ========== Header ========== */}
             <div className="text-center border-b border-dashed border-gray-300 pb-2 mb-2">
                 <h2 className="font-bold text-sm mb-0.5">RUANG KOPI</h2>

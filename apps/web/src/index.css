@@ -137,14 +137,14 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 80mm;
-    max-width: 80mm;
+    width: 58mm;
+    max-width: 58mm;
     padding: 0;
     margin: 0;
   }
 
   @page {
-    size: 80mm auto;
+    size: 58mm auto;
     margin: 0;
   }
 }
