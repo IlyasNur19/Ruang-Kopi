@@ -14,14 +14,14 @@ const ReceiptTemplate = forwardRef((props, ref) => {
 
     return (
         <div ref={ref} className="receipt-container bg-white p-4 font-mono text-xs" style={{ width: '58mm', maxWidth: '58mm' }}>
-            {/* ========== Header ========== */}
+            {}
             <div className="text-center border-b border-dashed border-gray-300 pb-2 mb-2">
                 <h2 className="font-bold text-sm mb-0.5">RUANG KOPI</h2>
                 <p className="text-[10px] text-gray-500">Jl. Example No. 123, Jakarta Selatan</p>
                 <p className="text-[10px] text-gray-500">Tel: 0812-3456-7890</p>
             </div>
 
-            {/* ========== Order Info ========== */}
+            {}
             <div className="space-y-0.5 mb-2 text-[10px]">
                 <div className="flex justify-between">
                     <span>Tanggal</span>
@@ -49,7 +49,7 @@ const ReceiptTemplate = forwardRef((props, ref) => {
                 )}
             </div>
 
-            {/* ========== Items ========== */}
+            {}
             <div className="border-t border-dashed border-gray-300 pt-2 mb-2">
                 <div className="flex justify-between text-[10px] font-bold mb-1">
                     <span>Item</span>
@@ -65,7 +65,7 @@ const ReceiptTemplate = forwardRef((props, ref) => {
                 ))}
             </div>
 
-            {/* ========== Summary ========== */}
+            {}
             <div className="border-t border-dashed border-gray-300 pt-2 space-y-0.5">
                 <div className="flex justify-between text-[10px]">
                     <span>Subtotal</span>
@@ -81,7 +81,7 @@ const ReceiptTemplate = forwardRef((props, ref) => {
                 </div>
             </div>
 
-            {/* ========== Footer ========== */}
+            {}
             <div className="text-center border-t border-dashed border-gray-300 pt-2 mt-2 text-[10px] text-gray-500 space-y-1">
                 <p>Terima kasih!</p>
                 <p>Selamat menikmati kopi Anda :)</p>

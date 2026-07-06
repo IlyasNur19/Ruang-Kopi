@@ -5,9 +5,9 @@ const Footer = () => {
     return (
         <footer className="bg-primary text-on-primary w-full py-section-gap px-margin-mobile md:px-margin-desktop">
             <div className="max-w-container-max-width mx-auto">
-                {/* 4-Column Grid */}
+                {}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter">
-                    {/* Column 1 - Brand */}
+                    {}
                     <div>
                         <div className="flex items-center gap-2 mb-4">
                             <span
@@ -39,7 +39,7 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Column 2 - Navigasi */}
+                    {}
                     <div>
                         <h4 className="font-body text-label-md text-primary-fixed mb-6 uppercase tracking-wider">
                             Navigasi
@@ -68,7 +68,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Column 3 - Informasi */}
+                    {}
                     <div>
                         <h4 className="font-body text-label-md text-primary-fixed mb-6 uppercase tracking-wider">
                             Informasi
@@ -97,7 +97,7 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Column 4 - Lokasi & Jam Buka */}
+                    {}
                     <div>
                         <h4 className="font-body text-label-md text-primary-fixed mb-6 uppercase tracking-wider">
                             Lokasi &amp; Jam Buka
@@ -118,7 +118,7 @@ const Footer = () => {
                     </div>
                 </div>
 
-                {/* Copyright Bar */}
+                {}
                 <div className="max-w-container-max-width mx-auto mt-16 pt-8 border-t border-white/10 text-center">
                     <p className="font-body text-body-sm text-on-primary/50">
                         © 2026 RuangKopi Artisanal Coffee. All rights reserved.

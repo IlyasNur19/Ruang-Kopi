@@ -7,9 +7,6 @@ import { meja } from '../db/schema.js';
 
 let io: Server | null = null;
 
-/**
- * Initialize Socket.io server attached to an HTTP server
- */
 export function initSocketServer(httpServer: HttpServer): Server {
     io = new Server(httpServer, {
         cors: {
@@ -25,7 +22,6 @@ export function initSocketServer(httpServer: HttpServer): Server {
         transports: ['websocket', 'polling'],
     });
 
-    // Authentication middleware
     io.use((socket: Socket, next) => {
         const token = socket.handshake.auth?.token;
 
@@ -49,7 +45,6 @@ export function initSocketServer(httpServer: HttpServer): Server {
     io.on('connection', async (socket: Socket) => {
         console.log(`[Socket.io] Client connected: ${socket.id} (auth: ${socket.data.authenticated})`);
 
-        // On connection, send current table statuses
         try {
             const allTables = await db.select().from(meja).orderBy(asc(meja.nomor_meja));
             socket.emit('tables:refresh', allTables);
@@ -57,14 +52,10 @@ export function initSocketServer(httpServer: HttpServer): Server {
             console.error('[Socket.io] Error fetching tables for new connection:', error);
         }
 
-        // Join POS room for authenticated users (kasir/admin)
         if (socket.data.authenticated) {
             socket.join('pos-room');
         }
 
-        // --- Client Events ---
-
-        // Kasir occupies a table (walk-in)
         socket.on('table:occupy', async (data: { tableId: number }) => {
             if (!socket.data.authenticated) {
                 socket.emit('error', { message: 'Authentication required' });
@@ -89,7 +80,6 @@ export function initSocketServer(httpServer: HttpServer): Server {
             }
         });
 
-        // Kasir releases a table (walk-in done/cancelled)
         socket.on('table:release', async (data: { tableId: number }) => {
             if (!socket.data.authenticated) {
                 socket.emit('error', { message: 'Authentication required' });
@@ -123,25 +113,16 @@ export function initSocketServer(httpServer: HttpServer): Server {
     return io;
 }
 
-/**
- * Get the Socket.io server instance
- */
 export function getIO(): Server | null {
     return io;
 }
 
-/**
- * Emit table status update to all POS clients
- */
 export async function emitTableUpdate(tableId: number, status: string) {
     if (!io) return;
     const [updatedTable] = await db.select().from(meja).where(eq(meja.id, tableId));
     io.to('pos-room').emit('table:update', { tableId, status, table: updatedTable });
 }
 
-/**
- * Refresh all tables for POS clients
- */
 export async function emitTablesRefresh() {
     if (!io) return;
     try {
@@ -152,30 +133,18 @@ export async function emitTablesRefresh() {
     }
 }
 
-/**
- * Notify POS clients of a new online reservation
- */
 export function emitNewReservation(reservation: any) {
     io?.to('pos-room').emit('new:reservation', reservation);
 }
 
-/**
- * Notify POS clients that a payment has been confirmed
- */
 export function emitPaymentConfirmed(data: { tableId?: number; reservationId?: number; orderId: string }) {
     io?.to('pos-room').emit('payment:confirmed', data);
 }
 
-/**
- * Broadcast a new transaction to POS clients
- */
 export function emitNewTransaction(transaction: any) {
     io?.to('pos-room').emit('new-transaction', transaction);
 }
 
-/**
- * Notify POS clients of a new Kotak Gagasan submission
- */
 export function emitNewIdea(idea: any) {
     io?.to('pos-room').emit('new:idea', idea);
 }

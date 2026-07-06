@@ -15,7 +15,7 @@ import ReservationReview from '../components/reservation/ReservationReview';
 import PaymentStep from '../components/reservation/PaymentStep';
 
 const ReservationPage = () => {
-    // Steps: 'form' | 'table' | 'preorder' | 'review' | 'payment' | 'success' | 'error'
+
     const [step, setStep] = useState('form');
     const [formData, setFormData] = useState({
         name: '',
@@ -25,8 +25,8 @@ const ReservationPage = () => {
         guests: 2,
     });
     const [selectedTable, setSelectedTable] = useState(null);
-    const [cartItems, setCartItems] = useState([]); // { menuId, name, price, qty }
-    const [paymentType, setPaymentType] = useState('dp'); // 'dp' = 30%, 'full' = 100%
+    const [cartItems, setCartItems] = useState([]);
+    const [paymentType, setPaymentType] = useState('dp');
     const [snapToken, setSnapToken] = useState(null);
     const [shopStatus, setShopStatus] = useState('available');
     const [statusLoading, setStatusLoading] = useState(true);
@@ -58,7 +58,7 @@ const ReservationPage = () => {
             setFormData((prev) => ({ ...prev, date: '' }));
             return;
         }
-        // Gunakan local date untuk menghindari offset timezone (WIB = UTC+7)
+
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
@@ -90,7 +90,6 @@ const ReservationPage = () => {
     const handleBackToTable = () => setStep('table');
     const handleBackToPreOrder = () => setStep('preorder');
 
-    // Calculate totals — DP = 30% dari total pre-order, Full = 100%
     const cartTotal = cartItems.reduce((sum, ci) => sum + ci.price * ci.qty, 0);
     const dpAmount = Math.round(cartTotal * 0.3);
     const fullAmount = cartTotal;
@@ -99,7 +98,7 @@ const ReservationPage = () => {
 
     const handleConfirm = async () => {
         try {
-            // 1. Create reservation
+
             const reservation = await createReservation({
                 name: formData.name,
                 phone: formData.phone,
@@ -109,20 +108,18 @@ const ReservationPage = () => {
                 mejaId: selectedTable,
             });
 
-            // 2. If no pre-order, skip payment — go directly to success
             if (!hasPreOrder || paymentAmount <= 0) {
                 setStep('success');
                 return;
             }
 
-            // 3. Get Snap token for payment (DP 30% or Full)
             const reservationId = reservation?.id || reservation?.data?.id;
             const snapResult = await paymentApi.getSnapToken({
                 reservationId,
                 amount: paymentAmount,
                 customerName: formData.name,
                 customerPhone: formData.phone,
-                // Include cart items so they can be stored in the transaction
+
                 items: cartItems.map(ci => ({
                     id: ci.menuId,
                     name: ci.name,
@@ -149,7 +146,7 @@ const ReservationPage = () => {
     };
 
     const handlePaymentClose = () => {
-        // Popup closed without completing — stay on payment step
+
     };
 
     const handleReset = () => {
@@ -167,7 +164,7 @@ const ReservationPage = () => {
         const formattedDate = date ? new Date(date).toLocaleDateString('id-ID', {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         }) : '';
-        // Include cart items in WhatsApp message
+
         let itemsText = '';
         if (cartItems.length > 0) {
             itemsText = '%0A%0A*Pre-Order:*%0A' + cartItems.map(ci =>
@@ -185,7 +182,6 @@ const ReservationPage = () => {
     const timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00'];
     const guestOptions = [1, 2, 3, 4, 5, 6, 7, 8];
 
-    // Step indicator — 5 steps
     const steps = [
         { id: 'form', label: 'Jadwal' },
         { id: 'table', label: 'Meja' },
@@ -201,7 +197,7 @@ const ReservationPage = () => {
             <Navbar />
             <main className="flex-grow">
                 <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-80px)]">
-                    {/* Left - Image Panel */}
+                    {}
                     <div className="hidden lg:block relative">
                         <img
                             src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&q=80"
@@ -217,7 +213,7 @@ const ReservationPage = () => {
                         </div>
                     </div>
 
-                    {/* Right - Form Panel */}
+                    {}
                     <div className="flex items-start justify-center px-6 py-10 lg:py-16 overflow-y-auto">
                         <motion.div
                             key={step}
@@ -227,7 +223,7 @@ const ReservationPage = () => {
                             transition={{ duration: 0.3 }}
                             className="w-full max-w-lg"
                         >
-                            {/* ============ SUCCESS ============ */}
+                            {}
                             {step === 'success' && (
                                 <div className="text-center py-10">
                                     <CheckCircle size={64} className="mx-auto text-green-500 mb-6" />
@@ -269,7 +265,7 @@ const ReservationPage = () => {
                                 </div>
                             )}
 
-                            {/* ============ ERROR ============ */}
+                            {}
                             {step === 'error' && (
                                 <div className="text-center py-10">
                                     <XCircle size={64} className="mx-auto text-red-500 mb-6" />
@@ -298,7 +294,7 @@ const ReservationPage = () => {
                                 </div>
                             )}
 
-                            {/* ============ PAYMENT STEP ============ */}
+                            {}
                             {step === 'payment' && (
                                 <div>
                                     <h2 className="font-heading text-2xl text-primary mb-2 font-bold text-center">
@@ -327,7 +323,7 @@ const ReservationPage = () => {
                                 </div>
                             )}
 
-                            {/* ============ REVIEW STEP ============ */}
+                            {}
                             {step === 'review' && (
                                 <ReservationReview
                                     formData={formData}
@@ -341,7 +337,7 @@ const ReservationPage = () => {
                                 />
                             )}
 
-                            {/* ============ PRE-ORDER STEP ============ */}
+                            {}
                             {step === 'preorder' && (
                                 <PreOrderStep
                                     cartItems={cartItems}
@@ -351,7 +347,7 @@ const ReservationPage = () => {
                                 />
                             )}
 
-                            {/* ============ TABLE SELECTION STEP ============ */}
+                            {}
                             {step === 'table' && (
                                 <div>
                                     <button onClick={handleBackToForm} className="flex items-center gap-1 text-[#6D4C41] hover:text-[#3E2723] mb-4 text-sm">
@@ -380,7 +376,7 @@ const ReservationPage = () => {
                                 </div>
                             )}
 
-                            {/* ============ FORM STEP ============ */}
+                            {}
                             {step === 'form' && (
                                 <>
                                     <span className="inline-block px-4 py-1.5 bg-gray-100 text-xs font-bold uppercase tracking-widest text-muted-foreground rounded-full mb-6">
@@ -393,7 +389,7 @@ const ReservationPage = () => {
                                         Nikmati momen terbaik bersama kopi terbaik. Pilih jadwal, meja, dan pre-order menu favorit Anda.
                                     </p>
 
-                                    {/* Step Indicator */}
+                                    {}
                                     <div className="flex items-center justify-center gap-2 mb-8">
                                         {steps.map((s, i) => (
                                             <React.Fragment key={s.id}>
@@ -408,7 +404,7 @@ const ReservationPage = () => {
                                         ))}
                                     </div>
 
-                                    {/* Calendar */}
+                                    {}
                                     <div className="mb-6">
                                         <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-3">
                                             <CalendarDays size={16} className="text-[#6D4C41]" />
@@ -420,7 +416,7 @@ const ReservationPage = () => {
                                         />
                                     </div>
 
-                                    {/* Time + Guests */}
+                                    {}
                                     <form onSubmit={handleNextToTable} className="space-y-5">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>

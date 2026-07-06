@@ -1,10 +1,7 @@
-// API Service for RuangKopi Frontend
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-// Helper to get auth token
 const getAuthToken = () => localStorage.getItem('ruangkopi_token');
 
-// Helper for API requests
 const apiRequest = async (endpoint, options = {}) => {
     const token = getAuthToken();
 
@@ -19,7 +16,6 @@ const apiRequest = async (endpoint, options = {}) => {
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
-    // Handle non-JSON responses
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
         if (!response.ok) {
@@ -37,9 +33,6 @@ const apiRequest = async (endpoint, options = {}) => {
     return data;
 };
 
-// ================================
-// Auth API
-// ================================
 export const authApi = {
     login: async (email, password) => {
         return apiRequest('/auth/login', {
@@ -53,9 +46,6 @@ export const authApi = {
     },
 };
 
-// ================================
-// Menu API
-// ================================
 export const menuApi = {
     getAll: async () => {
         return apiRequest('/menu');
@@ -86,18 +76,12 @@ export const menuApi = {
     },
 };
 
-// ================================
-// Categories API
-// ================================
 export const categoriesApi = {
     getAll: async () => {
         return apiRequest('/categories');
     },
 };
 
-// ================================
-// Reservations API
-// ================================
 export const reservationsApi = {
     getAll: async () => {
         return apiRequest('/reservations');
@@ -132,9 +116,6 @@ export const reservationsApi = {
     },
 };
 
-// ================================
-// Gallery API
-// ================================
 export const galleryApi = {
     getAll: async () => {
         return apiRequest('/gallery');
@@ -168,9 +149,6 @@ export const galleryApi = {
     },
 };
 
-// ================================
-// Settings API
-// ================================
 export const settingsApi = {
     getStatus: async () => {
         return apiRequest('/settings/status');
@@ -206,9 +184,6 @@ export const settingsApi = {
     },
 };
 
-// ================================
-// Upload API (Cloudinary)
-// ================================
 export const uploadApi = {
     upload: async (file) => {
         const token = getAuthToken();
@@ -239,9 +214,6 @@ export const uploadApi = {
     },
 };
 
-// ================================
-// Ideas API (Kotak Gagasan)
-// ================================
 export const ideasApi = {
     getAll: async () => {
         return apiRequest('/ideas');
@@ -268,9 +240,6 @@ export const ideasApi = {
     },
 };
 
-// ================================
-// Meja API (Table Management)
-// ================================
 export const mejaApi = {
     getAll: async () => {
         return apiRequest('/meja');
@@ -306,9 +275,6 @@ export const mejaApi = {
     },
 };
 
-// ================================
-// Transaksi API (Transactions)
-// ================================
 export const transaksiApi = {
     getAll: async (params) => {
         const query = params ? `?${new URLSearchParams(params)}` : '';
@@ -336,9 +302,6 @@ export const transaksiApi = {
     },
 };
 
-// ================================
-// Payment API (Midtrans)
-// ================================
 export const paymentApi = {
     getSnapToken: async (data) => {
         return apiRequest('/payment/snap-token', {
@@ -359,9 +322,6 @@ export const paymentApi = {
     },
 };
 
-// ================================
-// Dashboard API (Financial Reports)
-// ================================
 export const dashboardApi = {
     getStats: async () => {
         return apiRequest('/dashboard/stats');

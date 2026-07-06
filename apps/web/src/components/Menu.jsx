@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Sample Data (can be moved to separate file later)
 const menuItems = [
     { id: 1, name: 'Espresso', price: '25.000', category: 'Kopi', image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&q=80' },
     { id: 2, name: 'Cappuccino', price: '35.000', category: 'Kopi', image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&q=80' },
@@ -33,13 +32,13 @@ const Menu = () => {
                     <p className="text-muted-foreground text-lg">Explore our signature blends and savory treats.</p>
                 </motion.div>
 
-                {/* Categories */}
+                {}
                 <div className="flex justify-center gap-4 flex-wrap mb-16">
                     {categories.map(category => (
                         <button
                             key={category}
                             onClick={() => setActiveCategory(category)}
-                            className={`px-6 py-3 rounded-full border border-primary/20 font-medium transition-all hover:bg-primary hover:text-white hover:border-primary hover:-translate-y-0.5 hover:shadow-md 
+                            className={`px-6 py-3 rounded-full border border-primary/20 font-medium transition-all hover:bg-primary hover:text-white hover:border-primary hover:-translate-y-0.5 hover:shadow-md
                                 ${activeCategory === category
                                     ? 'bg-primary text-white border-primary shadow-md transform -translate-y-0.5'
                                     : 'bg-transparent text-muted-foreground'}`}
@@ -49,7 +48,7 @@ const Menu = () => {
                     ))}
                 </div>
 
-                {/* Menu Grid */}
+                {}
                 <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 container mx-auto">
                     <AnimatePresence>
                         {filteredItems.map(item => (

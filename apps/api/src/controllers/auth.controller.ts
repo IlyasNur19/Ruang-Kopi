@@ -6,7 +6,7 @@ import { generateToken } from '../utils/jwt.js';
 import bcrypt from 'bcryptjs';
 
 export const authController = {
-    // POST /api/auth/login
+
     login: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { email, password } = req.body;
@@ -47,7 +47,6 @@ export const authController = {
         }
     },
 
-    // GET /api/auth/me
     getMe: async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!req.user) {

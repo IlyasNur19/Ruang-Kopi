@@ -8,7 +8,7 @@ const Location = () => {
     useEffect(() => {
         const checkStatus = () => {
             const hours = new Date().getHours();
-            // Buka pukul 08:00 - 22:00
+
             setIsOpen(hours >= 8 && hours < 22);
         };
         checkStatus();
@@ -57,7 +57,7 @@ const Location = () => {
                         viewport={{ once: true }}
                         className="h-[400px] rounded-3xl overflow-hidden shadow-xl"
                     >
-                        {/* Placeholder Google Maps Embed */}
+                        {}
                         <iframe
                             title="Location Map"
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.05987163353!2d106.81882!3d-6.25585!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTUnMjEuMCJTIDEwNsKwNDknMDguMCJF!5e0!3m2!1sen!2sid!4v1620000000000!5m2!1sen!2sid"

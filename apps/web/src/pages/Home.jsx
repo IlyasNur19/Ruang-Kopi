@@ -6,7 +6,6 @@ import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import { settingsApi, menuApi, mejaApi } from '../services/api';
 
-
 const Home = () => {
     const [liveStatus, setLiveStatus] = useState({ text: 'Buka · Memuat...', color: 'bg-green-500' });
     const [heroImage, setHeroImage] = useState('https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80');
@@ -68,7 +67,6 @@ const Home = () => {
         return labels[index % labels.length];
     };
 
-    // Animation variants
     const fadeInUp = {
         hidden: { opacity: 0, y: 30 },
         visible: (i = 0) => ({
@@ -87,37 +85,37 @@ const Home = () => {
         <div className="min-h-screen bg-[#F5F0EB] text-[#3E2723] font-body antialiased selection:bg-primary-fixed selection:text-on-primary-fixed overflow-x-hidden">
             <Navbar />
             <main>
-                {/* ========================================== */}
-                {/* HERO SECTION */}
-                {/* ========================================== */}
+                {}
+                {}
+                {}
                 <section className="relative min-h-[600px] md:min-h-[00px] flex items-center max-w-[1400px] mx-auto overflow-hidden">
-                    {/* Background Container with curved edges */}
+                    {}
                     <div className="absolute inset-5 md:inset-4 rounded-[2rem] md:rounded-[3rem] overflow-hidden">
                         <img
                             className="absolute inset-0 w-full h-full object-cover"
                             src={heroImage}
                             alt="RuangKopi suasana cafe"
                         />
-                        {/* Dark gradient overlay for text readability */}
+                        {}
                         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
                     </div>
 
-                    {/* Content Container */}
+                    {}
                     <div className="relative z-10 max-w-[1200px] mx-auto w-full px-12 md:px-10 flex flex-col justify-center pb-20 md:pb-36 h-full min-h-[600px] md:min-h-[800px] ">
-                        {/* Hero Content - directly on image */}
+                        {}
                         <motion.div
                             initial="hidden"
                             animate="visible"
                             variants={staggerContainer}
                             className="max-w-2xl"
                         >
-                            {/* Badge */}
+                            {}
                             <motion.div variants={fadeInUp} custom={0} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/30 backdrop-blur-sm bg-white/10 text-xs font-medium text-white/90 mb-10">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[#D7CCC8] animate-pulse"></span>
                                 Specialty Coffee
                             </motion.div>
 
-                            {/* Headline */}
+                            {}
                             <motion.div variants={fadeInUp} custom={0}>
                                 <img src='/icon-ruang-kopi-putih.png' className=' w-40 md:w-80' alt='RuangKopi Icon' />
                             </motion.div>
@@ -126,12 +124,12 @@ const Home = () => {
                                 ruang kopi
                             </motion.h1>
 
-                            {/* Subheading */}
+                            {}
                             <motion.p variants={fadeInUp} custom={2} className="text-white/70 text-xs md:text-sm max-w-md mb-8 mt-0 md:mt-5 leading-relaxed pr-20">
                                 Kopi artisanal yang diseduh dengan presisi. Temukan ritme lambat di tengah hiruk-pikuk kota.
                             </motion.p>
 
-                            {/* CTA Button */}
+                            {}
                             <motion.div variants={fadeInUp} custom={3} className="flex gap-3">
                                 <Link
                                     to="/reservation"
@@ -149,7 +147,7 @@ const Home = () => {
                             </motion.div>
 
                         </motion.div>
-                        {/* Status Widget */}
+                        {}
                         <div className="absolute bottom-10 md:bottom-24 left-9 right-9 md:left-[70px] md:right-auto z-20 flex md:inline-flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 md:scale-125 justify-center md:justify-start">
                             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white">
                                 <span className="material-symbols-outlined text-[20px]">table_restaurant</span>
@@ -168,11 +166,11 @@ const Home = () => {
                     </div>
                 </section>
 
-                {/* ========================================== */}
-                {/* KOLEKSI PILIHAN SECTION */}
-                {/* ========================================== */}
+                {}
+                {}
+                {}
                 <section className="py-5 md:py-10 px-8 md:px-8 max-w-[1200px] mx-auto bg-[#F5F0EB]">
-                    {/* Header & Filters */}
+                    {}
                     <div className="text-center mb-12">
                         <motion.h2
                             initial={{ opacity: 0, y: 20 }}
@@ -192,7 +190,7 @@ const Home = () => {
                             Jelajahi biji kopi terbaik dan peralatan seduh pilihan kami untuk menyempurnakan ritual kopi Anda di rumah.
                         </motion.p>
 
-                        {/* Filter Buttons */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -212,7 +210,7 @@ const Home = () => {
                         </motion.div>
                     </div>
 
-                    {/* Bento Grid */}
+                    {}
                     {isLoading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div className="lg:col-span-1 rounded-2xl bg-[#E0D8D0] animate-pulse h-[500px]"></div>
@@ -225,7 +223,7 @@ const Home = () => {
                     ) : menuItems.length > 0 ? (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
 
-                            {/* Left Large Card */}
+                            {}
                             {menuItems[0] && (
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
@@ -260,7 +258,7 @@ const Home = () => {
                                 </motion.div>
                             )}
 
-                            {/* Right 2x2 Grid */}
+                            {}
                             <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 {menuItems.slice(1, 5).map((item, index) => (
                                     <motion.div
@@ -300,15 +298,15 @@ const Home = () => {
                     )}
                 </section>
 
-                {/* ========================================== */}
-                {/* STORY SECTION — "Kisah Kami" */}
-                {/* ========================================== */}
+                {}
+                {}
+                {}
                 <section className="py-section-gap px-margin-mobile md:px-margin-desktop bg-[#EDE8E3] relative overflow-hidden">
-                    {/* Decorative blur blob */}
+                    {}
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-secondary-container/30 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
 
                     <div className="max-w-[1200px] mx-auto flex flex-col md:flex-row items-center gap-16 relative z-10">
-                        {/* Text Content */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
                             whileInView={{ opacity: 1, x: 0 }}
@@ -322,7 +320,7 @@ const Home = () => {
                                 <p>Kami bekerja sama langsung dengan petani lokal untuk memastikan setiap biji yang kami sangrai membawa cerita dari tanah tempatnya tumbuh, disajikan dengan kesederhanaan dan presisi.</p>
                             </div>
 
-                            {/* Rating */}
+                            {}
                             <div className="flex items-center gap-4 pt-4">
                                 <div className="flex text-[#3E2723]">
                                     {[...Array(4)].map((_, i) => (
@@ -333,7 +331,7 @@ const Home = () => {
                                 <span className="font-body text-label-sm text-[#6D4C41]">4.9/5 dari 500+ Ulasan</span>
                             </div>
 
-                            {/* CTA */}
+                            {}
                             <div className="pt-4">
                                 <Link
                                     to="/gallery"
@@ -345,7 +343,7 @@ const Home = () => {
                             </div>
                         </motion.div>
 
-                        {/* Image Composition */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0, x: 30 }}
                             whileInView={{ opacity: 1, x: 0 }}
@@ -353,7 +351,7 @@ const Home = () => {
                             transition={{ duration: 0.6, delay: 0.2 }}
                             className="w-full md:w-1/2 relative min-h-[400px] md:min-h-[500px]"
                         >
-                            {/* Image 1 (Front, slightly smaller) */}
+                            {}
                             <div className="absolute bottom-0 left-0 w-3/5 md:w-2/3 rounded-2xl overflow-hidden shadow-2xl z-20 border-4 border-[#EDE8E3] transition-transform hover:scale-105 duration-500">
                                 <img
                                     className="w-full h-full object-cover aspect-square"
@@ -361,7 +359,7 @@ const Home = () => {
                                     alt="Barista menyeduh espresso"
                                 />
                             </div>
-                            {/* Image 2 (Back, larger) */}
+                            {}
                             <div className="absolute top-0 right-0 w-3/4 rounded-2xl overflow-hidden shadow-xl z-10 transition-transform hover:scale-[1.02] duration-500">
                                 <img
                                     className="w-full h-full object-cover aspect-[4/3] opacity-90"
@@ -373,9 +371,9 @@ const Home = () => {
                     </div>
                 </section>
 
-                {/* ========================================== */}
-                {/* OUR SPACE SECTION */}
-                {/* ========================================== */}
+                {}
+                {}
+                {}
                 <section className="py-20 md:py-28 px-4 md:px-8 max-w-[1400px] mx-auto bg-[#F5F0EB]">
                     <div className="text-center mb-12">
                         <motion.h2
@@ -417,7 +415,7 @@ const Home = () => {
                                 );
                             })
                         ) : (
-                            /* Fallback images if API is empty */
+
                             <>
                                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-[2rem] overflow-hidden shadow-sm h-[300px] md:h-[400px]">
                                     <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80" alt="Space 1" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" />

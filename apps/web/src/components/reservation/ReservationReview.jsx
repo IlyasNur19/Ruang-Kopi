@@ -14,7 +14,7 @@ const ReservationReview = ({ formData, selectedTable, cartItems = [], paymentTyp
 
     return (
         <div className="space-y-6">
-            {/* Header */}
+            {}
             <div className="text-center">
                 <div className="w-16 h-16 bg-[#3E2723]/10 rounded-full flex items-center justify-center mx-auto mb-3">
                     <Check size={32} className="text-[#3E2723]" />
@@ -23,7 +23,7 @@ const ReservationReview = ({ formData, selectedTable, cartItems = [], paymentTyp
                 <p className="text-sm text-[#6D4C41] mt-1">Pastikan data berikut sudah benar</p>
             </div>
 
-            {/* Details */}
+            {}
             <div className="bg-[#F5F0EB] rounded-2xl p-5 space-y-3">
                 <div className="flex items-center gap-3 text-sm">
                     <User size={16} className="text-[#6D4C41] shrink-0" />
@@ -57,7 +57,7 @@ const ReservationReview = ({ formData, selectedTable, cartItems = [], paymentTyp
                 </div>
             </div>
 
-            {/* Pre-Order Items (if any) */}
+            {}
             {cartItems.length > 0 && (
                 <div className="bg-white rounded-2xl p-5 border border-[#3E2723]/10 space-y-3">
                     <div className="flex items-center gap-2">
@@ -84,10 +84,10 @@ const ReservationReview = ({ formData, selectedTable, cartItems = [], paymentTyp
                 </div>
             )}
 
-            {/* Payment Method Selector + Summary */}
+            {}
             {hasPreOrder ? (
                 <div className="space-y-3">
-                    {/* Payment Method Toggle */}
+                    {}
                     <div className="bg-white rounded-2xl p-1 border border-[#3E2723]/10 grid grid-cols-2 gap-1">
                         <button
                             type="button"
@@ -119,7 +119,7 @@ const ReservationReview = ({ formData, selectedTable, cartItems = [], paymentTyp
                         </button>
                     </div>
 
-                    {/* Summary */}
+                    {}
                     <div className="bg-[#FFF8E1] rounded-2xl p-4 border border-amber-200 space-y-2">
                         <div className="flex items-start gap-2">
                             <CreditCard size={18} className="text-amber-600 shrink-0 mt-0.5" />
@@ -167,7 +167,7 @@ const ReservationReview = ({ formData, selectedTable, cartItems = [], paymentTyp
                 </div>
             )}
 
-            {/* Actions */}
+            {}
             <div className="flex flex-col gap-3">
                 <button
                     onClick={onConfirm}

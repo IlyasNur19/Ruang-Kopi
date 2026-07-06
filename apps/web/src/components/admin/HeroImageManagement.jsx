@@ -35,7 +35,6 @@ const HeroImageManagement = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validate file
         if (!file.type.startsWith('image/')) {
             setError('Please select an image file');
             return;
@@ -49,11 +48,10 @@ const HeroImageManagement = () => {
             setUploading(true);
             setError(null);
 
-            // Upload to Cloudinary
             const uploadResult = await uploadApi.upload(file);
 
             if (uploadResult && uploadResult.url) {
-                // Save to settings
+
                 setSaving(true);
                 await settingsApi.updateHeroImage(uploadResult.url);
                 setHeroImage(uploadResult.url);
@@ -73,7 +71,7 @@ const HeroImageManagement = () => {
 
         try {
             setSaving(true);
-            // Reset to default image
+
             const defaultImage = 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80';
             await settingsApi.updateHeroImage(defaultImage);
             setHeroImage(defaultImage);
@@ -120,7 +118,7 @@ const HeroImageManagement = () => {
             <Card className="border-none shadow-sm">
                 <CardContent className="p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Preview */}
+                        {}
                         <div>
                             <h3 className="font-medium mb-3 text-foreground">Preview</h3>
                             <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100">
@@ -141,7 +139,7 @@ const HeroImageManagement = () => {
                             </div>
                         </div>
 
-                        {/* Upload Controls */}
+                        {}
                         <div className="flex flex-col justify-center">
                             <div className="space-y-4">
                                 <div>
@@ -191,7 +189,7 @@ const HeroImageManagement = () => {
                 </CardContent>
             </Card>
 
-            {/* Current URL */}
+            {}
             <Card className="border-none shadow-sm">
                 <CardContent className="p-4">
                     <p className="text-xs text-muted-foreground mb-1">URL Gambar Saat Ini:</p>

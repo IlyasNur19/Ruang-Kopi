@@ -16,7 +16,7 @@ const LocationPage = () => {
             <main className="flex-grow pt-28 pb-20">
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto items-start">
-                        {/* Left - Info Panel */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0, x: -30 }}
                             animate={{ opacity: 1, x: 0 }}
@@ -27,13 +27,13 @@ const LocationPage = () => {
                                 Nikmati kopi terbaik di suasana yang tenang dan nyaman. Kami menanti kedatangan Anda.
                             </p>
 
-                            {/* Status Badge */}
+                            {}
                             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-10 ${isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                 <span className={`w-2 h-2 rounded-full ${isOpen ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
                                 <span className="text-sm font-medium">Sedang {isOpen ? 'BUKA' : 'TUTUP'}</span>
                             </div>
 
-                            {/* Info Items */}
+                            {}
                             <div className="space-y-6">
                                 <div className="flex items-start gap-4">
                                     <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-primary shadow-sm flex-shrink-0">
@@ -66,7 +66,7 @@ const LocationPage = () => {
                                 </div>
                             </div>
 
-                            {/* Action Buttons */}
+                            {}
                             <div className="flex flex-wrap gap-4 mt-10">
                                 <a
                                     href="https://maps.app.goo.gl/iF77DJP89R5hARrQ6"
@@ -85,7 +85,7 @@ const LocationPage = () => {
                             </div>
                         </motion.div>
 
-                        {/* Right - Map Panel */}
+                        {}
                         <motion.div
                             initial={{ opacity: 0, x: 30 }}
                             animate={{ opacity: 1, x: 0 }}

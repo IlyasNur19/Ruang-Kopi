@@ -4,17 +4,15 @@ import { transaksi, detailTransaksi } from '../db/schema.js';
 import { desc, sql, inArray, and, gte, lte } from 'drizzle-orm';
 
 export const dashboardController = {
-    // GET /api/dashboard/stats — Overall statistics (optimized with SQL aggregation)
+
     getStats: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // Get today's date at midnight
+
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            // Start of this month
             const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-            // Use SQL aggregation — push computation to the database, not Node.js memory
             const todayResult = await db
                 .select({
                     count: sql<number>`CAST(COUNT(*) AS INTEGER)`,
@@ -66,12 +64,10 @@ export const dashboardController = {
         }
     },
 
-    // GET /api/dashboard/revenue-daily — Daily revenue for chart (optimized with SQL GROUP BY)
     getRevenueDaily: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { startDate, endDate, days } = req.query;
 
-            // Default to last 7 days
             const end = endDate
                 ? new Date(endDate as string)
                 : new Date();
@@ -82,7 +78,6 @@ export const dashboardController = {
                 : new Date(end.getTime() - (parseInt(days as string) || 7) * 24 * 60 * 60 * 1000);
             start.setHours(0, 0, 0, 0);
 
-            // Convert UTC to local Asia/Jakarta timezone for correct grouping
             const rows = await db
                 .select({
                     date: sql<string>`TO_CHAR((${transaksi.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD')`,
@@ -98,16 +93,14 @@ export const dashboardController = {
                 .groupBy(sql`TO_CHAR((${transaksi.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD')`)
                 .orderBy(sql`TO_CHAR((${transaksi.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD')`);
 
-            // Build a map of existing results
             const revenueMap = new Map<string, number>();
             rows.forEach((row) => {
                 revenueMap.set(row.date, row.revenue);
             });
 
-            // Fill in missing dates with 0
             const dailyRevenue: { date: string; revenue: number }[] = [];
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                // Use local timezone formatting to prevent UTC offset bugs
+
                 const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
                 dailyRevenue.push({
                     date: dateKey,
@@ -121,10 +114,9 @@ export const dashboardController = {
         }
     },
 
-    // GET /api/dashboard/revenue-by-type — Revenue by order type (optimized with SQL GROUP BY)
     getRevenueByType: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // Single query grouped by order type
+
             const byTypeRows = await db
                 .select({
                     type: transaksi.tipePesanan,
@@ -133,7 +125,6 @@ export const dashboardController = {
                 .from(transaksi)
                 .groupBy(transaksi.tipePesanan);
 
-            // Single query grouped by payment method
             const byPaymentRows = await db
                 .select({
                     method: transaksi.paymentMethod,
@@ -142,7 +133,6 @@ export const dashboardController = {
                 .from(transaksi)
                 .groupBy(transaksi.paymentMethod);
 
-            // Build result maps
             const typeMap: Record<string, number> = { dine_in: 0, take_away: 0, online: 0 };
             byTypeRows.forEach((row) => {
                 if (typeMap.hasOwnProperty(row.type)) {
@@ -173,12 +163,10 @@ export const dashboardController = {
         }
     },
 
-    // GET /api/dashboard/recent-transactions — Recent transactions with items (optimized: single batch query)
     getRecentTransactions: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const limit = parseInt(req.query.limit as string) || 10;
 
-            // 1. Fetch recent transactions
             const recentTransaksi = await db
                 .select()
                 .from(transaksi)
@@ -190,7 +178,6 @@ export const dashboardController = {
                 return;
             }
 
-            // 2. Single batch query to get ALL items for ALL recent transactions
             const transaksiIds: number[] = recentTransaksi
                 .map((t) => t.id)
                 .filter((id): id is number => id !== null);
@@ -202,7 +189,6 @@ export const dashboardController = {
                     .where(inArray(detailTransaksi.transaksiId, transaksiIds))
                 : [];
 
-            // 3. Group items by transaction ID in memory (fast, single pass)
             const itemsByTransaksiId = new Map<number, typeof allItems>();
             allItems.forEach((item) => {
                 const tid = item.transaksiId;
@@ -215,7 +201,6 @@ export const dashboardController = {
                 }
             });
 
-            // 4. Merge
             const result = recentTransaksi.map((t) => ({
                 ...t,
                 items: itemsByTransaksiId.get(t.id) || [],

@@ -19,7 +19,7 @@ const TableSelectionStep = ({ selectedTable, onSelect, date, time }) => {
                     return;
                 }
                 const data = await reservationsApi.getAvailableTables(date, time);
-                // API returns { available: [...], total, availableCount }
+
                 setTables(data?.available || []);
             } catch (err) {
                 console.error('Failed to fetch available tables:', err);

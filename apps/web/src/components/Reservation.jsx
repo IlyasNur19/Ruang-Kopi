@@ -17,7 +17,7 @@ const Reservation = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         const { name, date, time, guests } = formData;
-        const phone = '6281234567890'; // Replace with actual number
+        const phone = '6281234567890';
         const message = `Halo RuangKopi, saya ingin reservasi.%0A%0ANama: ${name}%0ATanggal: ${date}%0AJam: ${time}%0AJumlah: ${guests} orang%0A%0AMohon konfirmasinya. Terima kasih.`;
 
         window.open(`https://wa.me/${phone}?text=${message}`, '_blank');

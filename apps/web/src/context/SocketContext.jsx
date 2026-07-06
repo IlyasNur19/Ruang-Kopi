@@ -57,9 +57,6 @@ export function SocketProvider({ children }) {
             setIsConnected(true);
         });
 
-        // ========== Application Events ==========
-
-        // Table status updated by another client or server
         socket.on('table:update', (data) => {
             const { tableId, status } = data;
             if (tableId && status) {
@@ -67,14 +64,12 @@ export function SocketProvider({ children }) {
             }
         });
 
-        // All tables status (initial load or full refresh)
         socket.on('tables:refresh', (tables) => {
             if (Array.isArray(tables)) {
                 setTables(tables);
             }
         });
 
-        // New transaction (POS checkout) notification for admin
         socket.on('new-transaction', (transaction) => {
             addNotification({
                 type: 'transaction',
@@ -84,7 +79,6 @@ export function SocketProvider({ children }) {
             });
         });
 
-        // New reservation created online — notification for admin
         socket.on('new:reservation', (reservation) => {
             addNotification({
                 type: 'reservation',
@@ -94,7 +88,6 @@ export function SocketProvider({ children }) {
             });
         });
 
-        // New Kotak Gagasan idea submitted — notification for admin
         socket.on('new:idea', (idea) => {
             addNotification({
                 type: 'idea',
@@ -104,7 +97,6 @@ export function SocketProvider({ children }) {
             });
         });
 
-        // Payment confirmed via webhook
         socket.on('payment:confirmed', (data) => {
             console.log('[Socket] Payment confirmed:', data);
             if (data.tableId) {
@@ -128,9 +120,6 @@ export function SocketProvider({ children }) {
         };
     }, [connect]);
 
-    /**
-     * Emit event: kasir occupies a table for walk-in
-     */
     const occupyTable = useCallback((tableId) => {
         if (socketRef.current?.connected) {
             socketRef.current.emit('table:occupy', { tableId });
@@ -138,9 +127,6 @@ export function SocketProvider({ children }) {
         }
     }, [updateTableStatus]);
 
-    /**
-     * Emit event: kasir releases a table (walk-in done/cancelled)
-     */
     const releaseTable = useCallback((tableId) => {
         if (socketRef.current?.connected) {
             socketRef.current.emit('table:release', { tableId });

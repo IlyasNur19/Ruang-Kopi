@@ -2,7 +2,6 @@ import { Router } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
 
-// Controllers
 import { authController } from '../controllers/auth.controller.js';
 import { categoryController } from '../controllers/category.controller.js';
 import { menuController } from '../controllers/menu.controller.js';
@@ -16,15 +15,10 @@ import { transaksiController } from '../controllers/transaksi.controller.js';
 import { dashboardController } from '../controllers/dashboard.controller.js';
 import { paymentController } from '../controllers/payment.controller.js';
 
-// Middleware
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
 
 const router = Router();
-
-// ================================
-// Validation Schemas
-// ================================
 
 const loginSchema = z.object({
     email: z.string().email('Valid email is required'),
@@ -101,7 +95,6 @@ const updateIdeaSchema = z.object({
     status: z.enum(['Baru', 'Dibaca', 'Diproses', 'Selesai']).optional(),
 });
 
-// Meja schemas
 const createMejaSchema = z.object({
     nomor_meja: z.string().min(1, 'Nomor meja harus diisi'),
     kapasitas: z.number().min(1, 'Kapasitas minimal 1').optional(),
@@ -114,7 +107,6 @@ const updateMejaSchema = z.object({
     status: z.enum(['tersedia', 'direservasi', 'terisi']).optional(),
 });
 
-// Transaksi schemas
 const createTransaksiSchema = z.object({
     items: z.array(z.object({
         menuId: z.number(),
@@ -137,10 +129,6 @@ const createTransaksiSchema = z.object({
     change: z.number(),
 });
 
-// ================================
-// Multer Configuration for Upload
-// ================================
-
 const storage = multer.memoryStorage();
 const upload = multer({
     storage,
@@ -154,24 +142,12 @@ const upload = multer({
     },
 });
 
-// ================================
-// Auth Routes
-// ================================
-
 router.post('/auth/login', validate(loginSchema), authController.login);
 router.get('/auth/me', authMiddleware, authController.getMe);
-
-// ================================
-// Category Routes
-// ================================
 
 router.get('/categories', categoryController.getAll);
 router.post('/categories', authMiddleware, validate(categorySchema), categoryController.create);
 router.delete('/categories/:id', authMiddleware, categoryController.delete);
-
-// ================================
-// Menu Routes
-// ================================
 
 router.get('/menu', menuController.getAll);
 router.get('/menu/:id', menuController.getById);
@@ -179,19 +155,11 @@ router.post('/menu', authMiddleware, validate(menuItemSchema), menuController.cr
 router.put('/menu/:id', authMiddleware, validate(menuItemSchema.partial()), menuController.update);
 router.delete('/menu/:id', authMiddleware, menuController.delete);
 
-// ================================
-// Gallery Routes
-// ================================
-
 router.get('/gallery', galleryController.getAll);
 router.post('/gallery', authMiddleware, validate(galleryImageSchema), galleryController.create);
 router.put('/gallery/reorder', authMiddleware, validate(reorderSchema), galleryController.reorder);
 router.put('/gallery/:id', authMiddleware, validate(galleryImageSchema.partial()), galleryController.update);
 router.delete('/gallery/:id', authMiddleware, galleryController.delete);
-
-// ================================
-// Reservation Routes
-// ================================
 
 router.get('/reservations/available-tables', reservationController.getAvailableTables);
 router.get('/reservations', authMiddleware, reservationController.getAll);
@@ -200,10 +168,6 @@ router.post('/reservations', validate(createReservationSchema), reservationContr
 router.put('/reservations/:id', authMiddleware, validate(updateReservationSchema), reservationController.update);
 router.delete('/reservations/:id', authMiddleware, reservationController.delete);
 
-// ================================
-// Settings Routes
-// ================================
-
 router.get('/settings/status', settingsController.getStatus);
 router.put('/settings/status', authMiddleware, validate(statusSchema), settingsController.updateStatus);
 router.get('/settings/space-images', settingsController.getSpaceImages);
@@ -211,25 +175,13 @@ router.put('/settings/space-images', authMiddleware, validate(spaceImagesSchema)
 router.get('/settings/hero-image', settingsController.getHeroImage);
 router.put('/settings/hero-image', authMiddleware, settingsController.updateHeroImage);
 
-// ================================
-// Upload Routes
-// ================================
-
 router.post('/upload', authMiddleware, upload.single('image'), uploadController.upload);
 router.delete('/upload/:publicId(*)', authMiddleware, uploadController.delete);
-
-// ================================
-// Ideas Routes
-// ================================
 
 router.get('/ideas', authMiddleware, ideasController.getAll);
 router.post('/ideas', validate(createIdeaSchema), ideasController.create);
 router.put('/ideas/:id', authMiddleware, validate(updateIdeaSchema), ideasController.update);
 router.delete('/ideas/:id', authMiddleware, ideasController.delete);
-
-// ================================
-// Meja Routes
-// ================================
 
 router.get('/meja', mejaController.getAll);
 router.get('/meja/status', mejaController.getStatus);
@@ -238,10 +190,6 @@ router.post('/meja', authMiddleware, validate(createMejaSchema), mejaController.
 router.put('/meja/:id', authMiddleware, validate(updateMejaSchema), mejaController.update);
 router.delete('/meja/:id', authMiddleware, mejaController.delete);
 
-// ================================
-// Transaksi Routes
-// ================================
-
 router.get('/transaksi', authMiddleware, transaksiController.getAll);
 router.get('/transaksi/recent', authMiddleware, transaksiController.getRecent);
 router.get('/transaksi/summary', authMiddleware, transaksiController.getSummary);
@@ -249,20 +197,11 @@ router.get('/transaksi/:id', authMiddleware, transaksiController.getById);
 router.post('/transaksi', authMiddleware, validate(createTransaksiSchema), transaksiController.create);
 router.put('/transaksi/:id/cancel', authMiddleware, transaksiController.cancel);
 
-// ================================
-// Dashboard Routes
-// ================================
-
 router.get('/dashboard/stats', authMiddleware, dashboardController.getStats);
 router.get('/dashboard/revenue-daily', authMiddleware, dashboardController.getRevenueDaily);
 router.get('/dashboard/revenue-by-type', authMiddleware, dashboardController.getRevenueByType);
 router.get('/dashboard/recent-transactions', authMiddleware, dashboardController.getRecentTransactions);
 
-// ================================
-// Payment Routes (Midtrans Integration)
-// ================================
-
-// Payment validation schema
 const createPaymentSchema = z.object({
     reservationId: z.number().optional().nullable(),
     transaksiId: z.number().optional().nullable(),
@@ -280,12 +219,10 @@ const createPaymentSchema = z.object({
     })).optional(),
 });
 
-// Public routes (no auth required)
 router.post('/payment/snap-token', validate(createPaymentSchema), paymentController.createSnapToken);
-router.post('/payment/webhook', paymentController.webhook); // Called by Midtrans server
-router.get('/payment/status/:orderId', paymentController.getStatus); // Public status check
+router.post('/payment/webhook', paymentController.webhook);
+router.get('/payment/status/:orderId', paymentController.getStatus);
 
-// Authenticated routes
 router.get('/payment/by-reservation/:reservationId', authMiddleware, paymentController.getByReservation);
 router.get('/payment/all', authMiddleware, paymentController.getAll);
 

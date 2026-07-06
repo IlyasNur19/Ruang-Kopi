@@ -6,7 +6,6 @@ import bcrypt from 'bcryptjs';
 async function seed() {
     console.log('🌱 Seeding database...');
 
-    // Seed categories
     console.log('📁 Seeding categories...');
     const categoryData = [
         { name: 'Kopi', slug: 'kopi' },
@@ -19,7 +18,6 @@ async function seed() {
         await db.insert(categories).values(category).onConflictDoNothing();
     }
 
-    // Seed menu items
     console.log('☕ Seeding menu items...');
     const menuData = [
         { name: 'Espresso', price: 25000, categoryId: 1, description: 'Rich, full-bodied shot of pure Arabica goodness.', image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&q=80', available: true },
@@ -36,7 +34,6 @@ async function seed() {
         await db.insert(menuItems).values(item).onConflictDoNothing();
     }
 
-    // Seed gallery images
     console.log('🖼️ Seeding gallery images...');
     const galleryData = [
         { src: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80', category: 'Coffee', span: 'row-span-2', order: 1 },
@@ -54,7 +51,6 @@ async function seed() {
         await db.insert(galleryImages).values(image).onConflictDoNothing();
     }
 
-    // Seed admin user
     console.log('👤 Seeding admin user...');
     const hashedPassword = await bcrypt.hash('admin123', 10);
     await db.insert(users).values({
@@ -64,7 +60,6 @@ async function seed() {
         role: 'admin',
     }).onConflictDoNothing();
 
-    // Seed meja (tables) for POS system
     console.log('🪑 Seeding tables...');
     const mejaData = [
         { nomor_meja: 'A1', kapasitas: 2, status: 'tersedia' },
@@ -85,7 +80,6 @@ async function seed() {
         await db.insert(meja).values(table).onConflictDoNothing();
     }
 
-    // Seed shop settings
     console.log('⚙️ Seeding shop settings...');
     await db.insert(shopSettings).values({
         key: 'status',

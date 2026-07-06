@@ -50,7 +50,7 @@ const TableMapModal = () => {
                 exit={{ scale: 0.9, opacity: 0 }}
                 className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col"
             >
-                {/* Header */}
+                {}
                 <div className="p-6 border-b border-[#3E2723]/10 flex items-center justify-between">
                     <div>
                         <h2 className="text-xl font-bold text-[#3E2723] font-heading">Peta Meja</h2>
@@ -66,7 +66,7 @@ const TableMapModal = () => {
                     </button>
                 </div>
 
-                {/* Legend */}
+                {}
                 <div className="px-6 py-3 flex items-center gap-4 border-b border-[#3E2723]/5 bg-[#F5F0EB]/50">
                     {Object.entries(TABLE_STATUS).map(([status, config]) => (
                         <div key={status} className="flex items-center gap-1.5 text-xs">
@@ -79,7 +79,7 @@ const TableMapModal = () => {
                     </div>
                 </div>
 
-                {/* Content */}
+                {}
                 <div className="flex-1 overflow-y-auto p-6">
                     {loading ? (
                         <div className="grid grid-cols-4 gap-4">
@@ -122,7 +122,7 @@ const TableMapModal = () => {
                     )}
                 </div>
 
-                {/* Footer */}
+                {}
                 <div className="p-4 border-t border-[#3E2723]/10 flex gap-3">
                     <button
                         onClick={() => {

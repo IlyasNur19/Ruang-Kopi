@@ -1,6 +1,3 @@
-// ================================
-// API Response Types
-// ================================
 export interface ApiResponse<T> {
     success: boolean;
     data?: T;
@@ -17,9 +14,6 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
     };
 }
 
-// ================================
-// Menu Types
-// ================================
 export interface MenuItem {
     id: number;
     name: string;
@@ -45,9 +39,6 @@ export interface CreateMenuItemDto {
 
 export interface UpdateMenuItemDto extends Partial<CreateMenuItemDto> { }
 
-// ================================
-// Gallery Types
-// ================================
 export interface GalleryItem {
     id: number;
     title: string;
@@ -64,9 +55,6 @@ export interface CreateGalleryItemDto {
     category: string;
 }
 
-// ================================
-// Reservation Types
-// ================================
 export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled';
 
 export interface Reservation {
@@ -97,9 +85,6 @@ export interface UpdateReservationDto extends Partial<CreateReservationDto> {
     status?: ReservationStatus;
 }
 
-// ================================
-// Shop Settings Types
-// ================================
 export interface SocialMedia {
     instagram?: string;
     facebook?: string;
@@ -126,9 +111,6 @@ export interface UpdateShopSettingsDto {
     socialMedia?: SocialMedia;
 }
 
-// ================================
-// Auth Types
-// ================================
 export interface User {
     id: number;
     username: string;
@@ -147,9 +129,6 @@ export interface AuthResponse {
     token: string;
 }
 
-// ================================
-// Utility Types
-// ================================
 export type WithTimestamps<T> = T & {
     createdAt: Date;
     updatedAt: Date;

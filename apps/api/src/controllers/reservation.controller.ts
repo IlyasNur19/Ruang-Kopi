@@ -5,7 +5,7 @@ import { eq, desc, and, inArray } from 'drizzle-orm';
 import { emitNewReservation, emitTableUpdate } from '../services/socket.service.js';
 
 export const reservationController = {
-    // GET /api/reservations — Admin: get all reservations (optimized: batch enrichment)
+
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const allReservations = await db
@@ -18,7 +18,6 @@ export const reservationController = {
                 return;
             }
 
-            // Collect unique IDs for batch lookup
             const mejaIds: number[] = [...new Set(
                 allReservations
                     .filter((r) => r.mejaId !== null)
@@ -30,7 +29,6 @@ export const reservationController = {
                     .map((r) => r.userId as number)
             )];
 
-            // Batch fetch all tables and users in 2 queries (instead of N×2)
             const [allMeja, allUsers] = await Promise.all([
                 mejaIds.length > 0
                     ? db.select().from(meja).where(inArray(meja.id, mejaIds))
@@ -40,11 +38,9 @@ export const reservationController = {
                     : Promise.resolve([]),
             ]);
 
-            // Build lookup maps
             const mejaMap = new Map(allMeja.map((m) => [m.id, m]));
             const userMap = new Map(allUsers.map((u) => [u.id, u]));
 
-            // Merge in memory (fast, single pass)
             const enriched = allReservations.map((r) => ({
                 ...r,
                 meja: r.mejaId ? mejaMap.get(r.mejaId) || null : null,
@@ -57,7 +53,6 @@ export const reservationController = {
         }
     },
 
-    // GET /api/reservations/:id — Get a single reservation
     getById: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -71,7 +66,6 @@ export const reservationController = {
                 return;
             }
 
-            // Enrich with table and user info
             let mejaInfo = null;
             if (reservation.mejaId) {
                 const [m] = await db.select().from(meja).where(eq(meja.id, reservation.mejaId));
@@ -89,12 +83,10 @@ export const reservationController = {
         }
     },
 
-    // POST /api/reservations — Customer creates a reservation (public)
     create: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { name, phone, date, time, guests, mejaId } = req.body;
 
-            // If mejaId is provided, check table availability
             if (mejaId) {
                 const [table] = await db.select().from(meja).where(eq(meja.id, mejaId));
 
@@ -108,7 +100,6 @@ export const reservationController = {
                     return;
                 }
 
-                // Check for existing reservations on same date/time/table
                 const [existingReservation] = await db
                     .select()
                     .from(reservations)
@@ -131,7 +122,6 @@ export const reservationController = {
                 }
             }
 
-            // Create the reservation
             const [newReservation] = await db
                 .insert(reservations)
                 .values({
@@ -146,18 +136,15 @@ export const reservationController = {
                 })
                 .returning();
 
-            // If meja is selected, lock it temporarily
             if (mejaId) {
                 await db
                     .update(meja)
                     .set({ status: 'direservasi' })
                     .where(eq(meja.id, mejaId));
 
-                // Emit real-time notification
                 emitTableUpdate(mejaId, 'direservasi');
             }
 
-            // Emit new reservation notification to POS clients
             emitNewReservation(newReservation);
 
             res.status(201).json(newReservation);
@@ -166,7 +153,6 @@ export const reservationController = {
         }
     },
 
-    // PUT /api/reservations/:id — Admin: update reservation status
     update: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -188,12 +174,11 @@ export const reservationController = {
                 .where(eq(reservations.id, id))
                 .returning();
 
-            // Handle table status changes based on reservation status
             if (updateData.status && existingReservation.mejaId) {
                 const tableId = existingReservation.mejaId;
 
                 if (updateData.status === 'batal' || updateData.status === 'selesai') {
-                    // Release the table
+
                     await db
                         .update(meja)
                         .set({ status: 'tersedia' })
@@ -201,7 +186,7 @@ export const reservationController = {
 
                     emitTableUpdate(tableId, 'tersedia');
                 } else if (updateData.status === 'dibayar') {
-                    // Confirm table lock
+
                     await db
                         .update(meja)
                         .set({ status: 'direservasi' })
@@ -211,9 +196,8 @@ export const reservationController = {
                 }
             }
 
-            // If a new mejaId is assigned
             if (updateData.mejaId && updateData.mejaId !== existingReservation.mejaId) {
-                // Release old table if exists
+
                 if (existingReservation.mejaId) {
                     await db
                         .update(meja)
@@ -223,7 +207,6 @@ export const reservationController = {
                     emitTableUpdate(existingReservation.mejaId, 'tersedia');
                 }
 
-                // Lock new table
                 await db
                     .update(meja)
                     .set({ status: 'direservasi' })
@@ -238,7 +221,6 @@ export const reservationController = {
         }
     },
 
-    // DELETE /api/reservations/:id — Admin: delete a reservation
     delete: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -253,7 +235,6 @@ export const reservationController = {
                 return;
             }
 
-            // Release the table if reserved
             if (existingReservation.mejaId) {
                 await db
                     .update(meja)
@@ -271,7 +252,6 @@ export const reservationController = {
         }
     },
 
-    // GET /api/reservations/available-tables — Public: get available tables for a date/time
     getAvailableTables: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { date, time } = req.query;
@@ -281,10 +261,8 @@ export const reservationController = {
                 return;
             }
 
-            // Get all tables
             const allTables = await db.select().from(meja);
 
-            // Get reservations for given date/time that are not cancelled/completed
             const activeReservations = await db
                 .select()
                 .from(reservations)
@@ -295,7 +273,6 @@ export const reservationController = {
                     )
                 );
 
-            // Filter out tables that are reserved or occupied
             const reservedMejaIds = new Set(
                 activeReservations
                     .filter((r) => !['batal', 'selesai'].includes(r.status))

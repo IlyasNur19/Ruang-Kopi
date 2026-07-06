@@ -154,7 +154,7 @@ const SpaceImagesManagement = () => {
                                 </div>
                             )}
 
-                            {/* Overlay buttons */}
+                            {}
                             <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
                                 <input
                                     ref={(el) => fileInputRefs.current[index] = el}
@@ -210,7 +210,7 @@ const SpaceImagesManagement = () => {
                     </Card>
                 ))}
 
-                {/* Add New Image Card */}
+                {}
                 <Card
                     className="border-2 border-dashed border-gray-200 hover:border-[#8D6E63] transition-colors cursor-pointer"
                     onClick={handleAddImage}

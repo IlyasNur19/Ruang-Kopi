@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken, JWTPayload } from '../utils/jwt.js';
 
-// Extend Express Request to include user
 declare global {
     namespace Express {
         interface Request {
@@ -30,7 +29,6 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     next();
 }
 
-// Optional auth - doesn't fail if no token, just doesn't set user
 export function optionalAuthMiddleware(req: Request, res: Response, next: NextFunction) {
     const authHeader = req.headers.authorization;
 

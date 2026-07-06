@@ -4,7 +4,7 @@ import { menuItems, categories, detailTransaksi } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 
 export const menuController = {
-    // GET /api/menu
+
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const items = await db
@@ -28,7 +28,6 @@ export const menuController = {
         }
     },
 
-    // GET /api/menu/:id
     getById: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -59,7 +58,6 @@ export const menuController = {
         }
     },
 
-    // POST /api/menu
     create: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { name, description, price, image, categoryId, available } = req.body;
@@ -82,7 +80,6 @@ export const menuController = {
         }
     },
 
-    // PUT /api/menu/:id
     update: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -105,13 +102,10 @@ export const menuController = {
         }
     },
 
-    // DELETE /api/menu/:id
     delete: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
 
-            // Remove foreign key references in detail_transaksi before deleting the menu item
-            // This prevents the "violates foreign key constraint" error
             await db
                 .update(detailTransaksi)
                 .set({ menuId: null })

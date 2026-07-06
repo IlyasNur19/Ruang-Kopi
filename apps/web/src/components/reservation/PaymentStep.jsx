@@ -3,7 +3,7 @@ import { Loader2, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import { loadSnapScript, openSnapPopup } from '../../lib/midtrans';
 
 const PaymentStep = ({ snapToken, onSuccess, onError, onClose }) => {
-    const [status, setStatus] = useState('loading'); // 'loading' | 'ready' | 'processing' | 'success' | 'error'
+    const [status, setStatus] = useState('loading');
     const [errorMsg, setErrorMsg] = useState(null);
 
     useEffect(() => {
@@ -18,7 +18,6 @@ const PaymentStep = ({ snapToken, onSuccess, onError, onClose }) => {
                 await loadSnapScript();
                 setStatus('ready');
 
-                // Auto-open popup
                 setTimeout(() => {
                     setStatus('processing');
                     openSnapPopup(snapToken, {
@@ -28,7 +27,7 @@ const PaymentStep = ({ snapToken, onSuccess, onError, onClose }) => {
                         },
                         onPending: (result) => {
                             console.log('Payment pending:', result);
-                            // Consider pending as potentially successful
+
                             setStatus('success');
                             onSuccess?.(result);
                         },
@@ -38,7 +37,7 @@ const PaymentStep = ({ snapToken, onSuccess, onError, onClose }) => {
                             onError?.(result);
                         },
                         onClose: () => {
-                            // If popup closed without finishing
+
                             if (status !== 'success') {
                                 onClose?.();
                             }

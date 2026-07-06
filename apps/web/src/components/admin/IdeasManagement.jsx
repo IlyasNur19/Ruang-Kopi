@@ -13,7 +13,6 @@ const IdeasManagement = () => {
     const [topicFilter, setTopicFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Detail modal state
     const [selectedIdea, setSelectedIdea] = useState(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [updatingStatus, setUpdatingStatus] = useState(false);
@@ -63,7 +62,7 @@ const IdeasManagement = () => {
             setIdeas(prev => prev.map(idea =>
                 idea.id === id ? { ...idea, status: newStatus } : idea
             ));
-            // Update selected idea if in modal
+
             if (selectedIdea?.id === id) {
                 setSelectedIdea(prev => ({ ...prev, status: newStatus }));
             }
@@ -112,7 +111,6 @@ const IdeasManagement = () => {
         selesai: ideas.filter(i => i.status === 'Selesai').length,
     };
 
-    // Detail Modal Component
     const DetailModal = () => {
         if (!selectedIdea) return null;
 
@@ -133,7 +131,7 @@ const IdeasManagement = () => {
                     className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
                     onClick={e => e.stopPropagation()}
                 >
-                    {/* Header */}
+                    {}
                     <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white">
                         <h3 className="font-heading text-xl font-bold text-[#3E2723]">Detail Feedback</h3>
                         <button
@@ -145,7 +143,7 @@ const IdeasManagement = () => {
                     </div>
 
                     <div className="p-6 space-y-6">
-                        {/* Topic & Status Badges */}
+                        {}
                         <div className="flex flex-wrap gap-2">
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${topicColors[idea.topic] || 'bg-gray-100'}`}>
                                 {idea.topic}
@@ -155,7 +153,7 @@ const IdeasManagement = () => {
                             </span>
                         </div>
 
-                        {/* Info Cards */}
+                        {}
                         <div className="space-y-4">
                             <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
                                 <User size={20} className="text-[#3E2723] mt-0.5" />
@@ -192,14 +190,14 @@ const IdeasManagement = () => {
                             </div>
                         </div>
 
-                        {/* Timestamp */}
+                        {}
                         <p className="text-sm text-muted-foreground text-center">
                             Dikirim pada {new Date(idea.createdAt).toLocaleDateString('id-ID', {
                                 day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
                             })}
                         </p>
 
-                        {/* Update Status */}
+                        {}
                         <div>
                             <p className="text-sm font-medium text-[#3E2723] mb-3">Update Status</p>
                             <div className="grid grid-cols-2 gap-2">
@@ -225,7 +223,7 @@ const IdeasManagement = () => {
                             </div>
                         </div>
 
-                        {/* Actions */}
+                        {}
                         <div className="flex gap-3 pt-4 border-t">
                             <Button
                                 variant="destructive"
@@ -260,7 +258,7 @@ const IdeasManagement = () => {
                 <p className="text-muted-foreground">Kelola masukan dan ide dari pelanggan.</p>
             </div>
 
-            {/* Stats */}
+            {}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="border-none shadow-sm">
                     <CardContent className="p-4 flex items-center gap-3">
@@ -308,7 +306,7 @@ const IdeasManagement = () => {
                 </Card>
             </div>
 
-            {/* Filters */}
+            {}
             <div className="flex flex-col gap-4 p-4 bg-white rounded-xl border shadow-sm">
                 <div className="flex items-center gap-2">
                     <Filter size={18} className="text-muted-foreground" />
@@ -316,7 +314,7 @@ const IdeasManagement = () => {
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4">
-                    {/* Search */}
+                    {}
                     <div className="relative flex-1">
                         <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <input
@@ -328,7 +326,7 @@ const IdeasManagement = () => {
                         />
                     </div>
 
-                    {/* Topic Filter */}
+                    {}
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground whitespace-nowrap">Topik:</span>
                         <div className="relative">
@@ -345,7 +343,7 @@ const IdeasManagement = () => {
                         </div>
                     </div>
 
-                    {/* Status Filter */}
+                    {}
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground whitespace-nowrap">Status:</span>
                         <div className="relative">
@@ -364,13 +362,13 @@ const IdeasManagement = () => {
                     </div>
                 </div>
 
-                {/* Results count */}
+                {}
                 <p className="text-sm text-muted-foreground">
                     Menampilkan {filteredIdeas.length} dari {ideas.length} gagasan
                 </p>
             </div>
 
-            {/* Ideas List */}
+            {}
             {error && (
                 <div className="p-4 bg-red-50 text-red-600 rounded-lg">{error}</div>
             )}
@@ -429,7 +427,7 @@ const IdeasManagement = () => {
                 </div>
             )}
 
-            {/* Detail Modal */}
+            {}
             <AnimatePresence>
                 {showDetailModal && <DetailModal />}
             </AnimatePresence>

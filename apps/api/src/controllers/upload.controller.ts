@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -9,7 +8,7 @@ cloudinary.config({
 });
 
 export const uploadController = {
-    // POST /api/upload
+
     upload: async (req: Request, res: Response, next: NextFunction) => {
         try {
             if (!req.file) {
@@ -49,7 +48,6 @@ export const uploadController = {
         }
     },
 
-    // DELETE /api/upload/:publicId
     delete: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const publicId = req.params.publicId;

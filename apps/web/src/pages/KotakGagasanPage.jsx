@@ -60,7 +60,7 @@ const KotakGagasanPage = () => {
             <Navbar />
             <main className="flex-grow flex items-center justify-center py-10 px-4">
                 <div className="w-full max-w-2xl">
-                    {/* Success State */}
+                    {}
                     {submitted && !error && (
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
@@ -102,7 +102,7 @@ const KotakGagasanPage = () => {
                         </motion.div>
                     )}
 
-                    {/* Error State */}
+                    {}
                     {error && (
                         <motion.div
                             initial={{ opacity: 0 }}
@@ -125,7 +125,7 @@ const KotakGagasanPage = () => {
                         </motion.div>
                     )}
 
-                    {/* Form State */}
+                    {}
                     {!submitted && !error && (
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}

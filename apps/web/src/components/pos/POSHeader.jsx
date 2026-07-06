@@ -25,7 +25,7 @@ const POSHeader = ({ user }) => {
 
     return (
         <header className="h-16 bg-[#2D2420] text-white flex items-center justify-between px-4 lg:px-6 shrink-0 z-30">
-            {/* Left: Brand */}
+            {}
             <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-[#8D6E63] flex items-center justify-center">
                     <Coffee size={18} className="text-white" />
@@ -36,7 +36,7 @@ const POSHeader = ({ user }) => {
                 </div>
             </div>
 
-            {/* Center: Clock & Cart Info */}
+            {}
             <div className="flex items-center gap-6">
                 <div className="hidden md:flex items-center gap-2 text-[#D7CCC8] text-sm">
                     <Clock size={16} />
@@ -52,9 +52,9 @@ const POSHeader = ({ user }) => {
                 )}
             </div>
 
-            {/* Right: Actions & User */}
+            {}
             <div className="flex items-center gap-3">
-                {/* Table Map Toggle */}
+                {}
                 <button
                     onClick={toggleTableMap}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm"
@@ -63,7 +63,7 @@ const POSHeader = ({ user }) => {
                     <span className="hidden sm:inline">Peta Meja</span>
                 </button>
 
-                {/* Connection Status */}
+                {}
                 <div className="flex items-center gap-1.5">
                     {isConnected ? (
                         <Wifi size={16} className="text-green-400" />
@@ -77,7 +77,7 @@ const POSHeader = ({ user }) => {
                     )}
                 </div>
 
-                {/* User */}
+                {}
                 <div className="flex items-center gap-2 pl-3 border-l border-white/20">
                     <div className="w-8 h-8 rounded-full bg-[#5D4037] flex items-center justify-center">
                         <User size={16} className="text-white" />

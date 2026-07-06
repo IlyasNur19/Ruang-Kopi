@@ -1,8 +1,3 @@
-/**
- * Shared table data helper.
- * Tries API first; falls back to localStorage for frontend-only development.
- */
-
 const STORAGE_KEY = 'ruangkopi_meja_local';
 
 const SEED_TABLES = [
@@ -21,7 +16,7 @@ export function getLocalTables() {
             const parsed = JSON.parse(raw);
             if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
-    } catch { /* ignore */ }
+    } catch {  }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_TABLES));
     return SEED_TABLES;
 }
@@ -30,11 +25,6 @@ export function saveLocalTables(tables) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tables));
 }
 
-/**
- * Fetch tables — API first, localStorage fallback.
- * @param {Function} apiFetch - The API function to call (e.g., mejaApi.getAll)
- * @returns {Promise<{tables: Array, usingLocal: boolean}>}
- */
 export async function fetchTablesWithFallback(apiFetch) {
     try {
         const data = await apiFetch();

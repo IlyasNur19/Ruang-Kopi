@@ -26,7 +26,7 @@ const Admin = () => {
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
-        setSidebarOpen(false); // Close sidebar on mobile after selecting
+        setSidebarOpen(false);
     };
 
     const renderContent = () => {
@@ -57,7 +57,7 @@ const Admin = () => {
     return (
         <SocketProvider>
             <div className="flex min-h-screen bg-muted/40 font-sans">
-            {/* Mobile Overlay */}
+            {}
             {sidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -65,7 +65,7 @@ const Admin = () => {
                 />
             )}
 
-            {/* Sidebar */}
+            {}
             <aside className={`
                 fixed lg:static inset-y-0 left-0 z-50
                 w-64 bg-[#2D2420] text-[#D7CCC8] flex flex-col shrink-0
@@ -80,7 +80,7 @@ const Admin = () => {
                             <span className="font-sans text-[0.65rem] font-normal tracking-[0.15em] text-[#D7CCC8] mt-0.5">ADMIN DASHBOARD</span>
                         </span>
                     </div>
-                    {/* Close button for mobile */}
+                    {}
                     <button
                         onClick={() => setSidebarOpen(false)}
                         className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -117,11 +117,11 @@ const Admin = () => {
                 </div>
             </aside>
 
-            {/* Main Content */}
+            {}
             <main className="grow flex flex-col h-screen overflow-hidden w-full">
-                {/* Header */}
+                {}
                 <header className="h-[70px] bg-background border-b px-4 lg:px-8 flex justify-between items-center shrink-0">
-                    {/* Mobile Menu Button */}
+                    {}
                     <button
                         onClick={() => setSidebarOpen(true)}
                         className="lg:hidden p-2 hover:bg-muted rounded-lg transition-colors"
@@ -129,7 +129,7 @@ const Admin = () => {
                         <Menu size={24} />
                     </button>
 
-                    {/* Right side items */}
+                    {}
                     <div className="flex items-center gap-4 lg:gap-6 ml-auto">
                         <NotificationBell onNavigate={(tab) => handleTabChange(tab)} />
                         <div className="flex items-center gap-3 cursor-pointer group">

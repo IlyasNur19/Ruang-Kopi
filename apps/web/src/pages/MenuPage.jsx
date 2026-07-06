@@ -6,7 +6,6 @@ import Footer from '../components/Footer';
 import { menuApi, categoriesApi } from '../services/api';
 import { useApi } from '../hooks/useApi';
 
-// Helper to format price from number to "25K" format
 const formatPrice = (price) => {
     if (price >= 1000) {
         return `${Math.round(price / 1000)}K`;
@@ -17,19 +16,15 @@ const formatPrice = (price) => {
 const MenuPage = () => {
     const [activeCategory, setActiveCategory] = useState('All');
 
-    // Fetch menu items from API
     const { data: menuItems, loading: menuLoading, error: menuError } = useApi(menuApi.getAll);
 
-    // Fetch categories from API
     const { data: categoriesData, loading: categoriesLoading } = useApi(categoriesApi.getAll);
 
-    // Build categories array with "All" option
     const categories = useMemo(() => {
         if (!categoriesData) return ['All'];
         return ['All', ...categoriesData.map(cat => cat.name)];
     }, [categoriesData]);
 
-    // Filter items based on active category
     const filteredItems = useMemo(() => {
         if (!menuItems) return [];
         if (activeCategory === 'All') return menuItems.filter(item => item.available !== false);
@@ -43,7 +38,7 @@ const MenuPage = () => {
             <Navbar />
             <main className="flex-grow pt-10 pb-20">
                 <div className="container mx-auto px-8">
-                    {/* Page Header */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -55,7 +50,7 @@ const MenuPage = () => {
                         </p>
                     </motion.div>
 
-                    {/* Category Filter */}
+                    {}
                     <div className="flex justify-center gap-3 flex-wrap mb-12">
                         {categories.map(category => (
                             <button
@@ -71,7 +66,7 @@ const MenuPage = () => {
                         ))}
                     </div>
 
-                    {/* Loading State */}
+                    {}
                     {isLoading && (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 className="w-10 h-10 text-primary animate-spin" />
@@ -79,7 +74,7 @@ const MenuPage = () => {
                         </div>
                     )}
 
-                    {/* Error State */}
+                    {}
                     {menuError && !isLoading && (
                         <div className="text-center py-20">
                             <p className="text-red-500 mb-4">Gagal memuat menu: {menuError}</p>
@@ -92,7 +87,7 @@ const MenuPage = () => {
                         </div>
                     )}
 
-                    {/* Menu Grid */}
+                    {}
                     {!isLoading && !menuError && (
                         <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
                             <AnimatePresence>
@@ -132,14 +127,14 @@ const MenuPage = () => {
                         </motion.div>
                     )}
 
-                    {/* Empty State */}
+                    {}
                     {!isLoading && !menuError && filteredItems.length === 0 && (
                         <div className="text-center py-20">
                             <p className="text-muted-foreground">Tidak ada menu dalam kategori ini.</p>
                         </div>
                     )}
 
-                    {/* Load More - Hidden for now as we load all items */}
+                    {}
                     {!isLoading && filteredItems.length > 8 && (
                         <div className="text-center mt-12">
                             <button className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-full text-muted-foreground hover:border-primary hover:text-primary transition-colors font-medium">

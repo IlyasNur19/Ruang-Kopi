@@ -9,13 +9,10 @@ import routes from './routes/index.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Create HTTP server (required for Socket.io)
 const httpServer = http.createServer(app);
 
-// Initialize Socket.io on the HTTP server
 const io = initSocketServer(httpServer);
 
-// Middleware
 app.use(cors({
     origin: [
         'https://ruang-kopi-web.vercel.app',
@@ -28,7 +25,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Root endpoint to prevent 404 on base URL
 app.get('/', (req, res) => {
     res.json({
         message: 'Welcome to RuangKopi API',
@@ -37,7 +33,6 @@ app.get('/', (req, res) => {
     });
 });
 
-// Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
@@ -47,18 +42,14 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// API Routes (consolidated)
 app.use('/api', routes);
 
-// Error handling middleware
 app.use(errorHandler);
 
-// 404 handler
 app.use((req, res) => {
     res.status(404).json({ error: 'Endpoint not found' });
 });
 
-// Start server with Socket.io (Only if NOT in serverless environment)
 if (!process.env.VERCEL) {
     httpServer.listen(PORT, () => {
         console.log(`🚀 RuangKopi API server running on http://localhost:${PORT}`);
@@ -69,7 +60,6 @@ if (!process.env.VERCEL) {
     });
 }
 
-// Graceful shutdown
 process.on('SIGTERM', () => {
     console.log('[Server] SIGTERM received. Shutting down gracefully...');
     httpServer.close(() => {

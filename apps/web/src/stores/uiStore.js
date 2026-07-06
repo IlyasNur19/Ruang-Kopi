@@ -1,12 +1,8 @@
 import { create } from 'zustand';
 
-/**
- * UI Store
- * Manages global UI state: active tabs, sidebar, modals.
- */
 const useUIStore = create((set) => ({
-    // ========== POS ==========
-    posActiveView: 'dashboard', // 'dashboard' | 'menu' | 'tables' | 'reservation'
+
+    posActiveView: 'dashboard',
     posTableMapOpen: false,
     posCheckoutOpen: false,
 
@@ -15,7 +11,6 @@ const useUIStore = create((set) => ({
     setPosCheckoutOpen: (open) => set({ posCheckoutOpen: open }),
     togglePosTableMap: () => set((s) => ({ posTableMapOpen: !s.posTableMapOpen })),
 
-    // ========== Admin ==========
     adminActiveTab: 'dashboard',
     adminSidebarOpen: false,
 
@@ -23,7 +18,6 @@ const useUIStore = create((set) => ({
     setAdminSidebarOpen: (open) => set({ adminSidebarOpen: open }),
     toggleAdminSidebar: () => set((s) => ({ adminSidebarOpen: !s.adminSidebarOpen })),
 
-    // ========== Global ==========
     sidebarOpen: false,
 
     toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),

@@ -4,7 +4,7 @@ import { meja } from '../db/schema.js';
 import { eq, asc } from 'drizzle-orm';
 
 export const mejaController = {
-    // GET /api/meja
+
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const allMeja = await db
@@ -18,7 +18,6 @@ export const mejaController = {
         }
     },
 
-    // GET /api/meja/status - Get table counts by status
     getStatus: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const allMeja = await db.select().from(meja);
@@ -37,7 +36,6 @@ export const mejaController = {
         }
     },
 
-    // GET /api/meja/:id
     getById: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -57,7 +55,6 @@ export const mejaController = {
         }
     },
 
-    // POST /api/meja
     create: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { nomor_meja, kapasitas, status } = req.body;
@@ -77,7 +74,6 @@ export const mejaController = {
         }
     },
 
-    // PUT /api/meja/:id
     update: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -100,7 +96,6 @@ export const mejaController = {
         }
     },
 
-    // DELETE /api/meja/:id
     delete: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);

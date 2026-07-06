@@ -4,7 +4,7 @@ import { galleryImages } from '../db/schema.js';
 import { eq, asc, sql } from 'drizzle-orm';
 
 export const galleryController = {
-    // GET /api/gallery
+
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const images = await db
@@ -18,7 +18,6 @@ export const galleryController = {
         }
     },
 
-    // POST /api/gallery
     create: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { src, category, span, order } = req.body;
@@ -39,7 +38,6 @@ export const galleryController = {
         }
     },
 
-    // PUT /api/gallery/reorder
     reorder: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { images } = req.body;
@@ -57,7 +55,6 @@ export const galleryController = {
         }
     },
 
-    // PUT /api/gallery/:id
     update: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -80,7 +77,6 @@ export const galleryController = {
         }
     },
 
-    // DELETE /api/gallery/:id
     delete: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);

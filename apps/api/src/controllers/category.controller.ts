@@ -4,7 +4,7 @@ import { categories } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
 
 export const categoryController = {
-    // GET /api/categories
+
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const allCategories = await db.select().from(categories);
@@ -14,7 +14,6 @@ export const categoryController = {
         }
     },
 
-    // POST /api/categories
     create: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { name, slug } = req.body;
@@ -30,7 +29,6 @@ export const categoryController = {
         }
     },
 
-    // DELETE /api/categories/:id
     delete: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);

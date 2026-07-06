@@ -16,7 +16,7 @@ const Hero = () => {
 
     return (
         <section className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-            {/* Background Image with Overlay */}
+            {}
             <div className="absolute inset-0 z-0">
                 <img
                     src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80"
@@ -26,14 +26,14 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-black/50" />
             </div>
 
-            {/* Content */}
+            {}
             <div className="relative z-10 text-center text-white px-4">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                    {/* Availability Widget - Connected to Admin */}
+                    {}
                     <div className={`inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-md border rounded-full mb-8 ${status.border}`}>
                         <span className={`w-2 h-2 rounded-full animate-pulse ${status.color}`} />
                         <span className="text-xs font-medium uppercase tracking-wider text-white">{status.text}</span>
@@ -59,7 +59,7 @@ const Hero = () => {
                 </motion.div>
             </div>
 
-            {/* Scroll Down Indicator */}
+            {}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, y: [0, 10, 0] }}

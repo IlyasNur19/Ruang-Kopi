@@ -13,7 +13,7 @@ const CheckoutModal = () => {
     const setOpen = useUIStore((s) => s.setPosCheckoutOpen);
     const { items, getSummary, tableId, customerName, orderType, clearCart } = useCartStore();
 
-    const [step, setStep] = useState('payment'); // 'payment' | 'processing' | 'midtrans' | 'success'
+    const [step, setStep] = useState('payment');
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const [amountPaid, setAmountPaid] = useState('');
     const [loading, setLoading] = useState(false);
@@ -22,7 +22,6 @@ const CheckoutModal = () => {
     const total = getSummary().total;
     const change = amountPaid ? Math.max(0, parseInt(amountPaid) - total) : 0;
 
-    // Preload Midtrans Snap script when non-cash payment is selected
     useEffect(() => {
         if (paymentMethod !== 'cash') {
             loadSnapScript().catch(() => {});
@@ -58,15 +57,13 @@ const CheckoutModal = () => {
                 change: paymentMethod === 'cash' ? change : 0,
             };
 
-            // Step 1: Create transaction in database
             const transactionResult = await transaksiApi.create(transactionData);
 
             if (isMidtransPayment) {
-                // Calculate tax for Midtrans item_details
-                const subtotal = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
-                const tax = total - subtotal; // PPN 11%
 
-                // Build Midtrans items (must sum up to gross_amount exactly)
+                const subtotal = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+                const tax = total - subtotal;
+
                 const midtransItems = items.map((item) => ({
                     id: String(item.menuId),
                     price: item.price,
@@ -74,7 +71,6 @@ const CheckoutModal = () => {
                     name: item.name,
                 }));
 
-                // Add tax as a separate line item so the total matches
                 if (tax > 0) {
                     midtransItems.push({
                         id: 'TAX-PPN',
@@ -84,7 +80,6 @@ const CheckoutModal = () => {
                     });
                 }
 
-                // Step 2: Get Midtrans Snap Token
                 const snapData = await paymentApi.getSnapToken({
                     transaksiId: transactionResult.id,
                     amount: total,
@@ -95,18 +90,17 @@ const CheckoutModal = () => {
                 setLoading(false);
                 setStep('midtrans');
 
-                // Step 3: Open Midtrans Snap Popup
                 await loadSnapScript();
                 openSnapPopup(snapData.token, {
                     onSuccess: (result) => {
                         console.log('[POS Midtrans] Payment success:', result);
                         setStep('success');
-                        // Removed auto-close so user can print receipt
+
                     },
                     onPending: (result) => {
                         console.log('[POS Midtrans] Payment pending:', result);
                         setStep('success');
-                        // Removed auto-close so user can print receipt
+
                     },
                     onError: (result) => {
                         console.error('[POS Midtrans] Payment error:', result);
@@ -115,13 +109,13 @@ const CheckoutModal = () => {
                     },
                     onClose: () => {
                         console.log('[POS Midtrans] Popup closed by user');
-                        // User closed popup without finishing payment
+
                         setStep('payment');
                         setError('Popup pembayaran ditutup. Silakan coba lagi atau pilih metode lain.');
                     },
                 });
             } else {
-                // Cash payment — immediately successful
+
                 setStep('success');
             }
         } catch (err) {
@@ -132,7 +126,6 @@ const CheckoutModal = () => {
         }
     };
 
-    // When Midtrans popup is open, hide the dialog so it doesn't block the iframe
     if (step === 'midtrans') {
         return null;
     }
@@ -153,7 +146,7 @@ const CheckoutModal = () => {
         <Dialog open={true} onOpenChange={() => {}}>
             <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
                 {step === 'success' ? (
-                    // Success State
+
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -186,7 +179,7 @@ const CheckoutModal = () => {
                         </div>
                     </motion.div>
                 ) : (
-                    // Payment Flow
+
                     <>
                         <DialogHeader>
                             <DialogTitle className="text-[#3E2723]">Konfirmasi Pembayaran</DialogTitle>
@@ -196,13 +189,13 @@ const CheckoutModal = () => {
                         </DialogHeader>
 
                         <div className="space-y-4">
-                            {/* Payment Method */}
+                            {}
                             <PaymentMethodSelector
                                 value={paymentMethod}
                                 onChange={setPaymentMethod}
                             />
 
-                            {/* Cash Input */}
+                            {}
                             {paymentMethod === 'cash' && (
                                 <div>
                                     <label className="text-sm font-medium text-[#3E2723] mb-1.5 block">
@@ -224,7 +217,7 @@ const CheckoutModal = () => {
                                 </div>
                             )}
 
-                            {/* QRIS / Card Info */}
+                            {}
                             {isMidtransPayment && (
                                 <div className="bg-[#F5F0EB] p-4 rounded-xl text-center">
                                     <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mx-auto mb-2 border border-[#3E2723]/10">
@@ -240,7 +233,7 @@ const CheckoutModal = () => {
                                 </div>
                             )}
 
-                            {/* Error */}
+                            {}
                             {error && (
                                 <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
                                     {error}
@@ -248,7 +241,7 @@ const CheckoutModal = () => {
                             )}
                         </div>
 
-                        {/* Actions */}
+                        {}
                         <div className="flex gap-3 mt-2">
                             <button
                                 onClick={() => {

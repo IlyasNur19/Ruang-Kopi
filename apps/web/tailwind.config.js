@@ -1,5 +1,3 @@
-/** @type {import('tailwindcss').Config} */
-
 export default {
   content: [
     "./index.html",
@@ -16,7 +14,7 @@ export default {
     },
     extend: {
       colors: {
-        // Existing colors (preserved for other pages)
+
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -53,7 +51,6 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
 
-        // Material Design 3 tokens (new redesign)
         "on-surface": "#1a1c1c",
         "inverse-primary": "#e5beb5",
         "on-error": "#ffffff",

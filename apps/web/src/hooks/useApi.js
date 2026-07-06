@@ -1,11 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 
-/**
- * Custom hook for API calls with loading, error, and data states
- * @param {Function} apiFunction - The API function to call
- * @param {Array} dependencies - Dependencies array for useEffect
- * @param {boolean} immediate - Whether to call immediately on mount
- */
 export const useApi = (apiFunction, dependencies = [], immediate = true) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(immediate);
@@ -34,16 +28,12 @@ export const useApi = (apiFunction, dependencies = [], immediate = true) => {
         if (immediate) {
             execute();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, dependencies);
 
     return { data, loading, error, refetch, execute };
 };
 
-/**
- * Hook for mutation operations (POST, PUT, DELETE)
- * Does not execute immediately
- */
 export const useMutation = (apiFunction) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);

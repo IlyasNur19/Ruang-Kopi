@@ -9,11 +9,6 @@ const navLinks = [
   { name: 'Gallery', path: '/gallery', icon: 'photo_library' },
 ];
 
-// const staffLinks = [
-//   { name: 'POS', path: '/pos', icon: 'point_of_sale' },
-//   { name: 'Admin', path: '/admin', icon: 'admin_panel_settings' },
-// ];
-
 const isAuthenticated = () => {
   try {
     return !!localStorage.getItem('ruangkopi_token');
@@ -49,7 +44,6 @@ const Navbar = () => {
     return () => { document.body.style.overflow = ''; };
   }, [isMenuOpen]);
 
-  // Close contact dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (contactRef.current && !contactRef.current.contains(e.target)) {
@@ -64,7 +58,7 @@ const Navbar = () => {
 
   return (
     <>
-      {/* ====== MAIN NAVBAR ====== */}
+      {}
       <header
         className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled
           ? 'bg-[#F5F0EB]/95 backdrop-blur-lg shadow-[0_2px_20px_rgba(62,39,35,0.06)]'
@@ -74,7 +68,7 @@ const Navbar = () => {
         <div className="max-w-[1200px] mx-auto px-7 md:px-10 ">
           <div className="flex items-center justify-between py-2 pt-3 md:pt-6 md:py-5 ">
 
-            {/* === LEFT: Logo === */}
+            {}
             <Link to="/" className="flex items-center gap-0.5 shrink-0 group">
               <span className="font-serif text-[32px] md:text-[40px] font-bold text-[#3E2723] leading-none tracking-tight">
                 ruang&nbsp;
@@ -85,7 +79,7 @@ const Navbar = () => {
               <span className="font-serif text-[#8D6E63] text-[32px] md:text-[40px] font-bold leading-none">.</span>
             </Link>
 
-            {/* === CENTER: Desktop Nav Links === */}
+            {}
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map((item) => (
                 <Link
@@ -106,22 +100,13 @@ const Navbar = () => {
                   )}
                 </Link>
               ))}
-              {/* Staff Links */}
-              {/* {isAuthenticated() && staffLinks.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="relative px-4 py-2 text-[13px] font-medium text-[#8D6E63] hover:text-[#3E2723] hover:bg-[#8D6E63]/5 rounded-lg transition-colors duration-200 flex items-center gap-1.5"
-                >
-                  <span className="material-symbols-outlined text-[16px]">{item.icon}</span>
-                  {item.name}
-                </Link>
-              ))} */}
+              {}
+              {}
             </nav>
 
-            {/* === RIGHT: Contact Button (Desktop) + Hamburger (Mobile) === */}
+            {}
             <div className="flex items-center gap-3">
-              {/* Contact Dropdown - Desktop */}
+              {}
               <div className="hidden md:block relative" ref={contactRef}>
                 <button
                   onClick={() => setIsContactOpen(!isContactOpen)}
@@ -134,7 +119,7 @@ const Navbar = () => {
                   </span>
                 </button>
 
-                {/* Dropdown Menu */}
+                {}
                 <AnimatePresence>
                   {isContactOpen && (
                     <motion.div
@@ -182,7 +167,7 @@ const Navbar = () => {
                 </AnimatePresence>
               </div>
 
-              {/* Hamburger - Mobile */}
+              {}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="md:hidden p-2.5 rounded-xl text-[#3E2723] hover:bg-[#3E2723]/5 transition-colors"
@@ -197,11 +182,11 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* ====== MOBILE DRAWER ====== */}
+      {}
       <AnimatePresence>
         {isMenuOpen && (
           <>
-            {/* Overlay */}
+            {}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -211,7 +196,7 @@ const Navbar = () => {
               className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[55] md:hidden"
             />
 
-            {/* Drawer Panel */}
+            {}
             <motion.aside
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
@@ -219,7 +204,7 @@ const Navbar = () => {
               transition={{ type: 'tween', duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
               className="fixed top-0 left-0 z-[60] bg-[#F5F0EB] h-full w-[85vw] max-w-[320px] shadow-2xl flex flex-col md:hidden"
             >
-              {/* Drawer Header */}
+              {}
               <div className="flex items-center justify-between px-6 pt-6 pb-4">
                 <Link to="/" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-0.5">
                   <span className="font-serif text-[28px] font-bold text-[#3E2723] leading-none tracking-tight">Ruang</span>
@@ -235,10 +220,10 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {/* Divider */}
+              {}
               <div className="mx-6 border-t border-[#3E2723]/10 mb-2"></div>
 
-              {/* Nav Items */}
+              {}
               <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
                 {navLinks.map((item, index) => (
                   <motion.div
@@ -266,7 +251,7 @@ const Navbar = () => {
                   </motion.div>
                 ))}
 
-                {/* Extra mobile links */}
+                {}
                 <div className="pt-3 mt-3 border-t border-[#3E2723]/10 space-y-1">
                   <motion.div
                     initial={{ opacity: 0, x: -16 }}
@@ -298,7 +283,7 @@ const Navbar = () => {
                 </div>
               </nav>
 
-              {/* Bottom CTA */}
+              {}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}

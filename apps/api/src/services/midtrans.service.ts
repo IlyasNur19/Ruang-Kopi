@@ -1,9 +1,8 @@
 import crypto from 'crypto';
 
-// Midtrans configuration
 const MIDTRANS_SERVER_KEY = process.env.MIDTRANS_SERVER_KEY || '';
 const MIDTRANS_CLIENT_KEY = process.env.MIDTRANS_CLIENT_KEY || '';
-const MIDTRANS_ENV = process.env.MIDTRANS_ENV || 'sandbox'; // 'sandbox' or 'production'
+const MIDTRANS_ENV = process.env.MIDTRANS_ENV || 'sandbox';
 
 const MIDTRANS_API_BASE =
     MIDTRANS_ENV === 'production'
@@ -15,9 +14,6 @@ const MIDTRANS_CORE_API =
         ? 'https://api.midtrans.com/v2'
         : 'https://api.sandbox.midtrans.com/v2';
 
-/**
- * Interface for Snap transaction parameters
- */
 export interface SnapTransactionParams {
     orderId: string;
     amount: number;
@@ -32,10 +28,6 @@ export interface SnapTransactionParams {
     }>;
 }
 
-/**
- * Generate a Snap token for Midtrans popup payment
- * This handles the down payment (DP) for online reservations
- */
 export async function createSnapTransaction(params: SnapTransactionParams): Promise<{
     token: string;
     redirect_url: string;
@@ -57,7 +49,7 @@ export async function createSnapTransaction(params: SnapTransactionParams): Prom
             email: customerEmail || 'pelanggan@ruangkopi.site',
             phone: customerPhone || '08123456789',
         },
-        // Enable all payment methods
+
         enabled_payments: [
             'qris',
             'gopay',
@@ -82,7 +74,7 @@ export async function createSnapTransaction(params: SnapTransactionParams): Prom
             id: item.id,
             price: item.price,
             quantity: item.quantity,
-            name: item.name.substring(0, 50), // Midtrans limit
+            name: item.name.substring(0, 50),
         }));
     }
 
@@ -109,9 +101,6 @@ export async function createSnapTransaction(params: SnapTransactionParams): Prom
     };
 }
 
-/**
- * Verify Midtrans webhook signature for security
- */
 export function verifyWebhookSignature(
     orderId: string,
     statusCode: string,
@@ -120,7 +109,7 @@ export function verifyWebhookSignature(
 ): boolean {
     if (!MIDTRANS_SERVER_KEY) {
         console.warn('[Midtrans] Server key not configured, skipping signature verification');
-        return true; // Allow in development without key
+        return true;
     }
 
     const raw = orderId + statusCode + grossAmount + MIDTRANS_SERVER_KEY;
@@ -136,9 +125,6 @@ export function verifyWebhookSignature(
     return isValid;
 }
 
-/**
- * Check transaction status directly from Midtrans (for manual verification)
- */
 export async function getTransactionStatus(orderId: string): Promise<{
     status: string;
     paymentType: string;
@@ -169,9 +155,6 @@ export async function getTransactionStatus(orderId: string): Promise<{
     };
 }
 
-/**
- * Map Midtrans transaction status to our internal status
- */
 export function mapMidtransStatus(midtransStatus: string): 'pending' | 'settlement' | 'expire' | 'cancel' {
     switch (midtransStatus) {
         case 'capture':

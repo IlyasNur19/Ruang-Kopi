@@ -22,7 +22,6 @@ const MenuGrid = ({ items }) => {
     );
 };
 
-/** Skeleton loading state for MenuGrid */
 MenuGrid.Skeleton = function MenuGridSkeleton() {
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-4">

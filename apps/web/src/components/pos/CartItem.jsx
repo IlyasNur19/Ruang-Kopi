@@ -12,7 +12,7 @@ const CartItem = ({ item }) => {
 
     return (
         <div className="flex items-start gap-3 py-3 group">
-            {/* Image Thumbnail */}
+            {}
             <div className="w-12 h-12 rounded-xl bg-[#F5F0EB] flex items-center justify-center shrink-0 overflow-hidden">
                 {item.image ? (
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -21,7 +21,7 @@ const CartItem = ({ item }) => {
                 )}
             </div>
 
-            {/* Info */}
+            {}
             <div className="flex-1 min-w-0">
                 <h4 className="text-sm font-semibold text-[#3E2723] leading-tight line-clamp-2 mb-1">
                     {item.name}
@@ -36,7 +36,7 @@ const CartItem = ({ item }) => {
                 </div>
             </div>
 
-            {/* Line Total */}
+            {}
             <div className="text-right shrink-0">
                 <span className="text-sm font-bold text-[#3E2723]">
                     {formatCurrency(lineTotal)}

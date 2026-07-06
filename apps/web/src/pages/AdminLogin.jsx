@@ -16,7 +16,6 @@ const AdminLogin = () => {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // Redirect if already authenticated
     React.useEffect(() => {
         if (isAuthenticated) {
             const from = location.state?.from?.pathname || '/admin';
@@ -27,14 +26,13 @@ const AdminLogin = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        setError(''); // Clear error on input change
+        setError('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
-        // Validation
         if (!formData.email) {
             setError('Email is required');
             return;
@@ -60,9 +58,9 @@ const AdminLogin = () => {
 
     return (
         <div className="min-h-screen flex">
-            {/* Left Side - Image */}
+            {}
             <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-                {/* Background Image */}
+                {}
                 <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
@@ -70,10 +68,10 @@ const AdminLogin = () => {
                     }}
                 />
 
-                {/* Overlay Gradient */}
+                {}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
 
-                {/* Content */}
+                {}
                 <div className="relative z-10 flex flex-col justify-end p-12 text-white">
                     <span className="text-xs tracking-[0.3em] uppercase text-white/80 mb-4">
                         Premium Coffee
@@ -86,10 +84,10 @@ const AdminLogin = () => {
                 </div>
             </div>
 
-            {/* Right Side - Login Form */}
+            {}
             <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#FAF9F7]">
                 <div className="w-full max-w-md">
-                    {/* Logo */}
+                    {}
                     <div className="flex items-center gap-3 mb-12">
                         <Coffee className="w-8 h-8 text-[#3E2723]" />
                         <span className="font-heading font-bold text-xl text-[#3E2723]">
@@ -97,7 +95,7 @@ const AdminLogin = () => {
                         </span>
                     </div>
 
-                    {/* Header */}
+                    {}
                     <div className="mb-8">
                         <h2 className="font-heading text-3xl font-bold text-[#3E2723] mb-2">
                             Welcome Back
@@ -107,16 +105,16 @@ const AdminLogin = () => {
                         </p>
                     </div>
 
-                    {/* Error Message */}
+                    {}
                     {error && (
                         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                             <p className="text-red-600 text-sm">{error}</p>
                         </div>
                     )}
 
-                    {/* Form */}
+                    {}
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Email Field */}
+                        {}
                         <div>
                             <label
                                 htmlFor="email"
@@ -141,7 +139,7 @@ const AdminLogin = () => {
                             </div>
                         </div>
 
-                        {/* Password Field */}
+                        {}
                         <div>
                             <label
                                 htmlFor="password"
@@ -177,7 +175,7 @@ const AdminLogin = () => {
                             </div>
                         </div>
 
-                        {/* Forgot Password Link */}
+                        {}
                         <div className="flex justify-end">
                             <button
                                 type="button"
@@ -187,7 +185,7 @@ const AdminLogin = () => {
                             </button>
                         </div>
 
-                        {/* Submit Button */}
+                        {}
                         <button
                             type="submit"
                             disabled={isLoading}
@@ -207,7 +205,7 @@ const AdminLogin = () => {
                         </button>
                     </form>
 
-                    {/* Footer */}
+                    {}
                     <div className="mt-12 text-center">
                         <p className="text-sm text-[#A1887F]">
                             © 2023 RuangKopi. All rights reserved. Protected by reCAPTCHA.

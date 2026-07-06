@@ -36,18 +36,12 @@ function genToastId() {
     return `notif-toast-${toastCounter}`;
 }
 
-/**
- * Maps a notification type to the corresponding admin sidebar tab.
- */
 const TAB_MAP = {
     transaction: 'dashboard',
     reservation: 'reservations',
     idea: 'ideas',
 };
 
-/**
- * Icon and color config for each notification type.
- */
 const TYPE_CONFIG = {
     transaction: {
         icon: ShoppingCart,
@@ -75,17 +69,16 @@ const NotificationBell = ({ onNavigate }) => {
     const markAsRead = useNotificationStore((s) => s.markAsRead);
     const clearAll = useNotificationStore((s) => s.clearAll);
 
-    // Simple inline toast state (avoids importing the broken use-toast.js hook)
     const [toasts, setToasts] = useState([]);
     const toastTimeouts = useRef(new Map());
 
     const dismissToast = useCallback((toastId) => {
         setToasts((prev) => prev.map((t) => (t.id === toastId ? { ...t, open: false } : t)));
-        // Remove from DOM after animation
+
         setTimeout(() => {
             setToasts((prev) => prev.filter((t) => t.id !== toastId));
         }, 300);
-        // Clear the auto-dismiss timer
+
         if (toastTimeouts.current.has(toastId)) {
             clearTimeout(toastTimeouts.current.get(toastId));
             toastTimeouts.current.delete(toastId);
@@ -100,24 +93,20 @@ const NotificationBell = ({ onNavigate }) => {
             return next.slice(0, TOAST_LIMIT);
         });
 
-        // Auto-dismiss after timeout
         const timeout = setTimeout(() => {
             dismissToast(id);
         }, TOAST_DISMISS_MS);
         toastTimeouts.current.set(id, timeout);
     }, [dismissToast]);
 
-    // Cleanup timeouts on unmount
     useEffect(() => {
         return () => {
             toastTimeouts.current.forEach((timeout) => clearTimeout(timeout));
         };
     }, []);
 
-    // Track which notification IDs have already been toasted
     const toastedRef = useRef(new Set());
 
-    // Fire toast for new unread notifications
     useEffect(() => {
         const unreadNotifications = notifications.filter((n) => !n.read && !toastedRef.current.has(n.id));
 
@@ -133,7 +122,6 @@ const NotificationBell = ({ onNavigate }) => {
             toastedRef.current.add(n.id);
         });
 
-        // Clean up old IDs from the ref that are no longer in notifications
         const currentIds = new Set(notifications.map((n) => n.id));
         for (const id of toastedRef.current) {
             if (!currentIds.has(id)) {
@@ -173,7 +161,7 @@ const NotificationBell = ({ onNavigate }) => {
 
     return (
         <>
-            {/* Toast notifications rendered in a local viewport */}
+            {}
             <ToastViewport>
                 {toasts.map((t) => (
                     <Toast key={t.id} variant={t.variant}>
@@ -188,7 +176,7 @@ const NotificationBell = ({ onNavigate }) => {
                 ))}
             </ToastViewport>
 
-            {/* Bell Dropdown */}
+            {}
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <button className="relative text-muted-foreground hover:text-foreground transition-colors">
@@ -219,7 +207,7 @@ const NotificationBell = ({ onNavigate }) => {
 
                     <DropdownMenuSeparator />
 
-                    {/* Notification list */}
+                    {}
                     <div className="overflow-y-auto max-h-[300px]">
                         {notifications.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-8 px-4 text-muted-foreground">

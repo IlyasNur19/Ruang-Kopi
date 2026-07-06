@@ -24,7 +24,6 @@ const DashboardOverview = () => {
                 setLoading(true);
                 setError(null);
 
-                // Fetch menu items, reservations, and current status in parallel
                 const [menuData, reservationsData, statusData] = await Promise.all([
                     menuApi.getAll().catch(() => []),
                     reservationsApi.getAll().catch(() => []),
@@ -40,7 +39,6 @@ const DashboardOverview = () => {
                     pendingReservations: reservations.filter(r => r.status === 'Pending').length,
                 });
 
-                // Set the status from API
                 if (statusData && statusData.status) {
                     setShopStatus(statusData.status);
                 }
@@ -55,7 +53,6 @@ const DashboardOverview = () => {
         fetchData();
     }, []);
 
-    // Function to update status via API
     const handleStatusChange = async (newStatus) => {
         try {
             setSaving(true);
@@ -150,7 +147,7 @@ const DashboardOverview = () => {
                 </div>
             )}
 
-            {/* Stats Row */}
+            {}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {statsCards.map((stat, index) => (
                     <motion.div
@@ -174,7 +171,7 @@ const DashboardOverview = () => {
                 ))}
             </div>
 
-            {/* Charts Section */}
+            {}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className="border-none shadow-sm">
                     <CardContent className="p-6">
@@ -188,14 +185,14 @@ const DashboardOverview = () => {
                 </Card>
             </div>
 
-            {/* Recent Transactions */}
+            {}
             <Card className="border-none shadow-sm">
                 <CardContent className="p-6">
                     <RecentTransactionsTable />
                 </CardContent>
             </Card>
 
-            {/* Status Section */}
+            {}
             <section>
                 <h2 className="flex items-center gap-2 text-xl font-semibold mb-4 text-foreground">
                     <Coffee size={20} />

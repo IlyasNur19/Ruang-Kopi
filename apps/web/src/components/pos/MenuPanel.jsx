@@ -19,7 +19,6 @@ const MenuPanel = ({ searchQuery = '' }) => {
             const items = Array.isArray(data) ? data : data?.data || [];
             setMenuItems(items);
 
-            // Extract unique categories
             const cats = [...new Set(items.map((item) => item.category || item.categoryId).filter(Boolean))];
             setCategories(cats);
         } catch (err) {
@@ -34,7 +33,6 @@ const MenuPanel = ({ searchQuery = '' }) => {
         fetchMenu();
     }, []);
 
-    // Calculate item counts per category
     const itemCounts = useMemo(() => {
         const counts = {};
         const availableItems = menuItems.filter(
@@ -49,11 +47,9 @@ const MenuPanel = ({ searchQuery = '' }) => {
         return counts;
     }, [menuItems]);
 
-    // Filter menu based on category and search
     const filteredItems = useMemo(() => {
         let items = [...menuItems];
 
-        // Filter by category
         if (activeCategory !== 'all') {
             items = items.filter((item) => {
                 const cat = (item.category || item.categoryId || '').toLowerCase();
@@ -61,7 +57,6 @@ const MenuPanel = ({ searchQuery = '' }) => {
             });
         }
 
-        // Filter by search
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase().trim();
             items = items.filter((item) =>
@@ -69,7 +64,6 @@ const MenuPanel = ({ searchQuery = '' }) => {
             );
         }
 
-        // Filter out unavailable items
         items = items.filter((item) => item.available !== false && item.ketersediaan !== false);
 
         return items;
@@ -77,7 +71,7 @@ const MenuPanel = ({ searchQuery = '' }) => {
 
     return (
         <div className="h-full flex flex-col bg-[#F5F0EB]">
-            {/* Category Filter */}
+            {}
             <div className="py-3 px-4 bg-white border-b border-[#3E2723]/5">
                 <CategoryFilter
                     categories={categories}
@@ -86,7 +80,7 @@ const MenuPanel = ({ searchQuery = '' }) => {
                 />
             </div>
 
-            {/* Content */}
+            {}
             <div className="flex-1 overflow-y-auto">
                 {loading ? (
                     <div className="p-4">

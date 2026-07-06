@@ -14,7 +14,6 @@ const MenuManagement = () => {
     const [error, setError] = useState(null);
     const [deleting, setDeleting] = useState(null);
 
-    // Modal state
     const [showModal, setShowModal] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
@@ -99,7 +98,6 @@ const MenuManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate price before sending
         const priceValue = parseInt(formData.price);
         if (isNaN(priceValue) || priceValue <= 0) {
             alert('Harga harus berupa angka positif. Contoh: 35000');
@@ -109,43 +107,39 @@ const MenuManagement = () => {
         try {
             setSaving(true);
 
-            // Build data object — only include valid fields to avoid Zod validation errors
             const data = {
                 name: formData.name,
                 price: priceValue,
                 available: formData.available,
             };
 
-            // description: only include if non-empty
             if (formData.description && formData.description.trim() !== '') {
                 data.description = formData.description.trim();
             }
 
-            // categoryId: only include if it's a valid number
             const catId = parseInt(formData.categoryId);
             if (!isNaN(catId)) {
                 data.categoryId = catId;
             }
 
-            // image: only include if it's a non-empty URL string
             if (formData.image && formData.image.trim() !== '') {
                 data.image = formData.image.trim();
             } else if (editingItem) {
-                // When clearing an existing image, explicitly set to null
+
                 data.image = null;
             }
 
             if (editingItem) {
                 await menuApi.update(editingItem.id, data);
             } else {
-                // Create must include all required fields
+
                 if (!data.name) throw new Error('Name is required');
                 if (!data.categoryId) throw new Error('Category is required');
                 await menuApi.create(data);
             }
 
             setShowModal(false);
-            fetchData(); // Refresh the list
+            fetchData();
         } catch (err) {
             console.error('Error saving item:', err);
             alert('Gagal menyimpan: ' + (err.message || 'Silakan coba lagi.'));
@@ -305,7 +299,7 @@ const MenuManagement = () => {
                 </CardContent>
             </Card>
 
-            {/* Add/Edit Modal */}
+            {}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <motion.div
@@ -391,7 +385,7 @@ const MenuManagement = () => {
                                     Image
                                 </label>
 
-                                {/* Image Preview */}
+                                {}
                                 {formData.image && (
                                     <div className="mb-3 relative">
                                         <img
@@ -409,7 +403,7 @@ const MenuManagement = () => {
                                     </div>
                                 )}
 
-                                {/* Upload Area */}
+                                {}
                                 <div
                                     className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all
                                         ${uploading ? 'pointer-events-none opacity-70' : 'hover:border-[#8D6E63] hover:bg-[#FBEFEF]'}

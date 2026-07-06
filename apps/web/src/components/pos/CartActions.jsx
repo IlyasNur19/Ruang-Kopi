@@ -18,7 +18,7 @@ const CartActions = () => {
 
     return (
         <div className="p-4 flex flex-col gap-2">
-            {/* Print Receipt Button */}
+            {}
             <button
                 onClick={() => handlePrint()}
                 disabled={isEmpty()}
@@ -28,7 +28,7 @@ const CartActions = () => {
                 Cetak Bill
             </button>
 
-            {/* Checkout Button */}
+            {}
             <button
                 onClick={() => setCheckoutOpen(true)}
                 disabled={isEmpty()}
@@ -38,7 +38,7 @@ const CartActions = () => {
                 Checkout
             </button>
 
-            {/* Hidden print template */}
+            {}
             <div className="hidden">
                 <ReceiptTemplate ref={printRef} />
             </div>

@@ -37,18 +37,18 @@ const POSPage = () => {
     return (
         <SocketProvider>
             <div className="h-screen flex bg-[#F5F0EB] overflow-hidden">
-                {/* Sidebar - Left */}
+                {}
                 <POSSidebar />
 
-                {/* Main Content */}
+                {}
                 <POSLayout />
             </div>
 
-            {/* Modals */}
+            {}
             {tableMapOpen && <TableMapModal />}
             {checkoutOpen && <CheckoutModal />}
 
-            {/* Hidden receipt template for printing */}
+            {}
             <div className="hidden print:block">
                 <ReceiptTemplate />
             </div>

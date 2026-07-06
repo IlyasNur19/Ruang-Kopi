@@ -30,4 +30,3 @@ const CategoryFilter = ({ categories, active, onChange }) => {
 };
 
 export default CategoryFilter;
-

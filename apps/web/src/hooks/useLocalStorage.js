@@ -1,12 +1,7 @@
 import { useState, useEffect } from 'react';
 
-/**
- * Hook custom untuk mengelola state yang tersimpan di localStorage
- * Mendukung sinkronisasi antar tab/window
- */
 function useLocalStorage(key, initialValue) {
-    // Get from local storage then
-    // parse stored json or if none return initialValue
+
     const readValue = () => {
         if (typeof window === 'undefined') {
             return initialValue;
@@ -25,7 +20,7 @@ function useLocalStorage(key, initialValue) {
 
     const setValue = (value) => {
         try {
-            // Allow value to be a function so we have same API as useState
+
             const valueToStore = value instanceof Function ? value(storedValue) : value;
 
             setStoredValue(valueToStore);
@@ -33,7 +28,6 @@ function useLocalStorage(key, initialValue) {
             if (typeof window !== 'undefined') {
                 window.localStorage.setItem(key, JSON.stringify(valueToStore));
 
-                // Dispatch custom event untuk update real-time di komponen lain
                 window.dispatchEvent(new Event('local-storage'));
             }
         } catch (error) {
@@ -46,7 +40,6 @@ function useLocalStorage(key, initialValue) {
             setStoredValue(readValue());
         };
 
-        // Listen to changes
         window.addEventListener('storage', handleStorageChange);
         window.addEventListener('local-storage', handleStorageChange);
 

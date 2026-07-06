@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('ruangkopi_token'));
     const [loading, setLoading] = useState(true);
 
-    // Check if user is authenticated on mount
     useEffect(() => {
         const checkAuth = async () => {
             const storedToken = localStorage.getItem('ruangkopi_token');
@@ -27,7 +26,7 @@ export const AuthProvider = ({ children }) => {
                     setUser(userData);
                     setToken(storedToken);
                 } catch (error) {
-                    // Token invalid or expired
+
                     console.error('Auth check failed:', error);
                     localStorage.removeItem('ruangkopi_token');
                     localStorage.removeItem('ruangkopi_user');
@@ -46,7 +45,6 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await authApi.login(email, password);
 
-            // Store token and user
             localStorage.setItem('ruangkopi_token', response.token);
             localStorage.setItem('ruangkopi_user', JSON.stringify(response.user));
 

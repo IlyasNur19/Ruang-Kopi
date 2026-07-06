@@ -19,7 +19,7 @@ function App() {
       <AuthProvider>
         <ToastProvider>
         <Routes>
-          {/* Public Routes */}
+          {}
           <Route path="/" element={<Home />} />
           <Route path="/kotak-gagasan" element={<KotakGagasanPage />} />
           <Route path="/menu" element={<MenuPage />} />
@@ -27,7 +27,7 @@ function App() {
           <Route path="/reservation" element={<ReservationPage />} />
           <Route path="/location" element={<LocationPage />} />
 
-          {/* Admin Routes */}
+          {}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"
@@ -38,7 +38,7 @@ function App() {
             }
           />
 
-          {/* POS Route */}
+          {}
           <Route
             path="/pos"
             element={

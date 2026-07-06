@@ -14,13 +14,11 @@ const GalleryManagement = () => {
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
 
-    // Modal state for adding new image
     const [showModal, setShowModal] = useState(false);
     const [uploadedUrl, setUploadedUrl] = useState('');
     const [category, setCategory] = useState('');
     const [saving, setSaving] = useState(false);
 
-    // Reorder mode state
     const [reorderMode, setReorderMode] = useState(false);
     const [reorderedImages, setReorderedImages] = useState([]);
     const [savingOrder, setSavingOrder] = useState(false);
@@ -43,7 +41,6 @@ const GalleryManagement = () => {
         fetchImages();
     }, []);
 
-    // Sync reorderedImages when entering reorder mode
     useEffect(() => {
         if (reorderMode) {
             setReorderedImages([...images]);
@@ -96,7 +93,7 @@ const GalleryManagement = () => {
             await galleryApi.create({
                 src: uploadedUrl,
                 category: category,
-                order: images.length, // Add at the end
+                order: images.length,
             });
 
             setShowModal(false);
@@ -119,10 +116,8 @@ const GalleryManagement = () => {
         try {
             setDeleting(image.id);
 
-            // Delete from database
             await galleryApi.delete(image.id);
 
-            // Update local state
             setImages(images.filter(img => img.id !== image.id));
         } catch (err) {
             console.error('Delete error:', err);
@@ -152,7 +147,6 @@ const GalleryManagement = () => {
         }
     };
 
-    // Reorder functions
     const handleEnterReorderMode = () => {
         setReorderMode(true);
         setReorderedImages([...images]);
@@ -167,7 +161,6 @@ const GalleryManagement = () => {
         try {
             setSavingOrder(true);
 
-            // Build array of {id, order}
             const orderData = reorderedImages.map((img, index) => ({
                 id: img.id,
                 order: index,
@@ -175,7 +168,6 @@ const GalleryManagement = () => {
 
             await galleryApi.reorder(orderData);
 
-            // Update main images state
             setImages(reorderedImages);
             setReorderMode(false);
             setReorderedImages([]);
@@ -251,7 +243,7 @@ const GalleryManagement = () => {
                 </div>
             </motion.div>
 
-            {/* Reorder Mode Banner */}
+            {}
             {reorderMode && (
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -271,7 +263,7 @@ const GalleryManagement = () => {
                 </div>
             )}
 
-            {/* Upload Area - Hidden in reorder mode */}
+            {}
             {!reorderMode && (
                 <Card className="border-none shadow-sm">
                     <CardHeader>
@@ -313,7 +305,7 @@ const GalleryManagement = () => {
                 </Card>
             )}
 
-            {/* Gallery Grid - Normal Mode */}
+            {}
             {!reorderMode && (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                     <AnimatePresence>
@@ -356,7 +348,7 @@ const GalleryManagement = () => {
                 </div>
             )}
 
-            {/* Gallery Grid - Reorder Mode */}
+            {}
             {reorderMode && (
                 <Reorder.Group
                     axis="x"
@@ -396,7 +388,7 @@ const GalleryManagement = () => {
                 </div>
             )}
 
-            {/* Category Modal */}
+            {}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
                     <motion.div
@@ -415,7 +407,7 @@ const GalleryManagement = () => {
                         </div>
 
                         <form onSubmit={handleSaveImage} className="p-6 space-y-4">
-                            {/* Preview */}
+                            {}
                             <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
                                 <img
                                     src={uploadedUrl}
@@ -424,7 +416,7 @@ const GalleryManagement = () => {
                                 />
                             </div>
 
-                            {/* Category */}
+                            {}
                             <div>
                                 <label className="block text-sm font-medium text-[#5D4037] mb-2">
                                     Category *

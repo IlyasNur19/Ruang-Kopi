@@ -20,7 +20,6 @@ const CartPanel = () => {
     const setCheckoutOpen = useUIStore((s) => s.setPosCheckoutOpen);
     const [paymentMethod, setPaymentMethod] = useState('cash');
 
-    // Get selected table info
     const tables = useTableStore((s) => s.tables);
     const selectedTable = tables.find((t) => t.id === tableId);
     const tableLabel = selectedTable
@@ -29,7 +28,7 @@ const CartPanel = () => {
 
     return (
         <div className="h-full flex flex-col bg-white w-full">
-            {/* Header - Table Info */}
+            {}
             <div className="px-5 pt-5 pb-3 border-b border-[#3E2723]/5">
                 <div className="flex items-center justify-between mb-3">
                     <div>
@@ -47,14 +46,14 @@ const CartPanel = () => {
                     </div>
                 </div>
 
-                {/* Order Type Tabs */}
+                {}
                 <OrderTypeSelector />
             </div>
 
-            {/* Table Selector (for dine-in) */}
+            {}
             <div className="px-5 py-2 border-b border-[#3E2723]/5">
                 <TableSelector />
-                {/* Customer Name Input */}
+                {}
                 <div className="flex items-center gap-2 mt-2">
                     <User size={14} className="text-[#6D4C41]/50 shrink-0" />
                     <input
@@ -67,7 +66,7 @@ const CartPanel = () => {
                 </div>
             </div>
 
-            {/* Cart Items */}
+            {}
             <div className="flex-1 overflow-hidden">
                 {isEmpty() ? (
                     <div className="flex flex-col items-center justify-center h-full text-center px-8">
@@ -88,15 +87,15 @@ const CartPanel = () => {
                 )}
             </div>
 
-            {/* Bottom Section: Summary, Payment, Place Order */}
+            {}
             {!isEmpty() && (
                 <div className="shrink-0 border-t border-[#3E2723]/5 bg-white">
-                    {/* Summary */}
+                    {}
                     <div className="px-5 py-3">
                         <CartSummary />
                     </div>
 
-                    {/* Payment Method Icons */}
+                    {}
                     <div className="px-5 pb-3">
                         <PaymentMethodSelector
                             value={paymentMethod}
@@ -104,7 +103,7 @@ const CartPanel = () => {
                         />
                     </div>
 
-                    {/* Place Order Button */}
+                    {}
                     <div className="px-5 pb-5">
                         <button
                             onClick={() => setCheckoutOpen(true)}

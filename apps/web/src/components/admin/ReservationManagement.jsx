@@ -13,12 +13,10 @@ const ReservationManagement = () => {
     const [error, setError] = useState(null);
     const [updating, setUpdating] = useState(null);
 
-    // Filter states
     const [statusFilter, setStatusFilter] = useState('all');
-    const [dateFilter, setDateFilter] = useState('all'); // 'all', 'today', 'week', 'custom'
+    const [dateFilter, setDateFilter] = useState('all');
     const [customDate, setCustomDate] = useState('');
 
-    // Detail modal state
     const [selectedReservation, setSelectedReservation] = useState(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
 
@@ -41,7 +39,6 @@ const ReservationManagement = () => {
         fetchReservations();
     }, []);
 
-    // Status label mapping (backend value -> display label)
     const statusLabels = {
         pending: 'Pending',
         dibayar: 'Dikonfirmasi',
@@ -51,16 +48,13 @@ const ReservationManagement = () => {
 
     const getStatusLabel = (status) => statusLabels[status] || status;
 
-    // Filtered reservations
     const filteredReservations = useMemo(() => {
         let result = [...reservations];
 
-        // Filter by status
         if (statusFilter !== 'all') {
             result = result.filter(res => res.status === statusFilter);
         }
 
-        // Filter by date
         if (dateFilter === 'today') {
             const today = new Date().toISOString().split('T')[0];
             result = result.filter(res => res.date === today);
@@ -75,7 +69,6 @@ const ReservationManagement = () => {
             result = result.filter(res => res.date === customDate);
         }
 
-        // Sort by date (newest first)
         result.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         return result;
@@ -86,12 +79,10 @@ const ReservationManagement = () => {
             setUpdating(id);
             await reservationsApi.updateStatus(id, status);
 
-            // Update local state
             setReservations(reservations.map(res =>
                 res.id === id ? { ...res, status } : res
             ));
 
-            // Update selected reservation if in modal
             if (selectedReservation?.id === id) {
                 setSelectedReservation(prev => ({ ...prev, status }));
             }
@@ -162,7 +153,6 @@ const ReservationManagement = () => {
         }
     };
 
-    // Status options (value matches backend, label for display)
     const statusOptions = [
         { value: 'all', label: 'Semua' },
         { value: 'pending', label: 'Pending' },
@@ -177,7 +167,6 @@ const ReservationManagement = () => {
         { value: 'custom', label: 'Pilih Tanggal' },
     ];
 
-    // Detail Modal Component
     const DetailModal = () => {
         if (!selectedReservation) return null;
 
@@ -198,7 +187,7 @@ const ReservationManagement = () => {
                     className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6"
                     onClick={e => e.stopPropagation()}
                 >
-                    {/* Header */}
+                    {}
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="font-heading text-xl font-bold text-[#3E2723]">Detail Reservasi</h3>
                         <button
@@ -209,7 +198,7 @@ const ReservationManagement = () => {
                         </button>
                     </div>
 
-                    {/* Guest Info */}
+                    {}
                     <div className="space-y-4 mb-6">
                         <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
                             <div className="w-12 h-12 bg-[#3E2723] rounded-full flex items-center justify-center text-white font-bold text-lg">
@@ -223,7 +212,7 @@ const ReservationManagement = () => {
                             </div>
                         </div>
 
-                        {/* Reservation Details */}
+                        {}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="p-3 bg-gray-50 rounded-xl">
                                 <p className="text-xs text-muted-foreground mb-1">Tanggal</p>
@@ -252,7 +241,7 @@ const ReservationManagement = () => {
                         </div>
                     </div>
 
-                    {/* Update Status */}
+                    {}
                     <div className="mb-6">
                         <p className="text-sm font-medium text-[#3E2723] mb-2">Update Status</p>
                         <div className="grid grid-cols-2 gap-2">
@@ -280,7 +269,7 @@ const ReservationManagement = () => {
                         </div>
                     </div>
 
-                    {/* Actions */}
+                    {}
                     <div className="flex gap-3">
                         <Button
                             className="flex-1 bg-[#25D366] hover:bg-[#128C7E] text-white"
@@ -325,7 +314,7 @@ const ReservationManagement = () => {
                 </Button>
             </motion.div>
 
-            {/* Filters */}
+            {}
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -337,7 +326,7 @@ const ReservationManagement = () => {
                     <span className="text-sm font-medium text-[#3E2723]">Filter:</span>
                 </div>
 
-                {/* Status Filter */}
+                {}
                 <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">Status:</span>
                     <div className="relative">
@@ -354,7 +343,7 @@ const ReservationManagement = () => {
                     </div>
                 </div>
 
-                {/* Date Filter */}
+                {}
                 <div className="flex items-center gap-2">
                     <span className="text-xs text-muted-foreground">Tanggal:</span>
                     <div className="relative">
@@ -371,7 +360,7 @@ const ReservationManagement = () => {
                     </div>
                 </div>
 
-                {/* Custom Date Picker */}
+                {}
                 {dateFilter === 'custom' && (
                     <input
                         type="date"
@@ -381,7 +370,7 @@ const ReservationManagement = () => {
                     />
                 )}
 
-                {/* Results Count */}
+                {}
                 <div className="ml-auto">
                     <Badge variant="outline" className="bg-gray-50">
                         {filteredReservations.length} reservasi
@@ -508,7 +497,7 @@ const ReservationManagement = () => {
                 </CardContent>
             </Card>
 
-            {/* Detail Modal */}
+            {}
             <AnimatePresence>
                 {showDetailModal && <DetailModal />}
             </AnimatePresence>

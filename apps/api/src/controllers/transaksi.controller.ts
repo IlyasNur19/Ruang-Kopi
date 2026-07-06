@@ -4,9 +4,6 @@ import { transaksi, detailTransaksi, meja, reservations } from '../db/schema.js'
 import { eq, desc, sql, and, inArray, gte, lte } from 'drizzle-orm';
 import { emitNewTransaction, emitTableUpdate } from '../services/socket.service.js';
 
-/**
- * Generate unique order ID
- */
 function generateOrderId(): string {
     const now = new Date();
     const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
@@ -16,7 +13,7 @@ function generateOrderId(): string {
 }
 
 export const transaksiController = {
-    // POST /api/transaksi — Create new transaction (POS Checkout)
+
     create: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const {
@@ -31,17 +28,15 @@ export const transaksiController = {
                 reservationId,
             } = req.body;
 
-            // Calculate subtotal and tax from items
             const subtotal = items.reduce(
                 (sum: number, item: { subtotal: number }) => sum + item.subtotal,
                 0
             );
-            const tax = Math.round(subtotal * 0.11); // 11% PPN
+            const tax = Math.round(subtotal * 0.11);
             const orderId = generateOrderId();
 
-            // Use a database transaction to ensure consistency
             const result = await db.transaction(async (tx) => {
-                // 1. Insert transaction
+
                 const [newTransaksi] = await tx
                     .insert(transaksi)
                     .values({
@@ -61,7 +56,6 @@ export const transaksiController = {
                     })
                     .returning();
 
-                // 2. Insert transaction items
                 const detailItems = items.map(
                     (item: {
                         menuId: number;
@@ -81,7 +75,6 @@ export const transaksiController = {
 
                 await tx.insert(detailTransaksi).values(detailItems);
 
-                // 3. Update table status to 'terisi' if tableId is provided (walk-in)
                 if (tableId && !reservationId) {
                     await tx
                         .update(meja)
@@ -89,7 +82,6 @@ export const transaksiController = {
                         .where(eq(meja.id, tableId));
                 }
 
-                // 4. If this transaction is linked to a reservation, update reservation status
                 if (reservationId) {
                     await tx
                         .update(reservations)
@@ -100,7 +92,6 @@ export const transaksiController = {
                 return newTransaksi;
             });
 
-            // Fetch the complete transaction with items
             const items_result = await db
                 .select()
                 .from(detailTransaksi)
@@ -111,7 +102,6 @@ export const transaksiController = {
                 items: items_result,
             };
 
-            // Emit socket events for real-time updates
             emitNewTransaction(response);
 
             if (tableId) {
@@ -125,7 +115,6 @@ export const transaksiController = {
         }
     },
 
-    // GET /api/transaksi — Get all transactions with optional date filters (optimized: batch enrichment)
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { startDate, endDate, tipePesanan, page, limit } = req.query;
@@ -153,7 +142,6 @@ export const transaksiController = {
                 return;
             }
 
-            // Batch enrichment: collect unique IDs, fetch in 2 queries instead of N*2
             const mejaIds: number[] = [...new Set(
                 allTransaksi
                     .filter((t) => t.mejaId !== null)
@@ -189,7 +177,6 @@ export const transaksiController = {
         }
     },
 
-    // GET /api/transaksi/recent?limit=10 — Get recent transactions with items (optimized: batch queries)
     getRecent: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const limit = parseInt(req.query.limit as string) || 10;
@@ -205,7 +192,6 @@ export const transaksiController = {
                 return;
             }
 
-            // Batch: fetch all items + all tables in 2 queries
             const transaksiIds: number[] = recentTransaksi
                 .map((t) => t.id)
                 .filter((id): id is number => id !== null);
@@ -215,7 +201,6 @@ export const transaksiController = {
                     .map((t) => t.mejaId as number)
             )];
 
-            // Always query since transaksiIds is guaranteed non-empty after the guard above
             const allItems = await db
                 .select()
                 .from(detailTransaksi)
@@ -225,7 +210,6 @@ export const transaksiController = {
                 ? await db.select().from(meja).where(inArray(meja.id, mejaIds))
                 : [];
 
-            // Group items by transaction ID
             const itemsByTransaksiId = new Map<number, typeof allItems>();
             allItems.forEach((item) => {
                 const tid = item.transaksiId;
@@ -238,7 +222,6 @@ export const transaksiController = {
                 }
             });
 
-            // Build table lookup
             const mejaMap = new Map(allMeja.map((m) => [m.id, m]));
 
             const enriched = recentTransaksi.map((t) => ({
@@ -253,12 +236,10 @@ export const transaksiController = {
         }
     },
 
-    // GET /api/transaksi/summary — Get transaction summary for dashboard (optimized with SQL aggregation)
     getSummary: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { startDate, endDate } = req.query;
 
-            // Build WHERE conditions
             const conditions = [];
             if (startDate) {
                 conditions.push(gte(transaksi.createdAt, new Date(startDate as string)));
@@ -267,7 +248,6 @@ export const transaksiController = {
                 conditions.push(lte(transaksi.createdAt, new Date(endDate as string)));
             }
 
-            // Single query with SQL aggregation — no full table scan to Node.js memory
             const [result] = await db
                 .select({
                     totalTransaksi: sql<number>`CAST(COUNT(*) AS INTEGER)`,
@@ -300,7 +280,6 @@ export const transaksiController = {
         }
     },
 
-    // GET /api/transaksi/:id — Get transaction by ID with items
     getById: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -320,7 +299,6 @@ export const transaksiController = {
                 .from(detailTransaksi)
                 .where(eq(detailTransaksi.transaksiId, id));
 
-            // Enrich with related info
             let mejaInfo = null;
             if (result.mejaId) {
                 const [m] = await db.select().from(meja).where(eq(meja.id, result.mejaId));
@@ -342,7 +320,6 @@ export const transaksiController = {
         }
     },
 
-    // PUT /api/transaksi/:id/cancel — Cancel a transaction
     cancel: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -362,14 +339,12 @@ export const transaksiController = {
                 return;
             }
 
-            // Cancel the transaction
             const [updatedTransaksi] = await db
                 .update(transaksi)
                 .set({ status: 'cancelled' })
                 .where(eq(transaksi.id, id))
                 .returning();
 
-            // Release the table if occupied
             if (existingTransaksi.mejaId && !existingTransaksi.reservasiId) {
                 await db
                     .update(meja)

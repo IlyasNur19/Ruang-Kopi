@@ -22,7 +22,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
                 setMenuItems(menuData.filter(item => item.available !== false));
                 setCategories(catData);
             } catch {
-                // Silently fail
+
             } finally {
                 setLoading(false);
             }
@@ -51,7 +51,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
         if (categories.length > 0) {
             cats.push(...categories.map(c => c.name));
         } else {
-            // Fallback categories from menu items
+
             const unique = [...new Set(menuItems.map(item => item.category).filter(Boolean))];
             cats.push(...unique);
         }
@@ -92,7 +92,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
 
     return (
         <div className="space-y-5">
-            {/* Header */}
+            {}
             <div className="flex items-center justify-between">
                 <button onClick={onBack} className="flex items-center gap-1 text-[#6D4C41] hover:text-[#3E2723] text-sm">
                     <ChevronLeft size={16} /> Kembali
@@ -106,7 +106,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
                 </p>
             </div>
 
-            {/* Search */}
+            {}
             <div className="relative">
                 <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#A1887F]" />
                 <input
@@ -118,7 +118,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
                 />
             </div>
 
-            {/* Category Filter */}
+            {}
             {categoryLabels.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                     {categoryLabels.map(cat => (
@@ -136,7 +136,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
                 </div>
             )}
 
-            {/* Menu Grid */}
+            {}
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-3">
                     <Loader2 className="w-8 h-8 text-[#3E2723] animate-spin" />
@@ -159,7 +159,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
                                 transition={{ delay: index * 0.03 }}
                                 className="flex items-center gap-3 bg-white rounded-xl p-3 border border-gray-100 hover:border-[#3E2723]/15 transition-all"
                             >
-                                {/* Image */}
+                                {}
                                 <div className="w-14 h-14 rounded-lg bg-[#F5F0EB] overflow-hidden shrink-0">
                                     {item.image ? (
                                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
@@ -170,7 +170,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
                                     )}
                                 </div>
 
-                                {/* Info */}
+                                {}
                                 <div className="flex-1 min-w-0">
                                     <h4 className="text-sm font-semibold text-[#3E2723] truncate">{item.name}</h4>
                                     <p className="text-xs text-[#6D4C41]/70 truncate">
@@ -181,7 +181,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
                                     </p>
                                 </div>
 
-                                {/* Qty Controls */}
+                                {}
                                 <div className="flex items-center gap-2 shrink-0">
                                     {qty > 0 ? (
                                         <>
@@ -216,7 +216,7 @@ const PreOrderStep = ({ cartItems, onCartChange, onNext, onBack }) => {
                 </div>
             )}
 
-            {/* Cart Summary & Next */}
+            {}
             <div className="pt-3 border-t border-gray-200">
                 {cartCount > 0 && (
                     <div className="flex items-center justify-between mb-3 p-3 bg-[#F5F0EB] rounded-xl">

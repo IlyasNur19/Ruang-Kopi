@@ -67,7 +67,7 @@ const POSDashboard = () => {
         const fetchDashboardData = async () => {
             try {
                 setLoading(true);
-                
+
                 const [
                     statsData,
                     mejaStatusData,
@@ -116,13 +116,12 @@ const POSDashboard = () => {
                 }
 
                 if (reservationsData && Array.isArray(reservationsData)) {
-                    // Filter reservations for today that are pending
-                    // Use local timezone to get YYYY-MM-DD
+
                     const today = new Date();
                     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-                    
-                    const todaysPending = reservationsData.filter(r => 
-                        r.date === todayStr && 
+
+                    const todaysPending = reservationsData.filter(r =>
+                        r.date === todayStr &&
                         (r.status === 'Pending' || r.status === 'pending')
                     );
                     setReservations(todaysPending);
@@ -136,8 +135,7 @@ const POSDashboard = () => {
         };
 
         fetchDashboardData();
-        
-        // Optional: Auto-refresh every 60 seconds
+
         const interval = setInterval(fetchDashboardData, 60000);
         return () => clearInterval(interval);
     }, []);
@@ -182,8 +180,8 @@ const POSDashboard = () => {
     return (
         <div className="flex-1 h-full overflow-y-auto bg-[#F5F0EB] p-6 custom-scrollbar">
             <div className="max-w-7xl mx-auto space-y-6">
-                
-                {/* Header */}
+
+                {}
                 <div className="flex justify-between items-end">
                     <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
                         <h1 className="text-2xl font-bold text-[#3E2723] tracking-tight">Dashboard Kasir</h1>
@@ -195,10 +193,10 @@ const POSDashboard = () => {
                     </div>
                 </div>
 
-                {/* Stat Cards */}
+                {}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {statCards.map((card, idx) => (
-                        <motion.div 
+                        <motion.div
                             key={idx}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -219,10 +217,10 @@ const POSDashboard = () => {
                     ))}
                 </div>
 
-                {/* Charts Row */}
+                {}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Revenue Area Chart */}
-                    <motion.div 
+                    {}
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
@@ -239,39 +237,39 @@ const POSDashboard = () => {
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0D8D0" />
-                                    <XAxis 
-                                        dataKey="date" 
-                                        axisLine={false} 
-                                        tickLine={false} 
-                                        tick={{ fill: '#8D6E63', fontSize: 12 }} 
+                                    <XAxis
+                                        dataKey="date"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#8D6E63', fontSize: 12 }}
                                         dy={10}
                                     />
-                                    <YAxis 
-                                        axisLine={false} 
-                                        tickLine={false} 
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
                                         tick={{ fill: '#8D6E63', fontSize: 12 }}
                                         tickFormatter={(val) => `Rp${(val/1000000).toFixed(1)}M`}
                                         dx={-10}
                                     />
-                                    <Tooltip 
+                                    <Tooltip
                                         formatter={(value) => [formatCurrency(value), 'Pendapatan']}
                                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                     />
-                                    <Area 
-                                        type="monotone" 
-                                        dataKey="revenue" 
-                                        stroke="#3E2723" 
+                                    <Area
+                                        type="monotone"
+                                        dataKey="revenue"
+                                        stroke="#3E2723"
                                         strokeWidth={3}
-                                        fillOpacity={1} 
-                                        fill="url(#colorRevenue)" 
+                                        fillOpacity={1}
+                                        fill="url(#colorRevenue)"
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
                     </motion.div>
 
-                    {/* Payment Method Pie Chart */}
-                    <motion.div 
+                    {}
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
@@ -306,26 +304,26 @@ const POSDashboard = () => {
                     </motion.div>
                 </div>
 
-                {/* Bottom Row */}
+                {}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-8">
-                    
-                    {/* Recent Transactions & Quick Actions */}
-                    <motion.div 
+
+                    {}
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
                         className="lg:col-span-2 space-y-6"
                     >
-                        {/* Quick Actions */}
+                        {}
                         <div className="grid grid-cols-2 gap-4">
-                            <button 
+                            <button
                                 onClick={() => setActiveView('menu')}
                                 className="bg-[#3E2723] text-white p-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-[#4E342E] transition-colors shadow-sm"
                             >
                                 <PlusCircle size={20} />
                                 <span className="font-semibold text-sm">Pesanan Baru</span>
                             </button>
-                            <button 
+                            <button
                                 onClick={() => toggleTableMap()}
                                 className="bg-white text-[#3E2723] border border-[#3E2723]/20 p-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-[#F5F0EB] transition-colors shadow-sm"
                             >
@@ -334,7 +332,7 @@ const POSDashboard = () => {
                             </button>
                         </div>
 
-                        {/* Recent Transactions Table */}
+                        {}
                         <div className="bg-white rounded-2xl shadow-sm border border-[#3E2723]/5 overflow-hidden">
                             <div className="px-6 py-5 border-b border-[#3E2723]/5 flex justify-between items-center">
                                 <h3 className="text-base font-bold text-[#3E2723]">Transaksi Terakhir</h3>
@@ -387,8 +385,8 @@ const POSDashboard = () => {
                         </div>
                     </motion.div>
 
-                    {/* Today's Reservations */}
-                    <motion.div 
+                    {}
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
@@ -442,7 +440,7 @@ const POSDashboard = () => {
                             )}
                         </div>
                         <div className="p-4 border-t border-[#3E2723]/5">
-                            <button 
+                            <button
                                 onClick={() => setActiveView('reservation')}
                                 className="w-full py-2.5 text-sm font-semibold text-[#3E2723] bg-[#F5F0EB] hover:bg-[#E0D8D0] rounded-xl transition-colors"
                             >

@@ -4,7 +4,7 @@ import { shopSettings } from '../db/schema.js';
 import { eq, sql } from 'drizzle-orm';
 
 export const settingsController = {
-    // GET /api/settings/status
+
     getStatus: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const [setting] = await db
@@ -23,7 +23,6 @@ export const settingsController = {
         }
     },
 
-    // PUT /api/settings/status
     updateStatus: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { status } = req.body;
@@ -53,7 +52,6 @@ export const settingsController = {
         }
     },
 
-    // GET /api/settings/space-images
     getSpaceImages: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const [setting] = await db
@@ -78,7 +76,6 @@ export const settingsController = {
         }
     },
 
-    // PUT /api/settings/space-images
     updateSpaceImages: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { images } = req.body;
@@ -109,7 +106,6 @@ export const settingsController = {
         }
     },
 
-    // GET /api/settings/hero-image
     getHeroImage: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const [setting] = await db
@@ -118,7 +114,7 @@ export const settingsController = {
                 .where(eq(shopSettings.key, 'hero_image'));
 
             if (!setting) {
-                // Default hero image
+
                 res.json({
                     heroImage: 'https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&q=80'
                 });
@@ -131,7 +127,6 @@ export const settingsController = {
         }
     },
 
-    // PUT /api/settings/hero-image
     updateHeroImage: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { heroImage } = req.body;

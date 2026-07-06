@@ -13,9 +13,6 @@ import {
     emitNewTransaction,
 } from '../services/socket.service.js';
 
-/**
- * Generate a unique Midtrans order ID
- */
 function generateMidtransOrderId(): string {
     const now = new Date();
     const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
@@ -25,24 +22,17 @@ function generateMidtransOrderId(): string {
 }
 
 export const paymentController = {
-    /**
-     * POST /api/payment/snap-token
-     * Generate a Midtrans Snap token for the popup payment flow
-     * Used for:
-     *   - Online reservation down payment (DP) — via reservationId
-     *   - POS QRIS payment — via transaksiId
-     */
+
     createSnapToken: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { reservationId, transaksiId, amount, customerName, customerEmail, customerPhone, items: requestItems } = req.body;
 
             const orderId = generateMidtransOrderId();
 
-            // Build items list for Midtrans
             let snapItems: Array<{ id: string; price: number; quantity: number; name: string }> = [];
 
             if (transaksiId) {
-                // POS flow: fetch transaction items from database
+
                 const [existingTransaction] = await db
                     .select()
                     .from(transaksi)
@@ -53,7 +43,6 @@ export const paymentController = {
                     return;
                 }
 
-                // Use request items if provided, otherwise create a single item
                 if (requestItems && requestItems.length > 0) {
                     snapItems = requestItems.map((item: { id?: string; menuId?: number; price: number; quantity?: number; qty?: number; name: string }) => ({
                         id: String(item.id || item.menuId || 'ITEM'),
@@ -70,7 +59,7 @@ export const paymentController = {
                     }];
                 }
             } else {
-                // Reservation DP flow (existing behavior)
+
                 snapItems = [{
                     id: 'DP-RESERVASI',
                     price: amount,
@@ -79,7 +68,6 @@ export const paymentController = {
                 }];
             }
 
-            // Generate Snap token via Midtrans API
             const { token, redirect_url } = await createSnapTransaction({
                 orderId,
                 amount,
@@ -89,7 +77,6 @@ export const paymentController = {
                 items: snapItems,
             });
 
-            // Insert payment record into database
             const [payment] = await db
                 .insert(paymentGateway)
                 .values({
@@ -101,7 +88,6 @@ export const paymentController = {
                 })
                 .returning();
 
-            // If this is for a reservation, lock the table
             if (reservationId) {
                 const [reservation] = await db
                     .select()
@@ -114,7 +100,6 @@ export const paymentController = {
                         .set({ status: 'direservasi' })
                         .where(eq(meja.id, reservation.mejaId));
 
-                    // Emit real-time table update
                     emitPaymentConfirmed({
                         tableId: reservation.mejaId,
                         reservationId: reservation.id,
@@ -134,12 +119,6 @@ export const paymentController = {
         }
     },
 
-
-    /**
-     * POST /api/payment/webhook
-     * Handle Midtrans webhook notifications for payment status updates
-     * Called by Midtrans server when payment status changes
-     */
     webhook: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const {
@@ -159,7 +138,6 @@ export const paymentController = {
                 status_code,
             });
 
-            // Verify webhook signature for security
             const isSignatureValid = verifyWebhookSignature(
                 order_id,
                 status_code,
@@ -173,7 +151,6 @@ export const paymentController = {
                 return;
             }
 
-            // Find the payment record
             const [payment] = await db
                 .select()
                 .from(paymentGateway)
@@ -185,10 +162,8 @@ export const paymentController = {
                 return;
             }
 
-            // Map Midtrans status to our internal status
             const internalStatus = mapMidtransStatus(transaction_status);
 
-            // Update payment record
             await db
                 .update(paymentGateway)
                 .set({
@@ -199,7 +174,6 @@ export const paymentController = {
                 })
                 .where(eq(paymentGateway.id, payment.id));
 
-            // Handle reservation-related payment
             if (payment.reservasiId) {
                 const [reservation] = await db
                     .select()
@@ -208,13 +182,12 @@ export const paymentController = {
 
                 if (reservation) {
                     if (internalStatus === 'settlement') {
-                        // Update reservation status to 'dibayar'
+
                         await db
                             .update(reservations)
                             .set({ status: 'dibayar' })
                             .where(eq(reservations.id, reservation.id));
 
-                        // Lock the table
                         if (reservation.mejaId) {
                             await db
                                 .update(meja)
@@ -230,7 +203,7 @@ export const paymentController = {
                             emitTableUpdate(reservation.mejaId, 'direservasi');
                         }
                     } else if (internalStatus === 'cancel' || internalStatus === 'expire') {
-                        // Release the table if payment failed/expired
+
                         if (reservation.mejaId) {
                             await db
                                 .update(meja)
@@ -240,7 +213,6 @@ export const paymentController = {
                             emitTableUpdate(reservation.mejaId, 'tersedia');
                         }
 
-                        // Update reservation to 'batal'
                         await db
                             .update(reservations)
                             .set({ status: 'batal' })
@@ -249,7 +221,6 @@ export const paymentController = {
                 }
             }
 
-            // Handle transaction-related payment
             if (payment.transaksiId) {
                 if (internalStatus === 'settlement') {
                     await db
@@ -257,7 +228,6 @@ export const paymentController = {
                         .set({ status: 'completed' })
                         .where(eq(transaksi.id, payment.transaksiId));
 
-                    // Emit real-time update so POS dashboard refreshes
                     const [updatedTrx] = await db
                         .select()
                         .from(transaksi)
@@ -283,15 +253,11 @@ export const paymentController = {
             });
         } catch (error) {
             console.error('[Payment Webhook] Error processing webhook:', error);
-            // Always return 200 to Midtrans to prevent retries
+
             res.status(200).json({ status: 'error', message: 'Internal error, logged' });
         }
     },
 
-    /**
-     * GET /api/payment/status/:orderId
-     * Check payment status (for frontend polling)
-     */
     getStatus: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const orderId = req.params.orderId as string;
@@ -317,10 +283,6 @@ export const paymentController = {
         }
     },
 
-    /**
-     * GET /api/payment/by-reservation/:reservationId
-     * Get payment info for a specific reservation
-     */
     getByReservation: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const reservationId = parseInt(req.params.reservationId as string);
@@ -341,9 +303,6 @@ export const paymentController = {
         }
     },
 
-    /**
-     * GET /api/payment/all — Get all payment records (admin)
-     */
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const allPayments = await db.select().from(paymentGateway);

@@ -15,7 +15,6 @@ const POSLayout = () => {
     const itemCount = useCartStore((s) => s.getItemCount);
     const activeView = useUIStore((s) => s.posActiveView);
 
-    // Reservation view
     if (activeView === 'reservation') {
         return (
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -26,7 +25,6 @@ const POSLayout = () => {
         );
     }
 
-    // Dashboard view
     if (activeView === 'dashboard') {
         return (
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -35,25 +33,24 @@ const POSLayout = () => {
         );
     }
 
-    // Default: Menu view
     return (
         <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Top Bar with Search */}
+            {}
             <POSTopBar searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-            {/* Main Content: Menu + Cart */}
+            {}
             <div className="flex-1 flex overflow-hidden">
-                {/* Menu Panel - Center */}
+                {}
                 <div className="flex-1 h-full overflow-hidden">
                     <MenuPanel searchQuery={searchQuery} />
                 </div>
 
-                {/* Cart Panel - Right (desktop only) */}
+                {}
                 <div className="hidden lg:flex w-[340px] xl:w-[380px] h-full overflow-hidden border-l border-[#3E2723]/5 shrink-0">
                     <CartPanel />
                 </div>
 
-                {/* Mobile: Cart as bottom sheet */}
+                {}
                 <div className="lg:hidden">
                     <Sheet open={mobileCartOpen} onOpenChange={setMobileCartOpen}>
                         <SheetTrigger asChild>
@@ -82,4 +79,3 @@ const POSLayout = () => {
 };
 
 export default POSLayout;
-

@@ -6,7 +6,6 @@ const ReservationCalendar = ({ selected, onSelect, disabledDates = [] }) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Max booking: 30 days ahead
     const maxDate = new Date(today);
     maxDate.setDate(maxDate.getDate() + 30);
 

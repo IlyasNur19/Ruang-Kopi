@@ -5,7 +5,7 @@ import { eq, desc } from 'drizzle-orm';
 import { emitNewIdea } from '../services/socket.service.js';
 
 export const ideasController = {
-    // GET /api/ideas
+
     getAll: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const allIdeas = await db
@@ -19,7 +19,6 @@ export const ideasController = {
         }
     },
 
-    // POST /api/ideas
     create: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { name, contact, topic, message } = req.body;
@@ -35,7 +34,6 @@ export const ideasController = {
                 })
                 .returning();
 
-            // Emit real-time notification to admin dashboard
             emitNewIdea(newIdea);
 
             res.status(201).json(newIdea);
@@ -44,7 +42,6 @@ export const ideasController = {
         }
     },
 
-    // PUT /api/ideas/:id
     update: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);
@@ -67,7 +64,6 @@ export const ideasController = {
         }
     },
 
-    // DELETE /api/ideas/:id
     delete: async (req: Request, res: Response, next: NextFunction) => {
         try {
             const id = parseInt(req.params.id as string);

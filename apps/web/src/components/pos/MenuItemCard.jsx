@@ -36,7 +36,7 @@ const MenuItemCard = ({ item }) => {
                 isUnavailable && 'opacity-50 pointer-events-none'
             )}
         >
-            {/* Image */}
+            {}
             <div className="relative h-36 bg-[#F9F7F5] flex items-center justify-center overflow-hidden">
                 {item.image ? (
                     <img
@@ -51,7 +51,7 @@ const MenuItemCard = ({ item }) => {
                     </div>
                 )}
 
-                {/* Category Badge */}
+                {}
                 {categoryLabel && (
                     <span className={cn(
                         'absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize',
@@ -61,7 +61,7 @@ const MenuItemCard = ({ item }) => {
                     </span>
                 )}
 
-                {/* Unavailable overlay */}
+                {}
                 {isUnavailable && (
                     <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
                         <span className="text-xs font-semibold text-[#6D4C41] bg-white px-3 py-1 rounded-full shadow-sm">
@@ -71,7 +71,7 @@ const MenuItemCard = ({ item }) => {
                 )}
             </div>
 
-            {/* Info */}
+            {}
             <div className="p-3">
                 <h3 className="font-semibold text-sm text-[#3E2723] line-clamp-2 mb-1 leading-snug">
                     {item.name}
@@ -82,7 +82,7 @@ const MenuItemCard = ({ item }) => {
                     </p>
 
                     {isInCart ? (
-                        // Quantity controls when item is in cart
+
                         <div className="flex items-center gap-1">
                             <button
                                 onClick={() => decrementQty(cartItem.id)}
@@ -101,7 +101,7 @@ const MenuItemCard = ({ item }) => {
                             </button>
                         </div>
                     ) : (
-                        // Add to Dish button
+
                         <button
                             onClick={handleAdd}
                             className="text-xs font-semibold text-[#3E2723] hover:text-[#4E342E] px-3 py-1.5 rounded-lg hover:bg-[#F5F0EB] transition-all active:scale-95"

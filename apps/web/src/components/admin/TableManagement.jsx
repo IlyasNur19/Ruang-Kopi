@@ -55,7 +55,7 @@ const TableManagement = () => {
             setSaving(true);
 
             if (usingLocal) {
-                // Gunakan localStorage
+
                 let updated;
                 if (editingId) {
                     updated = tables.map((t) =>
@@ -71,7 +71,7 @@ const TableManagement = () => {
                 setTables(updated);
                 saveLocalTables(updated);
             } else {
-                // Gunakan API
+
                 if (editingId) {
                     await mejaApi.update(editingId, formData);
                 } else {
@@ -207,7 +207,7 @@ const TableManagement = () => {
                 </CardContent>
             </Card>
 
-            {/* Add/Edit Dialog */}
+            {}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -271,7 +271,7 @@ const TableManagement = () => {
                 </DialogContent>
             </Dialog>
 
-            {/* Delete Confirmation Dialog */}
+            {}
             <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
                 <DialogContent>
                     <DialogHeader>

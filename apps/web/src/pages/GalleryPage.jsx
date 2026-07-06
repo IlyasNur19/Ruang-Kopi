@@ -7,7 +7,7 @@ import { galleryApi } from '../services/api';
 import { useApi } from '../hooks/useApi';
 
 const GalleryPage = () => {
-    // Fetch gallery images from API
+
     const { data: galleryImages, loading, error, refetch } = useApi(galleryApi.getAll);
 
     return (
@@ -15,7 +15,7 @@ const GalleryPage = () => {
             <Navbar />
             <main className="flex-grow pt-28 pb-20">
                 <div className="container mx-auto px-4">
-                    {/* Page Header */}
+                    {}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -30,7 +30,7 @@ const GalleryPage = () => {
                         </p>
                     </motion.div>
 
-                    {/* Loading State */}
+                    {}
                     {loading && (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 className="w-10 h-10 text-primary animate-spin" />
@@ -38,7 +38,7 @@ const GalleryPage = () => {
                         </div>
                     )}
 
-                    {/* Error State */}
+                    {}
                     {error && !loading && (
                         <div className="text-center py-20">
                             <p className="text-red-500 mb-4">Gagal memuat galeri: {error}</p>
@@ -51,7 +51,7 @@ const GalleryPage = () => {
                         </div>
                     )}
 
-                    {/* Masonry Grid */}
+                    {}
                     {!loading && !error && galleryImages && (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-6xl mx-auto auto-rows-[200px]">
                             {galleryImages.map((img, index) => (
@@ -78,7 +78,7 @@ const GalleryPage = () => {
                         </div>
                     )}
 
-                    {/* Empty State */}
+                    {}
                     {!loading && !error && galleryImages && galleryImages.length === 0 && (
                         <div className="text-center py-20">
                             <p className="text-muted-foreground">Belum ada gambar di galeri.</p>

@@ -42,7 +42,7 @@ const POSSidebar = () => {
 
     return (
         <aside className="w-[220px] h-full bg-[#2D2420] text-[#D7CCC8] flex flex-col shrink-0">
-            {/* Brand */}
+            {}
             <div className="px-5 py-5 flex items-center gap-3 border-b border-white/10">
                 <div className="w-10 h-10 rounded-xl bg-[#8D6E63] flex items-center justify-center shadow-md">
                     <Coffee size={20} className="text-white" />
@@ -53,7 +53,7 @@ const POSSidebar = () => {
                 </div>
             </div>
 
-            {/* Navigation */}
+            {}
             <nav className="flex-1 px-3 py-4">
                 <div className="space-y-1">
                     {menuItems.map((item) => {
@@ -77,9 +77,9 @@ const POSSidebar = () => {
                 </div>
             </nav>
 
-            {/* User Info at Bottom */}
+            {}
             <div className="px-3 pb-4 space-y-2 border-t border-white/10 pt-4">
-                {/* User Avatar */}
+                {}
                 <div className="flex items-center gap-3 px-3 py-2">
                     <div className="w-8 h-8 rounded-full bg-[#5D4037] flex items-center justify-center">
                         <User size={16} className="text-white" />
@@ -90,7 +90,7 @@ const POSSidebar = () => {
                     </div>
                 </div>
 
-                {/* Logout */}
+                {}
                 <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-400/10 hover:text-red-300 transition-all"
