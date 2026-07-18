@@ -17,6 +17,7 @@ export const dashboardController = {
                 .select({
                     count: sql<number>`CAST(COUNT(*) AS INTEGER)`,
                     revenue: sql<number>`CAST(COALESCE(SUM(${transaksi.total}), 0) AS INTEGER)`,
+                    totalHpp: sql<number>`CAST(COALESCE(SUM(${transaksi.totalHpp}), 0) AS INTEGER)`,
                 })
                 .from(transaksi)
                 .where(gte(transaksi.createdAt, today));
@@ -25,6 +26,7 @@ export const dashboardController = {
                 .select({
                     count: sql<number>`CAST(COUNT(*) AS INTEGER)`,
                     revenue: sql<number>`CAST(COALESCE(SUM(${transaksi.total}), 0) AS INTEGER)`,
+                    totalHpp: sql<number>`CAST(COALESCE(SUM(${transaksi.totalHpp}), 0) AS INTEGER)`,
                 })
                 .from(transaksi)
                 .where(gte(transaksi.createdAt, startOfMonth));
@@ -33,25 +35,29 @@ export const dashboardController = {
                 .select({
                     count: sql<number>`CAST(COUNT(*) AS INTEGER)`,
                     revenue: sql<number>`CAST(COALESCE(SUM(${transaksi.total}), 0) AS INTEGER)`,
+                    totalHpp: sql<number>`CAST(COALESCE(SUM(${transaksi.totalHpp}), 0) AS INTEGER)`,
                 })
                 .from(transaksi);
 
-            const todayStats = todayResult[0] || { count: 0, revenue: 0 };
-            const monthStats = monthResult[0] || { count: 0, revenue: 0 };
-            const totalStats = totalResult[0] || { count: 0, revenue: 0 };
+            const todayStats = todayResult[0] || { count: 0, revenue: 0, totalHpp: 0 };
+            const monthStats = monthResult[0] || { count: 0, revenue: 0, totalHpp: 0 };
+            const totalStats = totalResult[0] || { count: 0, revenue: 0, totalHpp: 0 };
 
             const stats = {
                 today: {
                     count: todayStats.count,
                     revenue: todayStats.revenue,
+                    netProfit: todayStats.revenue - (todayStats.totalHpp || 0),
                 },
                 thisMonth: {
                     count: monthStats.count,
                     revenue: monthStats.revenue,
+                    netProfit: monthStats.revenue - (monthStats.totalHpp || 0),
                 },
                 total: {
                     count: totalStats.count,
                     revenue: totalStats.revenue,
+                    netProfit: totalStats.revenue - (totalStats.totalHpp || 0),
                 },
                 averagePerTransaction: totalStats.count
                     ? Math.round(totalStats.revenue / totalStats.count)
@@ -82,6 +88,7 @@ export const dashboardController = {
                 .select({
                     date: sql<string>`TO_CHAR((${transaksi.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD')`,
                     revenue: sql<number>`CAST(COALESCE(SUM(${transaksi.total}), 0) AS INTEGER)`,
+                    totalHpp: sql<number>`CAST(COALESCE(SUM(${transaksi.totalHpp}), 0) AS INTEGER)`,
                 })
                 .from(transaksi)
                 .where(
@@ -93,18 +100,22 @@ export const dashboardController = {
                 .groupBy(sql`TO_CHAR((${transaksi.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD')`)
                 .orderBy(sql`TO_CHAR((${transaksi.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Asia/Jakarta'), 'YYYY-MM-DD')`);
 
-            const revenueMap = new Map<string, number>();
+            const revenueMap = new Map<string, { revenue: number, netProfit: number }>();
             rows.forEach((row) => {
-                revenueMap.set(row.date, row.revenue);
+                revenueMap.set(row.date, { 
+                    revenue: row.revenue, 
+                    netProfit: row.revenue - (row.totalHpp || 0)
+                });
             });
 
-            const dailyRevenue: { date: string; revenue: number }[] = [];
+            const dailyRevenue: { date: string; revenue: number; netProfit: number }[] = [];
             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-
                 const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                const data = revenueMap.get(dateKey) || { revenue: 0, netProfit: 0 };
                 dailyRevenue.push({
                     date: dateKey,
-                    revenue: revenueMap.get(dateKey) || 0,
+                    revenue: data.revenue,
+                    netProfit: data.netProfit,
                 });
             }
 
@@ -201,14 +212,44 @@ export const dashboardController = {
                 }
             });
 
-            const result = recentTransaksi.map((t) => ({
+            const enriched = recentTransaksi.map((t) => ({
                 ...t,
                 items: itemsByTransaksiId.get(t.id) || [],
             }));
 
-            res.json(result);
+            res.json(enriched);
         } catch (error) {
             next(error);
         }
     },
+
+    getPopularMenus: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const popularItems = await db
+                .select({
+                    menuId: detailTransaksi.menuId,
+                    namaMenu: sql<string>`MAX(${detailTransaksi.namaMenu})`,
+                    totalSold: sql<number>`CAST(SUM(${detailTransaksi.qty}) AS INTEGER)`,
+                    totalRevenue: sql<number>`CAST(SUM(${detailTransaksi.subtotal}) AS INTEGER)`,
+                    totalHpp: sql<number>`CAST(SUM(${detailTransaksi.hpp} * ${detailTransaksi.qty}) AS INTEGER)`,
+                })
+                .from(detailTransaksi)
+                .where(sql`${detailTransaksi.menuId} IS NOT NULL`)
+                .groupBy(detailTransaksi.menuId)
+                .orderBy(desc(sql`SUM(${detailTransaksi.qty})`))
+                .limit(10);
+            
+            const results = popularItems.map(item => ({
+                menuId: item.menuId,
+                namaMenu: item.namaMenu,
+                totalSold: item.totalSold,
+                totalRevenue: item.totalRevenue,
+                netProfit: item.totalRevenue - (item.totalHpp || 0)
+            }));
+
+            res.json(results);
+        } catch (error) {
+            next(error);
+        }
+    }
 };

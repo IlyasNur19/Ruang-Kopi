@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../db/index.js';
-import { transaksi, detailTransaksi, meja, reservations } from '../db/schema.js';
+import { transaksi, detailTransaksi, meja, reservations, menuItems } from '../db/schema.js';
 import { eq, desc, sql, and, inArray, gte, lte } from 'drizzle-orm';
 import { emitNewTransaction, emitTableUpdate } from '../services/socket.service.js';
 
@@ -35,6 +35,27 @@ export const transaksiController = {
             const tax = Math.round(subtotal * 0.11);
             const orderId = generateOrderId();
 
+            // Fetch HPP for all items
+            const menuIds = items.map((item: any) => item.menuId).filter((id: any) => id != null);
+            let menuHppMap = new Map<number, number>();
+            if (menuIds.length > 0) {
+                const dbMenus = await db
+                    .select({ id: menuItems.id, hpp: menuItems.hpp })
+                    .from(menuItems)
+                    .where(inArray(menuItems.id, menuIds));
+                
+                dbMenus.forEach(m => {
+                    menuHppMap.set(m.id, m.hpp);
+                });
+            }
+
+            let totalHpp = 0;
+            items.forEach((item: any) => {
+                const hppPerItem = menuHppMap.get(item.menuId) || 0;
+                item.hpp = hppPerItem;
+                totalHpp += hppPerItem * item.qty;
+            });
+
             const result = await db.transaction(async (tx) => {
 
                 const [newTransaksi] = await tx
@@ -49,6 +70,7 @@ export const transaksiController = {
                         paymentMethod: paymentMethod || 'cash',
                         subtotal,
                         tax,
+                        totalHpp,
                         total,
                         amountPaid: amountPaid || total,
                         change: change || 0,
@@ -69,6 +91,7 @@ export const transaksiController = {
                         namaMenu: item.name,
                         qty: item.qty,
                         harga: item.price,
+                        hpp: item.hpp,
                         subtotal: item.subtotal,
                     })
                 );
@@ -153,22 +176,38 @@ export const transaksiController = {
                     .map((t) => t.reservasiId as number)
             )];
 
-            const [allMeja, allReservasi] = await Promise.all([
+            const [allMeja, allReservasi, allItems] = await Promise.all([
                 mejaIds.length > 0
                     ? db.select().from(meja).where(inArray(meja.id, mejaIds))
                     : Promise.resolve([]),
                 reservasiIds.length > 0
                     ? db.select().from(reservations).where(inArray(reservations.id, reservasiIds))
                     : Promise.resolve([]),
+                allTransaksi.length > 0
+                    ? db.select().from(detailTransaksi).where(inArray(detailTransaksi.transaksiId, allTransaksi.map(t => t.id)))
+                    : Promise.resolve([]),
             ]);
 
             const mejaMap = new Map(allMeja.map((m) => [m.id, m]));
             const reservasiMap = new Map(allReservasi.map((r) => [r.id, r]));
+            const itemsMap = new Map<number, typeof allItems>();
+            
+            allItems.forEach((item) => {
+                const tid = item.transaksiId;
+                if (tid === null) return;
+                const existing = itemsMap.get(tid);
+                if (existing) {
+                    existing.push(item);
+                } else {
+                    itemsMap.set(tid, [item]);
+                }
+            });
 
             const enriched = allTransaksi.map((t) => ({
                 ...t,
                 meja: t.mejaId ? mejaMap.get(t.mejaId) || null : null,
                 reservasi: t.reservasiId ? reservasiMap.get(t.reservasiId) || null : null,
+                items: itemsMap.get(t.id) || [],
             }));
 
             res.json(enriched);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Coffee, AlertTriangle, CheckCircle, XCircle, Users, Calendar, ShoppingBag, Loader2 } from 'lucide-react';
-import { menuApi, reservationsApi, settingsApi } from '../../services/api';
+import { menuApi, reservationsApi, settingsApi, dashboardApi } from '../../services/api';
 import { Card, CardContent } from '../ui/card';
 import RevenueBarChart from './RevenueBarChart';
 import TransactionTypePieChart from './TransactionTypePieChart';
@@ -13,7 +13,11 @@ const DashboardOverview = () => {
         menuItems: 0,
         reservations: 0,
         pendingReservations: 0,
+        todayNetProfit: 0,
+        monthNetProfit: 0,
+        todayRevenue: 0,
     });
+    const [popularMenus, setPopularMenus] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
@@ -24,19 +28,26 @@ const DashboardOverview = () => {
                 setLoading(true);
                 setError(null);
 
-                const [menuData, reservationsData, statusData] = await Promise.all([
+                const [menuData, reservationsData, statusData, statsData, popularData] = await Promise.all([
                     menuApi.getAll().catch(() => []),
                     reservationsApi.getAll().catch(() => []),
                     settingsApi.getStatus().catch(() => ({ status: 'available' })),
+                    dashboardApi.getStats().catch(() => null),
+                    dashboardApi.getPopularMenus().catch(() => []),
                 ]);
 
                 const menuItems = Array.isArray(menuData) ? menuData : [];
                 const reservations = Array.isArray(reservationsData) ? reservationsData : [];
+                
+                setPopularMenus(Array.isArray(popularData) ? popularData : []);
 
                 setStats({
                     menuItems: menuItems.length,
                     reservations: reservations.length,
                     pendingReservations: reservations.filter(r => r.status === 'Pending').length,
+                    todayNetProfit: statsData?.today?.netProfit || 0,
+                    monthNetProfit: statsData?.thisMonth?.netProfit || 0,
+                    todayRevenue: statsData?.today?.revenue || 0,
                 });
 
                 if (statusData && statusData.status) {
@@ -99,23 +110,31 @@ const DashboardOverview = () => {
         }
     ];
 
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0
+        }).format(amount);
+    };
+
     const statsCards = [
         {
-            label: 'Menu Items',
-            value: stats.menuItems,
+            label: 'Pendapatan Hari Ini',
+            value: formatCurrency(stats.todayRevenue),
             icon: <ShoppingBag size={20} />,
             color: 'bg-blue-100 text-blue-600'
         },
         {
-            label: 'Total Reservations',
-            value: stats.reservations,
-            icon: <Calendar size={20} />,
+            label: 'Laba Bersih (Hari Ini)',
+            value: formatCurrency(stats.todayNetProfit),
+            icon: <CheckCircle size={20} />,
             color: 'bg-green-100 text-green-600'
         },
         {
-            label: 'Pending Reservations',
-            value: stats.pendingReservations,
-            icon: <Users size={20} />,
+            label: 'Laba Bersih (Bulan Ini)',
+            value: formatCurrency(stats.monthNetProfit),
+            icon: <Calendar size={20} />,
             color: 'bg-purple-100 text-purple-600'
         },
     ];
@@ -191,6 +210,45 @@ const DashboardOverview = () => {
                     <RecentTransactionsTable />
                 </CardContent>
             </Card>
+
+            <section>
+                <h2 className="text-xl font-semibold mb-4 text-foreground">Menu Paling Menguntungkan & Terlaris</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card className="border-none shadow-sm">
+                        <CardContent className="p-6">
+                            <h3 className="font-semibold mb-4">Top 5 Paling Terlaris (Qty)</h3>
+                            <div className="space-y-4">
+                                {popularMenus.slice(0,5).map((menu, i) => (
+                                    <div key={menu.menuId} className="flex justify-between items-center border-b pb-2">
+                                        <div className="flex gap-2 items-center">
+                                            <span className="font-bold text-muted-foreground w-4">{i + 1}.</span>
+                                            <span className="font-medium text-sm">{menu.namaMenu}</span>
+                                        </div>
+                                        <span className="font-bold text-primary">{menu.totalSold} terjual</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border-none shadow-sm">
+                        <CardContent className="p-6">
+                            <h3 className="font-semibold mb-4">Top 5 Paling Menguntungkan (Laba)</h3>
+                            <div className="space-y-4">
+                                {[...popularMenus].sort((a,b) => b.netProfit - a.netProfit).slice(0,5).map((menu, i) => (
+                                    <div key={menu.menuId} className="flex justify-between items-center border-b pb-2">
+                                        <div className="flex gap-2 items-center">
+                                            <span className="font-bold text-muted-foreground w-4">{i + 1}.</span>
+                                            <span className="font-medium text-sm">{menu.namaMenu}</span>
+                                        </div>
+                                        <span className="font-bold text-green-600">{formatCurrency(menu.netProfit)}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </section>
 
             {}
             <section>

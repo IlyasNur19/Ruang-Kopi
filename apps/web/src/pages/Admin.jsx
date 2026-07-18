@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Coffee, Image, Calendar, User, LogOut, Menu, X, Home, Lightbulb, ImageIcon, Grid3X3 } from 'lucide-react';
+import { LayoutDashboard, Coffee, Image, Calendar, User, LogOut, Menu, X, Home, Lightbulb, ImageIcon, Grid3X3, History } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { SocketProvider } from '../context/SocketContext';
 import NotificationBell from '../components/admin/NotificationBell';
@@ -12,6 +12,7 @@ import SpaceImagesManagement from '../components/admin/SpaceImagesManagement';
 import IdeasManagement from '../components/admin/IdeasManagement';
 import HeroImageManagement from '../components/admin/HeroImageManagement';
 import TableManagement from '../components/admin/TableManagement';
+import TransactionHistory from '../components/admin/TransactionHistory';
 
 const Admin = () => {
     const navigate = useNavigate();
@@ -39,11 +40,12 @@ const Admin = () => {
             case 'ideas': return <IdeasManagement />;
             case 'hero-image': return <HeroImageManagement />;
             case 'meja': return <TableManagement />;
+            case 'transactions': return <TransactionHistory />;
             default: return <DashboardOverview />;
         }
     };
 
-    const navItems = [
+    const allNavItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'menu', label: 'Menu Management', icon: Coffee },
         { id: 'meja', label: 'Table Management', icon: Grid3X3 },
@@ -52,7 +54,14 @@ const Admin = () => {
         { id: 'space-images', label: 'Space Images', icon: Home },
         { id: 'ideas', label: 'Kotak Gagasan', icon: Lightbulb },
         { id: 'reservations', label: 'Reservations', icon: Calendar },
+        { id: 'transactions', label: 'Riwayat Transaksi', icon: History },
     ];
+
+    const adminAllowedTabs = ['dashboard', 'meja', 'ideas', 'reservations'];
+
+    const navItems = user?.role === 'super_admin'
+        ? allNavItems
+        : allNavItems.filter(item => adminAllowedTabs.includes(item.id));
 
     return (
         <SocketProvider>

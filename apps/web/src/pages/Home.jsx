@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
-import { settingsApi, menuApi, mejaApi } from '../services/api';
+import { settingsApi, menuApi, mejaApi, dashboardApi } from '../services/api';
 
 const Home = () => {
     const [liveStatus, setLiveStatus] = useState({ text: 'Buka · Memuat...', color: 'bg-green-500' });
@@ -17,11 +17,12 @@ const Home = () => {
         const fetchData = async () => {
             try {
                 setIsLoading(true);
-                const [mejaStatusData, menuData, heroData, spaceData] = await Promise.all([
+                const [mejaStatusData, menuData, heroData, spaceData, popularData] = await Promise.all([
                     mejaApi.getStatus().catch(() => null),
                     menuApi.getAll().catch(() => []),
                     settingsApi.getHeroImage().catch(() => ({ heroImage: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80' })),
                     settingsApi.getSpaceImages().catch(() => ({ images: [] })),
+                    dashboardApi.getPopularMenus().catch(() => []),
                 ]);
 
                 if (mejaStatusData) {
@@ -39,9 +40,21 @@ const Home = () => {
                 if (heroData?.heroImage) setHeroImage(heroData.heroImage);
                 if (spaceData?.images) setSpaceImages(spaceData.images);
 
-                const favoriteItems = (menuData || [])
-                    .filter(item => item.available !== false)
-                    .slice(0, 5);
+                let favoriteItems = [];
+                if (popularData && popularData.length > 0) {
+                    favoriteItems = popularData
+                        .map(pop => menuData.find(m => m.id === pop.menuId))
+                        .filter(item => item && item.available !== false)
+                        .slice(0, 5);
+                }
+                
+                // Fallback to old behavior if no popular items yet
+                if (favoriteItems.length === 0) {
+                    favoriteItems = (menuData || [])
+                        .filter(item => item.available !== false)
+                        .slice(0, 5);
+                }
+                
                 setMenuItems(favoriteItems);
             } catch (err) {
                 console.error('Failed to fetch data:', err);
@@ -178,7 +191,7 @@ const Home = () => {
                             viewport={{ once: true }}
                             className="font-serif text-[32px] md:text-[40px] font-bold text-[#3E2723] mb-4 tracking-tight"
                         >
-                            Koleksi Pilihan
+                            Menu Terbaik Kami
                         </motion.h2>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
@@ -187,7 +200,7 @@ const Home = () => {
                             transition={{ delay: 0.1 }}
                             className="font-body text-[#6D4C41] text-sm md:text-base max-w-2xl mx-auto mb-10"
                         >
-                            Jelajahi biji kopi terbaik dan peralatan seduh pilihan kami untuk menyempurnakan ritual kopi Anda di rumah.
+                            Jelajahi menu terbaik pilihan kami, mulai dari kopi klasik yang memikat hingga racikan signature unik yang siap menyempurnakan momen istimewa Anda.
                         </motion.p>
 
                         {}

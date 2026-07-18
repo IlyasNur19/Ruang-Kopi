@@ -11,6 +11,7 @@ export const menuItems = pgTable('menu_items', {
     name: text('name').notNull(),
     description: text('description'),
     price: integer('price').notNull(),
+    hpp: integer('hpp').notNull().default(0), // Harga Pokok Penjualan
     image: text('image'),
     categoryId: integer('category_id').references(() => categories.id),
     available: boolean('available').notNull().default(true),
@@ -67,6 +68,7 @@ export const transaksi = pgTable('transaksi', {
     paymentMethod: text('payment_method').notNull().default('cash'),
     subtotal: integer('subtotal').notNull(),
     tax: integer('tax').notNull().default(0),
+    totalHpp: integer('total_hpp').notNull().default(0), // Total Harga Pokok Penjualan for profit calculation
     total: integer('total').notNull(),
     amountPaid: integer('amount_paid').notNull(),
     change: integer('change').notNull().default(0),
@@ -81,6 +83,7 @@ export const detailTransaksi = pgTable('detail_transaksi', {
     namaMenu: text('nama_menu').notNull(),
     qty: integer('qty').notNull(),
     harga: integer('harga').notNull(),
+    hpp: integer('hpp').notNull().default(0), // Snapshot of HPP at the time of transaction
     subtotal: integer('subtotal').notNull(),
 });
 

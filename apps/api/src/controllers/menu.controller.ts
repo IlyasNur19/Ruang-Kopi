@@ -13,6 +13,7 @@ export const menuController = {
                     name: menuItems.name,
                     description: menuItems.description,
                     price: menuItems.price,
+                    hpp: menuItems.hpp,
                     image: menuItems.image,
                     categoryId: menuItems.categoryId,
                     category: categories.name,
@@ -37,6 +38,7 @@ export const menuController = {
                     name: menuItems.name,
                     description: menuItems.description,
                     price: menuItems.price,
+                    hpp: menuItems.hpp,
                     image: menuItems.image,
                     categoryId: menuItems.categoryId,
                     category: categories.name,
@@ -60,7 +62,7 @@ export const menuController = {
 
     create: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { name, description, price, image, categoryId, available } = req.body;
+            const { name, description, price, hpp, image, categoryId, available } = req.body;
 
             const [newItem] = await db
                 .insert(menuItems)
@@ -68,6 +70,7 @@ export const menuController = {
                     name,
                     description,
                     price,
+                    hpp: hpp ?? 0,
                     image,
                     categoryId,
                     available: available ?? true,

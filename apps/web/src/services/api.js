@@ -340,6 +340,10 @@ export const dashboardApi = {
     getRecentTransactions: async (limit = 10) => {
         return apiRequest(`/dashboard/recent-transactions?limit=${limit}`);
     },
+
+    getPopularMenus: async () => {
+        return apiRequest('/dashboard/popular-menus');
+    },
 };
 
 export default {

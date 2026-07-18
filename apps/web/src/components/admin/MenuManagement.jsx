@@ -20,6 +20,7 @@ const MenuManagement = () => {
         name: '',
         description: '',
         price: '',
+        hpp: '',
         categoryId: '',
         available: true,
         image: '',
@@ -75,6 +76,7 @@ const MenuManagement = () => {
             name: '',
             description: '',
             price: '',
+            hpp: '',
             categoryId: categories[0]?.id || '',
             available: true,
             image: '',
@@ -88,6 +90,7 @@ const MenuManagement = () => {
             name: item.name,
             description: item.description || '',
             price: item.price?.toString() || '',
+            hpp: item.hpp?.toString() || '',
             categoryId: item.categoryId || '',
             available: item.available,
             image: item.image || '',
@@ -104,12 +107,15 @@ const MenuManagement = () => {
             return;
         }
 
+        const hppValue = parseInt(formData.hpp) || 0;
+
         try {
             setSaving(true);
 
             const data = {
                 name: formData.name,
                 price: priceValue,
+                hpp: hppValue,
                 available: formData.available,
             };
 
@@ -229,7 +235,7 @@ const MenuManagement = () => {
                                     <TableHead className="w-[100px]">ID</TableHead>
                                     <TableHead>NAME</TableHead>
                                     <TableHead>CATEGORY</TableHead>
-                                    <TableHead>PRICE</TableHead>
+                                    <TableHead>PRICE & HPP</TableHead>
                                     <TableHead>STATUS</TableHead>
                                     <TableHead className="text-right">ACTIONS</TableHead>
                                 </TableRow>
@@ -251,7 +257,13 @@ const MenuManagement = () => {
                                                 {getCategoryName(item.categoryId)}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell>Rp {parseInt(item.price).toLocaleString('id-ID')}</TableCell>
+                                        <TableCell>
+                                            <div className="font-medium text-green-700">Rp {parseInt(item.price).toLocaleString('id-ID')}</div>
+                                            <div className="text-xs text-red-600 mt-1">HPP: Rp {parseInt(item.hpp || 0).toLocaleString('id-ID')}</div>
+                                            <div className="text-xs text-muted-foreground mt-0.5">
+                                                Margin: {item.price ? Math.round(((item.price - (item.hpp || 0)) / item.price) * 100) : 0}%
+                                            </div>
+                                        </TableCell>
                                         <TableCell>
                                             <Badge
                                                 variant={item.available ? "default" : "destructive"}
@@ -350,7 +362,7 @@ const MenuManagement = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-[#5D4037] mb-2">
-                                        Price (Rp) *
+                                        Harga Jual (Rp) *
                                     </label>
                                     <input
                                         type="number"
@@ -364,20 +376,39 @@ const MenuManagement = () => {
 
                                 <div>
                                     <label className="block text-sm font-medium text-[#5D4037] mb-2">
-                                        Category *
+                                        Harga HPP (Rp)
                                     </label>
-                                    <select
-                                        value={formData.categoryId}
-                                        onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                        required
+                                    <input
+                                        type="number"
+                                        value={formData.hpp}
+                                        onChange={(e) => setFormData({ ...formData, hpp: e.target.value })}
                                         className="w-full px-4 py-2.5 border border-[#D7CCC8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8D6E63]"
-                                    >
-                                        <option value="">Select category</option>
-                                        {categories.map(cat => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                        ))}
-                                    </select>
+                                        placeholder="15000"
+                                    />
+                                    {formData.price && formData.hpp && (
+                                        <p className="text-xs mt-1 text-green-600 font-medium">
+                                            Margin: {Math.round(((parseInt(formData.price) - parseInt(formData.hpp)) / parseInt(formData.price)) * 100)}%
+                                            (Rp {(parseInt(formData.price) - parseInt(formData.hpp)).toLocaleString('id-ID')})
+                                        </p>
+                                    )}
                                 </div>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-[#5D4037] mb-2">
+                                    Category *
+                                </label>
+                                <select
+                                    value={formData.categoryId}
+                                    onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                                    required
+                                    className="w-full px-4 py-2.5 border border-[#D7CCC8] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8D6E63]"
+                                >
+                                    <option value="">Select category</option>
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div>

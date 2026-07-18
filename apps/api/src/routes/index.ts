@@ -201,6 +201,7 @@ router.get('/dashboard/stats', authMiddleware, dashboardController.getStats);
 router.get('/dashboard/revenue-daily', authMiddleware, dashboardController.getRevenueDaily);
 router.get('/dashboard/revenue-by-type', authMiddleware, dashboardController.getRevenueByType);
 router.get('/dashboard/recent-transactions', authMiddleware, dashboardController.getRecentTransactions);
+router.get('/dashboard/popular-menus', dashboardController.getPopularMenus);
 
 const createPaymentSchema = z.object({
     reservationId: z.number().optional().nullable(),
